@@ -12,11 +12,11 @@ from shutil import rmtree
 from setuptools import find_packages, setup, Command
 
 # Package meta-data.
-NAME = 'mypackage'
+NAME = 'geonadir-upload-cli'
 DESCRIPTION = 'My short description for my project.'
-URL = 'https://github.com/me/myproject'
-EMAIL = 'me@example.com'
-AUTHOR = 'Awesome Soul'
+URL = 'https://github.com/ternaustralia/geonadir-upload-cli'
+EMAIL = 't.lan@uq.edu.au'
+AUTHOR = 'T Lan'
 REQUIRES_PYTHON = '>=3.6.0'
 VERSION = None
 LICENSE = 'MIT'
@@ -83,7 +83,7 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    py_modules=['mypackage'],
+    py_modules=['geonadir-upload-cli'],
 
     entry_points={
         'console_scripts': ['app=cli:main'],
