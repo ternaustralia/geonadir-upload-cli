@@ -34,10 +34,7 @@ def cli():
     required=False,
     help="Base url of geonadir api.",
 )
-@click.option(
-    "--token", "-t",
-    type=str,
-    required=True,
+@click.password_option(
     help="User token for authentication.",
 )
 @click.option(
@@ -61,9 +58,9 @@ def cli():
     required=False,
     help="Output csv file.",
 )
-def upload_dataset(base_url, token, dataset_name, image_location, output_csv):
+def upload_dataset(base_url, password, dataset_name, image_location, output_csv):
     logger.info(base_url)
-    token = "Token " + token
+    token = "Token " + password
     logger.info(f"Dataset name: {dataset_name}")
     logger.info(f"Images location: {image_location}")
     df = process_thread(dataset_name, image_location, base_url, token)
