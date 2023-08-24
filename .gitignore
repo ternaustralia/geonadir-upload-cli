@@ -59,3 +59,6 @@ Thumbs.db
 
 # upload record
 *.csv
+
+# test images
+testimage/
