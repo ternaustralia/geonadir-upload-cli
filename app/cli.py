@@ -56,6 +56,7 @@ def cli():
     "--item", "-i",
     type=(str, str),
     required=True,
+    multiple=True,
     help="The name of the dataset and the directory of images to be uploaded.",
 )
 @click.option(
@@ -69,11 +70,12 @@ def cli():
 def upload_dataset(base_url, password, item, output_filename):
     logger.info(base_url)
     token = "Token " + password
-    dataset_name, image_location = item
-    logger.info(f"Dataset name: {dataset_name}")
-    logger.info(f"Images location: {image_location}")
-    dataset_name_with_timestamp, df = process_thread(dataset_name, image_location, base_url, token)
-    df.to_csv(f"{output_filename}_{dataset_name_with_timestamp}.csv", index=False)
+    for i in item:
+        dataset_name, image_location = i
+        logger.info(f"Dataset name: {dataset_name}")
+        logger.info(f"Images location: {image_location}")
+        dataset_name_with_timestamp, df = process_thread(dataset_name, image_location, base_url, token)
+        df.to_csv(f"{output_filename}_{dataset_name_with_timestamp}.csv", index=False)
     # dataset_details = [(1,2)]
     # num_threads = len(dataset_details)
     # with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
