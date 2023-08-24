@@ -30,6 +30,7 @@ def cli():
 @click.option(
     "--base-url", "-u",
     default="https://api.geonadir.com",
+    show_default=True,
     type=str,
     required=False,
     help="Base url of geonadir api.",
@@ -37,34 +38,42 @@ def cli():
 @click.password_option(
     help="User token for authentication.",
 )
+# @click.option(
+#     "--dataset-name", "-n",
+#     default=0,
+#     type=str,
+#     required=True,
+#     help="The name of the dataset.",
+# )
+# @click.option(
+#     "--image-location", "-l",
+#     default=0,
+#     type=str,
+#     required=True,
+#     help="The directory of images to be uploaded.",
+# )
 @click.option(
-    "--dataset-name", "-n",
-    default=0,
-    type=str,
+    "--item", "-i",
+    type=(str, str),
     required=True,
-    help="The name of the dataset.",
+    help="The name of the dataset and the directory of images to be uploaded.",
 )
 @click.option(
-    "--image-location", "-l",
-    default=0,
-    type=str,
-    required=True,
-    help="The directory of images to be uploaded.",
-)
-@click.option(
-    "--output-csv", "-o",
-    default="output.csv",
+    "--output-filename", "-o",
+    default="output",
+    # show_default=True,
     type=str,
     required=False,
-    help="Output csv file.",
+    help="Output csv file path.",
 )
-def upload_dataset(base_url, password, dataset_name, image_location, output_csv):
+def upload_dataset(base_url, password, item, output_filename):
     logger.info(base_url)
     token = "Token " + password
+    dataset_name, image_location = item
     logger.info(f"Dataset name: {dataset_name}")
     logger.info(f"Images location: {image_location}")
-    df = process_thread(dataset_name, image_location, base_url, token)
-    df.to_csv(output_csv, index=False)
+    dataset_name_with_timestamp, df = process_thread(dataset_name, image_location, base_url, token)
+    df.to_csv(f"{output_filename}_{dataset_name_with_timestamp}.csv", index=False)
     # dataset_details = [(1,2)]
     # num_threads = len(dataset_details)
     # with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:

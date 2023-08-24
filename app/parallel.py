@@ -61,7 +61,7 @@ def process_thread(dataset_name, img_dir, base_url, token):
         # result_df["Image URL"] = result_df.apply(lambda row: image_urls[row["Image Name"]] if row["Is Image in API?"] else None, axis=1)  # TODO: what is image_urls?
     except Exception as e:
         print(e)
-    return result_df
+    return dataset_name_with_timestamp, result_df
 
 
 def extract_original_filename_from_url(url):
