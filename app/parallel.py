@@ -21,7 +21,7 @@ def process_thread(dataset_name, img_dir, base_url, token):
         pd.DataFrame: DataFrame containing upload results for each image.
     """
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")  # Get current timestamp
-    dataset_name_with_timestamp = f"{dataset_name} - {timestamp}"  # Add timestamp to dataset name
+    dataset_name_with_timestamp = f"{dataset_name}-{timestamp}"  # Add timestamp to dataset name
 
     # payload_data below can be modified to accomodate metadata information
     # {
