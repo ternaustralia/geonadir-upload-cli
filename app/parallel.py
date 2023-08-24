@@ -1,17 +1,13 @@
-import concurrent.futures
+import logging
 import os
-import re
 import time
 from datetime import datetime
-import logging
 
-import pandas as pd
-import requests
-import tqdm as tq
 from .dataset import (create_dataset, paginate_dataset_image_images,
-                     upload_images)
+                      upload_images)
 
 logger = logging.getLogger(__name__)
+
 
 def process_thread(dataset_name, img_dir, base_url, token):
     """
@@ -44,9 +40,9 @@ def process_thread(dataset_name, img_dir, base_url, token):
     # }
 
     payload_data = {
-    "dataset_name": dataset_name_with_timestamp,
-    "is_private": 0,
-    "is_published": True
+        "dataset_name": dataset_name_with_timestamp,
+        "is_private": 0,
+        "is_published": True
     }
 
     dataset_id = create_dataset(payload_data, base_url, token)
@@ -58,11 +54,20 @@ def process_thread(dataset_name, img_dir, base_url, token):
     try:
         logger.info("sleep 15s")
         print("sleep 15s")
-        # time.sleep(15)
+        time.sleep(15)
         image_names = paginate_dataset_image_images(url, [])
         print(image_names)
-        result_df["Is Image in API?"] = result_df["Image Name"].apply(lambda x: any(name.split("?")[0].split("/")[-1] in x for name in image_names))
+        result_df["Is Image in API?"] = result_df["Image Name"].apply(lambda x: any(extract_original_filename_from_url(name) in x for name in image_names))
         # result_df["Image URL"] = result_df.apply(lambda row: image_urls[row["Image Name"]] if row["Is Image in API?"] else None, axis=1)  # TODO: what is image_urls?
     except Exception as e:
         print(e)
     return result_df
+
+
+def extract_original_filename_from_url(url):
+    # url = 'https://geonadir-prod.s3.amazonaws.com/privateuploads/images/
+    # 3151-fce3304f-a253-4e91-acd9-3c2aaf876cd3/DJI_20220519122445_0024_766891.JPG
+    # ?AWSAccessKeyId=<key_id>&Signature=<sig>&Expires=1692857952'
+    url_name = url.split("?")[0].split("/")[-1]  # DJI_20220519122445_0024_766891.JPG
+    basename, ext = os.path.splitext(url_name)
+    return "_".join(basename.split("_")[:-1]) + ext  # DJI_20220519122445_0024.JPG

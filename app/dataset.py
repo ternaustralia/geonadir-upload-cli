@@ -1,8 +1,5 @@
-import concurrent.futures
 import os
-import re
 import time
-from datetime import datetime
 
 import pandas as pd
 import requests
@@ -36,7 +33,7 @@ def create_dataset(payload_data, base_url, token):
         payload += f"--kljmyvW1ndjXaOEAg4vPm6RBUqO6MC5A\r\nContent-Disposition: form-data; name=\"{key}\"\r\n\r\n{value}\r\n"
     payload += "--kljmyvW1ndjXaOEAg4vPm6RBUqO6MC5A--\r\n"
 
-    response = requests.post(reqUrl, data=payload, headers=headers)
+    response = requests.post(reqUrl, data=payload, headers=headers, timeout=60)
     response.raise_for_status()
 
     dataset_id = response.json()["id"]
@@ -78,6 +75,7 @@ def upload_images(dataset_id, img_dir, base_url, token):
                     headers=headers,
                     data=payload,
                     files={"upload_files": file},
+                    timeout=180,
                 )
 
             response_code = response.status_code
@@ -91,9 +89,7 @@ def upload_images(dataset_id, img_dir, base_url, token):
             df_list.append(df)
 
             count += 1
-            #pbar.set_description(f"Uploaded {count} file.")
             pbar.update(1)
-
 
     result_df = pd.concat(df_list, ignore_index=True)
     return result_df
@@ -110,7 +106,7 @@ def paginate_dataset_image_images(url, image_names):
     Returns:
         list: List of image names.
     """
-    response = requests.get(url)
+    response = requests.get(url, timeout=60)
     data = response.json()
     results = data["results"]
     for result in results:

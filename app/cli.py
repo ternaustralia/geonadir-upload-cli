@@ -2,15 +2,7 @@ import logging
 import os
 
 import click
-import concurrent.futures
-import os
-import re
-import time
-from datetime import datetime
 
-import pandas as pd
-import requests
-import tqdm as tq
 from .parallel import process_thread
 
 # BASE_URL = "https://api.geonadir.com"
@@ -70,10 +62,10 @@ def cli():
     help="Output csv file.",
 )
 def upload_dataset(base_url, token, dataset_name, image_location, output_csv):
-    print(base_url)
-    print(token)
-    print(dataset_name)
-    print(image_location)
+    logger.info(base_url)
+    token = "Token " + token
+    logger.info(f"Dataset name: {dataset_name}")
+    logger.info(f"Images location: {image_location}")
     df = process_thread(dataset_name, image_location, base_url, token)
     df.to_csv(output_csv, index=False)
     # dataset_details = [(1,2)]
