@@ -48,7 +48,7 @@ python -m upload_dataset --help
 ## sample output
 | **Project ID** |        **Image Name**       | **Response Code** |  **Upload Time**  | **Image Size** | **Is Image in API?** | **Image URL** |
 |:--------------:|:---------------------------:|:-----------------:|:-----------------:|----------------|----------------------|---------------|
-|      3174      | DJI_20220519122501_0041.JPG |        201        | 2.770872116088867 | 22500587       | True                 | <url>         |
+|      3174      | DJI_20220519122501_0041.JPG |        201        | 2.770872116088867 | 22500587       | True                 | (sample_url)  |
 
 
 ## Packaging 
