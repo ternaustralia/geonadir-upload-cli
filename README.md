@@ -19,12 +19,13 @@ It also creates/uploads a new git tag, automatically.
 virtualenv env
 source env/bin/activate
 pip install -r requirements.txt
-python -m upload_dataset --help
+python -m app upload-dataset --help
 ```
 
 # Running
+An example of uploading *./testimage* as dataset **test1** and *C:\tmp\testimage* as **test2** with metadata file in *sample_metadata.json*
 ```
-python -m app upload-dataset -i test1 testimage -i test2 C:\tmp\testimage -p -m sample_metadata.json -t 83c0a339c7fe47029fd5abc35c835bf08a12d0a6
+python -m app upload-dataset -i test1 testimage -i test2 C:\tmp\testimage -p -m sample_metadata.json
 ```
 
 ## sample metadata json
@@ -51,7 +52,7 @@ python -m app upload-dataset -i test1 testimage -i test2 C:\tmp\testimage -p -m 
 ## sample output
 | **Project ID** |        **Image Name**       | **Response Code** |  **Upload Time**  | **Image Size** | **Is Image in API?** | **Image URL** |
 |:--------------:|:---------------------------:|:-----------------:|:-----------------:|----------------|----------------------|---------------|
-|      3174      | DJI_20220519122501_0041.JPG |        201        | 2.770872116088867 | 22500587       | True                 | (sample_url)  |
+|      3174      | DJI_20220519122501_0041.JPG |        201        | 2.770872116088867 | 22500587       | True                 |  (image_url)  |
 
 
 ## Packaging 
