@@ -13,6 +13,7 @@ from .parallel import process_thread
 #     ('Nishon Tandukar Test - DroneMapper-RedRocks-Oblique','/content/drive/Shareddrives/Naxa Photos Sharing (Internal)/Test Data/DroneMapper-RedRocks-Oblique')
 # ]
 
+LEGAL_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
 logger = logging.getLogger(__name__)
 env = os.environ.get("DEPLOYMENT_ENV", "prod")
@@ -97,6 +98,9 @@ def upload_dataset(**kwargs):
     dataset_details = []
     for i in item:
         dataset_name, image_location = i
+        dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
+        if not dataset_name:
+            dataset_name = "untitled"
         logger.info(f"Dataset name: {dataset_name}")
         logger.info(f"Images location: {image_location}")
         if metadata_json:
