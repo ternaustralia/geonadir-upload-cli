@@ -10,6 +10,7 @@
 *.egg-info
 .env
 app/__pycache__
+build/
 
 
 # Node artifact files
@@ -57,8 +58,3 @@ Thumbs.db
 *.mov
 *.wmv
 
-# test files
-*.csv
-
-# test images
-testimage/
