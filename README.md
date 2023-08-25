@@ -23,6 +23,9 @@ python -m upload_dataset --help
 ```
 
 # Running
+```
+python -m app upload-dataset -i test1 testimage -i test2 C:\tmp\testimage -p -m sample_metadata.json -t 83c0a339c7fe47029fd5abc35c835bf08a12d0a6
+```
 
 ## sample metadata json
 ```
