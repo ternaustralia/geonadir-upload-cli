@@ -74,6 +74,7 @@ class UploadCommand(Command):
         
         sys.exit()
 
+
 setup(
     name=NAME,
     version=about['__version__'],

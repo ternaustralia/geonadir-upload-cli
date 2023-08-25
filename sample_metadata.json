@@ -1,0 +1,18 @@
+{
+    "test1": {
+        "tags": ["tag1", "tag2"],
+        "description": "test descriptuon",
+        "data_captured_by": "lan",
+        "data_credits": "credit1",
+        "institution_name": "Naxa Pvt Ltd",
+        "is_published": true,
+        "is_private": true
+    },
+    "test2": {
+        "tags": "tag2",
+        "description": "test descriptu123on",
+        "data_captured_by": "lan",
+        "data_credits": "credit2",
+        "institution_name": "Ndsf"
+    }
+}

@@ -19,8 +19,37 @@ It also creates/uploads a new git tag, automatically.
 virtualenv env
 source env/bin/activate
 pip install -r requirements.txt
-python -m app --help
+python -m upload_dataset --help
 ```
+
+# Running
+
+## sample metadata json
+```
+{
+    "test1": {
+        "tags": ["tag1", "tag2"],
+        "description": "test descriptuon",
+        "data_captured_by": "lan",
+        "data_credits": "credit1",
+        "institution_name": "Naxa Pvt Ltd",
+        "is_published": true,
+        "is_private": true
+    },
+    "test2": {
+        "tags": "tag2",
+        "description": "test descriptu123on",
+        "data_captured_by": "lan",
+        "data_credits": "credit2",
+        "institution_name": "Ndsf"
+    }
+}
+```
+## sample output
+| **Project ID** |        **Image Name**       | **Response Code** |  **Upload Time**  | **Image Size** | **Is Image in API?** | **Image URL** |
+|:--------------:|:---------------------------:|:-----------------:|:-----------------:|----------------|----------------------|---------------|
+|      3174      | DJI_20220519122501_0041.JPG |        201        | 2.770872116088867 | 22500587       | True                 | <url>         |
+
 
 ## Packaging 
 

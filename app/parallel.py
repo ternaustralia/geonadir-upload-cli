@@ -9,7 +9,7 @@ from .dataset import (create_dataset, paginate_dataset_image_images,
 logger = logging.getLogger(__name__)
 
 
-def process_thread(dataset_name, img_dir, base_url, token):
+def process_thread(dataset_name, img_dir, base_url, token, private, metadata):
     """
     Process a thread for uploading images to a dataset.
 
@@ -41,9 +41,13 @@ def process_thread(dataset_name, img_dir, base_url, token):
 
     payload_data = {
         "dataset_name": dataset_name_with_timestamp,
-        "is_private": 0,
+        "is_private": private,
         "is_published": True
     }
+    if metadata:
+        payload_data.update(**metadata)
+
+    print(payload_data)
 
     dataset_id = create_dataset(payload_data, base_url, token)
     # print(f"Uploading https://staging.geonadir.com/image-collection-details/{dataset_id}")
@@ -53,12 +57,11 @@ def process_thread(dataset_name, img_dir, base_url, token):
     result_df = upload_images(dataset_id, img_dir, base_url, token)
     try:
         logger.info("sleep 15s")
-        print("sleep 15s")
         time.sleep(15)
         image_names = paginate_dataset_image_images(url, [])
-        print(image_names)
+        logger.debug(image_names)
         result_df["Is Image in API?"] = result_df["Image Name"].apply(lambda x: any(extract_original_filename_from_url(name) in x for name in image_names))
-        # result_df["Image URL"] = result_df.apply(lambda row: image_urls[row["Image Name"]] if row["Is Image in API?"] else None, axis=1)  # TODO: what is image_urls?
+        result_df["Image URL"] = result_df["Image Name"].apply(lambda x: first_value(name if extract_original_filename_from_url(name) in x else None for name in image_names))
     except Exception as e:
         print(e)
     return dataset_name_with_timestamp, result_df
@@ -71,3 +74,7 @@ def extract_original_filename_from_url(url):
     url_name = url.split("?")[0].split("/")[-1]  # DJI_20220519122445_0024_766891.JPG
     basename, ext = os.path.splitext(url_name)
     return "_".join(basename.split("_")[:-1]) + ext  # DJI_20220519122445_0024.JPG
+
+
+def first_value(list):
+    return next((item for item in list if item is not None), None)

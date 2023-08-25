@@ -1,6 +1,7 @@
+import concurrent.futures
 import logging
 import os
-
+import json
 import click
 
 from .parallel import process_thread
@@ -15,9 +16,9 @@ from .parallel import process_thread
 
 logger = logging.getLogger(__name__)
 env = os.environ.get("DEPLOYMENT_ENV", "prod")
-log_level = logging.WARNING
+log_level = logging.INFO
 if env != "prod":
-    log_level = logging.INFO
+    log_level = logging.DEBUG
 logging.basicConfig(level=log_level)
 
 
@@ -28,6 +29,12 @@ def cli():
 
 @cli.command()
 @click.option(
+    "--dry-run",
+    is_flag=True,
+    show_default=True,
+    help="Dry-run.",
+)
+@click.option(
     "--base-url", "-u",
     default="https://api.geonadir.com",
     show_default=True,
@@ -36,51 +43,76 @@ def cli():
     help="Base url of geonadir api.",
 )
 @click.password_option(
+    "--token", "-t",
     help="User token for authentication.",
 )
-# @click.option(
-#     "--dataset-name", "-n",
-#     default=0,
-#     type=str,
-#     required=True,
-#     help="The name of the dataset.",
-# )
-# @click.option(
-#     "--image-location", "-l",
-#     default=0,
-#     type=str,
-#     required=True,
-#     help="The directory of images to be uploaded.",
-# )
+@click.option(
+    "--private/--public", "-p",
+    default=False,
+    show_default=True,
+    type=bool,
+    required=False,
+    help="Whether dataset is private.",
+)
+@click.option(
+    "--metadata", "-m",
+    type=click.Path(exists=True),
+    required=False,
+    help="Metadata json file.",
+)
 @click.option(
     "--item", "-i",
-    type=(str, str),
+    type=(str, click.Path(exists=True)),
     required=True,
     multiple=True,
     help="The name of the dataset and the directory of images to be uploaded.",
 )
-@click.option(
-    "--output-filename", "-o",
-    default="output",
-    # show_default=True,
-    type=str,
-    required=False,
-    help="Output csv file path.",
-)
-def upload_dataset(base_url, password, item, output_filename):
+def upload_dataset(**kwargs):
+    base_url = kwargs.get("base_url")
+    token = kwargs.get("token")
+    item = kwargs.get("item")
+    private = kwargs.get("private")
+    dry_run = kwargs.get("dry_run")
+    metadata_json = kwargs.get("metadata")
+
+    if dry_run:
+        logger.info("---------------------dry run---------------------")
+        logger.info(f"base_url: {base_url}")
+        logger.info(f"token: {token}")
+        logger.info(f"metadata: {metadata_json}")
+        logger.info(f"private: {private}")
+        for i in item:
+            logger.info("item:")
+            logger.info(f"\tdataset name: {i[0]}")
+            logger.info(f"\timage directory: {i[1]}")
+            logger.info(f"\toutput file: {os.getcwd()}/<dataset_name_with_timestamp>.csv")
+        return
+
     logger.info(base_url)
-    token = "Token " + password
+    token = "Token " + token
+    if metadata_json:
+        with open(metadata_json) as f:
+            metadata = json.load(f)
+        logger.info(f"metadata: {metadata_json}")
+    dataset_details = []
     for i in item:
         dataset_name, image_location = i
         logger.info(f"Dataset name: {dataset_name}")
         logger.info(f"Images location: {image_location}")
-        dataset_name_with_timestamp, df = process_thread(dataset_name, image_location, base_url, token)
-        df.to_csv(f"{output_filename}_{dataset_name_with_timestamp}.csv", index=False)
-    # dataset_details = [(1,2)]
-    # num_threads = len(dataset_details)
-    # with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
-    #     futures = [executor.submit(process_thread, *params) for params in dataset_details]
-    #     results = [future.result() for future in concurrent.futures.as_completed(futures)]
+        if metadata_json:
+            meta = metadata.get(dataset_name, None)
+            if meta:
+                logger.info(f"Metadata specified for dataset {dataset_name} in {metadata_json}")
+
+        dataset_details.append((dataset_name, image_location, base_url, token, private, meta))
+
+    num_threads = len(dataset_details)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
+        futures = [executor.submit(process_thread, *params) for params in dataset_details]
+        results = [future.result() for future in concurrent.futures.as_completed(futures)]
+        for dataset_name_with_timestamp, df in results:
+            df.to_csv(f"{dataset_name_with_timestamp}.csv", index=False)
+            logger.info(f"output file: {os.getcwd()}/{dataset_name_with_timestamp}.csv")
 
 
 if __name__ == "__main__":
