@@ -32,7 +32,7 @@ with io.open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 about = {}
 if not VERSION:
-    with open(os.path.join(here, "app", '__version__.py')) as f:
+    with open(os.path.join(here, "geonadir_upload_cli", '__version__.py')) as f:
         exec(f.read(), about)
 else:
     about['__version__'] = VERSION
@@ -84,10 +84,10 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    py_modules=['app'],
+    py_modules=['geonadir_upload_cli'],
 
     entry_points={
-        'console_scripts': ['geonadir-upload=app.cli:cli'],
+        'console_scripts': ['geonadir-upload=geonadir_upload_cli.cli:cli'],
     },
     install_requires=REQUIRED,
     include_package_data=True,
