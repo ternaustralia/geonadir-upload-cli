@@ -1,0 +1,58 @@
+[build-system]
+requires = [
+    "setuptools>=45",
+    "wheel",
+    "setuptools_scm>=6.2",
+    "setuptools_scm_semver"
+]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "geonadir-upload-cli"
+description = "My short description for my project."
+readme = "README.md"
+requires-python = ">=3.8.0"  # >= 3.6.0
+license = {text = "MIT"}  # Apache 2.0 ?
+authors = [
+    { name = "T Lan", email = "t.lan@uq.edu.au" },
+]
+keywords=[]
+dependencies = [
+    "click",
+    "pandas",
+    "requests",  # >=2.21.0 requests-toolbelt>=0.8.0
+    "tqdm"       # >=4.19.7
+]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    # "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3"
+]
+
+dynamic = ["version"]
+
+[project.urls]
+homepage = "https://github.com/ternaustralia/geonadir-upload-cli"
+
+[project.scripts]
+geonadir-upload = "geonadir_upload_cli.cli:cli"
+
+
+[tool.setuptools]
+zip-safe = false
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools_scm]
+write_to = "src/geonadir_upload_cli/__version__.py"
+fallback_version = "0.0.0.dev0"
+version_scheme = "guess-next-dev"
+# version_scheme = "python-simplified-semver"
+# version_scheme = "release-branch-semver"
+
+
+# version_scheme = "guess-next-semver"
+# local_scheme = "get-local-empty"%
