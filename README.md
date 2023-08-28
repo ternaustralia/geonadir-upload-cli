@@ -2,15 +2,15 @@
 
 A starting point for building Python Command Line Applications.
 
-## About 
+## About
 
-This project serves as a starting point to developing command line modules with Python. It is structured in such a way that 
-when we call the module it executes the main method in `app/cli.py`. This is typically where you would want to add 
+This project serves as a starting point to developing command line modules with Python. It is structured in such a way that
+when we call the module it executes the main method in `app/cli.py`. This is typically where you would want to add
 your own logic.
 
-The setup.py file includes some advanced patterns and best 
-practices for setup.py, as well as some commented–out nice–to–haves. For example, it provides a `python 
-setup.py upload` command, which creates a universal wheel (and sdist) and uploads your package to PyPi using Twine. 
+The setup.py file includes some advanced patterns and best
+practices for setup.py, as well as some commented–out nice–to–haves. For example, it provides a `python
+setup.py upload` command, which creates a universal wheel (and sdist) and uploads your package to PyPi using Twine.
 It also creates/uploads a new git tag, automatically.
 
 ## Setup
@@ -18,14 +18,14 @@ It also creates/uploads a new git tag, automatically.
 ```
 virtualenv env
 source env/bin/activate
-pip install -r requirements.txt
-python -m app upload-dataset --help
+pip install .
+geonadir-upload --help
 ```
 
 # Running
 An example of uploading *./testimage* as dataset **test1** and *C:\tmp\testimage* as **test2** with metadata file in *sample_metadata.json*
 ```
-python -m app upload-dataset -i test1 testimage -i test2 C:\tmp\testimage -p -m sample_metadata.json
+geonadir-upload -i test1 testimage -i test2 C:\tmp\testimage -p -m sample_metadata.json
 ```
 
 ## sample metadata json
@@ -55,9 +55,11 @@ python -m app upload-dataset -i test1 testimage -i test2 C:\tmp\testimage -p -m 
 |      3174      | DJI_20220519122501_0041.JPG |        201        | 2.770872116088867 | 22500587       | True                 |  (image_url)  |
 
 
-## Packaging 
+## Packaging
 
-Update `setup.py` with your details and then run `python setup.py upload` to package for distribution on PyPi.
+Ensure `setuptool`, `pip`, `wheel` and `build` are up to date.
+To build source and wheel package use `python -m build`.
+To upload package to PyPi use `twine`.
 
 ## Contributing
 
