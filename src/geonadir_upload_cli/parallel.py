@@ -54,7 +54,7 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata):
     # print()
     url = f"https://api.geonadir.com/api/uploadfiles/?page=1&project_id={dataset_id}"
 
-    result_df = upload_images(dataset_id, img_dir, base_url, token)
+    result_df = upload_images(dataset_name_with_timestamp, dataset_id, img_dir, base_url, token)
     try:
         logger.info("sleep 15s")
         time.sleep(15)

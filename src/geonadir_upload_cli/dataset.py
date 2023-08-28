@@ -40,7 +40,7 @@ def create_dataset(payload_data, base_url, token):
     return dataset_id
 
 
-def upload_images(dataset_id, img_dir, base_url, token):
+def upload_images(dataset_name, dataset_id, img_dir, base_url, token):
     """
     Upload images from a directory to a dataset.
 
@@ -83,7 +83,14 @@ def upload_images(dataset_id, img_dir, base_url, token):
             end_time = time.time()
             upload_time = end_time - start_time
             df = pd.DataFrame(
-                {"Project ID": dataset_id, "Image Name": file_path, "Response Code": response_code, "Upload Time": upload_time, "Image Size": file_size},
+                {
+                    "Project ID": dataset_id,
+                    "Dataset Name": dataset_name,
+                    "Image Name": file_path,
+                    "Response Code": response_code,
+                    "Upload Time": upload_time,
+                    "Image Size": file_size
+                },
                 index=[0]
             )
             df_list.append(df)
