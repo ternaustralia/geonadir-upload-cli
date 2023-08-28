@@ -1,25 +1,22 @@
-# python-cli-template
-
-A starting point for building Python Command Line Applications.
+# geonadir_upload_cli
 
 ## About
 
-This project serves as a starting point to developing command line modules with Python. It is structured in such a way that
-when we call the module it executes the main method in `app/cli.py`. This is typically where you would want to add
-your own logic.
-
-The setup.py file includes some advanced patterns and best
-practices for setup.py, as well as some commented–out nice–to–haves. For example, it provides a `python
-setup.py upload` command, which creates a universal wheel (and sdist) and uploads your package to PyPi using Twine.
-It also creates/uploads a new git tag, automatically.
+This package is for uploading datasets to geonadir. You can use it to upload multiple datasets at one time with metadata specified for any or all of them.
 
 ## Setup
+After cloning this repo, run the commands below to install this package.
 
 ```
-virtualenv env
-source env/bin/activate
-pip install .
-geonadir-upload --help
+(virtualenv env)
+(source env/bin/activate)
+cd your/repo/directory/geonadir-upload-cli
+pip install -e .
+```
+
+You can run this cli tool at any location.
+```
+geonadir-upload upload-dataset --help
 ```
 
 # Running
@@ -27,6 +24,7 @@ An example of uploading *./testimage* as dataset **test1** and *C:\tmp\testimage
 ```
 geonadir-upload -i test1 testimage -i test2 C:\tmp\testimage -p -m sample_metadata.json
 ```
+The final name of the dataset will be the dataset name specified by user plus the uploading timestamp, e.g., **test1 - 20230825115634**
 
 ## sample metadata json
 ```
@@ -52,7 +50,8 @@ geonadir-upload -i test1 testimage -i test2 C:\tmp\testimage -p -m sample_metada
 ## sample output
 | **Project ID** |        **Image Name**       | **Response Code** |  **Upload Time**  | **Image Size** | **Is Image in API?** | **Image URL** |
 |:--------------:|:---------------------------:|:-----------------:|:-----------------:|----------------|----------------------|---------------|
-|      3174      | DJI_20220519122501_0041.JPG |        201        | 2.770872116088867 | 22500587       | True                 |  (image_url)  |
+|      3174      | DJI_20220519122501_0041.JPG |        201        | 2.770872116088867 |    22500587    |         True         |  (image_url)  |
+|      ...       |             ...             |        ...        |        ...        |      ...       |         ...          |      ...      |
 
 
 ## Packaging
