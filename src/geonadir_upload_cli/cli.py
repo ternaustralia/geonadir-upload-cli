@@ -71,6 +71,12 @@ def cli():
     help="Metadata json file.",
 )
 @click.option(
+    "--output-folder", "-o",
+    type=click.Path(exists=True),
+    required=False,
+    help="Directory where output file will be.",
+)
+@click.option(
     "--item", "-i",
     type=(str, click.Path(exists=True)),
     required=True,
@@ -84,6 +90,9 @@ def upload_dataset(**kwargs):
     private = kwargs.get("private")
     dry_run = kwargs.get("dry_run")
     metadata_json = kwargs.get("metadata")
+    output_dir = kwargs.get("output_folder", os.getcwd())
+    if not output_dir:
+        output_dir = os.getcwd()
 
     if dry_run:
         logger.info("---------------------dry run---------------------")
@@ -93,9 +102,11 @@ def upload_dataset(**kwargs):
         logger.info(f"private: {private}")
         for i in item:
             logger.info("item:")
-            logger.info(f"\tdataset name: {i[0]}")
-            logger.info(f"\timage directory: {i[1]}")
-            logger.info(f"\toutput file: {os.getcwd()}/<dataset_name_with_timestamp>.csv")
+            dataset_name, image_location = i
+            dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
+            logger.info(f"\tdataset name: {dataset_name}")
+            logger.info(f"\timage location: {image_location}")
+            logger.info(f"\toutput file: {os.path.join(output_dir, '<dataset_name_with_timestamp>.csv')}")
         return
 
     logger.info(base_url)
@@ -125,8 +136,8 @@ def upload_dataset(**kwargs):
         futures = [executor.submit(process_thread, *params) for params in dataset_details]
         results = [future.result() for future in concurrent.futures.as_completed(futures)]
         for dataset_name_with_timestamp, df in results:
-            df.to_csv(f"{dataset_name_with_timestamp}.csv", index=False)
-            logger.info(f"output file: {os.getcwd()}/{dataset_name_with_timestamp}.csv")
+            df.to_csv(f"{os.path.join(output_dir, dataset_name_with_timestamp)}.csv", index=False)
+            logger.info(f"output file: {os.path.join(output_dir, dataset_name_with_timestamp)}.csv")
 
 
 if __name__ == "__main__":
