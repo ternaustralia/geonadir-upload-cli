@@ -2,7 +2,7 @@
 
 ## About
 
-This package is for uploading datasets to geonadir. You can use it to upload multiple datasets at one time with metadata specified for any or all of them.
+This package is for uploading datasets to Geonadir. You can use it to upload multiple datasets at one time with metadata specified for any or all of them.
 
 ## Setup
 After cloning this repo, run the commands below to install this package.
@@ -25,7 +25,7 @@ An example of uploading *./testimage* as dataset **test1** and *C:\tmp\testimage
 geonadir-upload -i test1 testimage -i test2 C:\tmp\testimage -p -m sample_metadata.json
 ```
 The metadata specified in the json file will override the global settings, e.g. is_private.  
-The final name of the dataset will be the dataset name specified by user plus the uploading timestamp, e.g., **test1 - 20230825115634**
+The final dataset name on Geonadir ui will be the name specified by user plus the uploading timestamp, e.g., **test1-20230825115634**
 
 ## sample metadata json
 ```
