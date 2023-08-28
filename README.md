@@ -24,7 +24,7 @@ An example of uploading *./testimage* as dataset **test1** and *C:\tmp\testimage
 ```
 geonadir-upload -i test1 testimage -i test2 C:\tmp\testimage -p -m sample_metadata.json
 ```
-The metadata specified in the json file will override the global settings, e.g. is_private.
+The metadata specified in the json file will override the global settings, e.g. is_private.  
 The final name of the dataset will be the dataset name specified by user plus the uploading timestamp, e.g., **test1 - 20230825115634**
 
 ## sample metadata json
