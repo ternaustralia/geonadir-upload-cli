@@ -69,8 +69,8 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata):
 
 def extract_original_filename_from_url(url):
     # url = 'https://geonadir-prod.s3.amazonaws.com/privateuploads/images/
-    # 3151-fce3304f-a253-4e91-acd9-3c2aaf876cd3/DJI_20220519122445_0024_766891.JPG
-    # ?AWSAccessKeyId=<key_id>&Signature=<sig>&Expires=1692857952'
+    #   3151-fce3304f-a253-4e91-acd9-3c2aaf876cd3/DJI_20220519122445_0024_766891.JPG
+    #   ?AWSAccessKeyId=<key_id>&Signature=<sig>&Expires=1692857952'
     url_name = url.split("?")[0].split("/")[-1]  # DJI_20220519122445_0024_766891.JPG
     basename, ext = os.path.splitext(url_name)
     return "_".join(basename.split("_")[:-1]) + ext  # DJI_20220519122445_0024.JPG
