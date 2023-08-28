@@ -74,7 +74,7 @@ def cli():
     "--output-folder", "-o",
     type=click.Path(exists=True),
     required=False,
-    help="Directory where output file will be.",
+    help="Directory where output file will be. Default is the current path of your terminal.",
 )
 @click.option(
     "--item", "-i",
