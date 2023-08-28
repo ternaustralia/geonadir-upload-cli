@@ -14,8 +14,13 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
     Process a thread for uploading images to a dataset.
 
     Args:
-        dataset_name (str): Name of the dataset.
+        dataset_name (str): Name of the dataset to upload images to.
+        dataset_id (str): ID of the dataset to upload images to.
         img_dir (str): Directory path where the images are located.
+        base_url (str): Base url of Geonadir api.
+        token (str): User token.
+        complete (str): Whether to trigger orthomosaic processing after finishing uploading.
+        metadata (str): Metadata json file directory.
 
     Returns:
         pd.DataFrame: DataFrame containing upload results for each image.
@@ -68,13 +73,30 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
 
 
 def extract_original_filename_from_url(url):
-    # url = 'https://geonadir-prod.s3.amazonaws.com/privateuploads/images/
-    #   3151-fce3304f-a253-4e91-acd9-3c2aaf876cd3/DJI_20220519122445_0024_766891.JPG
-    #   ?AWSAccessKeyId=<key_id>&Signature=<sig>&Expires=1692857952'
+    """Extract the original file name from Geonadir image url.
+    for url = 'https://geonadir-prod.s3.amazonaws.com/privateuploads/images/ \
+        3151-fce3304f-a253-4e91-acd9-3c2aaf876cd3/DJI_20220519122445_0024_766891.JPG \
+        ?AWSAccessKeyId=<key_id>&Signature=<sig>&Expires=1692857952',
+    the original file name is DJI_20220519122445_0024.JPG
+
+    Args:
+        url (str): image url
+
+    Returns:
+        name: the name of the original image
+    """    
     url_name = url.split("?")[0].split("/")[-1]  # DJI_20220519122445_0024_766891.JPG
     basename, ext = os.path.splitext(url_name)
     return "_".join(basename.split("_")[:-1]) + ext  # DJI_20220519122445_0024.JPG
 
 
 def first_value(list):
+    """Extract the first non-None value of a list.
+
+    Args:
+        list (list): list
+
+    Returns:
+        value: non-None value
+    """
     return next((item for item in list if item is not None), None)

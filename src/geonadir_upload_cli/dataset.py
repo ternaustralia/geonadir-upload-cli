@@ -45,8 +45,12 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token, complete):
     Upload images from a directory to a dataset.
 
     Args:
+        dataset_name (str): Name of the dataset to upload images to.
         dataset_id (str): ID of the dataset to upload images to.
         img_dir (str): Directory path where the images are located.
+        base_url (str): Base url of Geonadir api.
+        token (str): User token.
+        complete (str): Whether to trigger orthomosaic processing after finishing uploading.
 
     Returns:
         pd.DataFrame: DataFrame containing upload results for each image.
