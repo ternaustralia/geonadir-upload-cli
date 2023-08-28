@@ -57,7 +57,7 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token):
     count = 0
     df_list = []
 
-    with tq.tqdm(total=len(file_list), ncols=200,position=0) as pbar:
+    with tq.tqdm(total=len(file_list), position=0) as pbar:
         for file_path in file_list:
 
             file_size = os.path.getsize(os.path.join(img_dir, file_path))
@@ -97,6 +97,19 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token):
 
             count += 1
             pbar.update(1)
+
+    headers = {
+        "authorization": token
+    }
+
+    payload = {"dataset_id": dataset_id, "flag": "upload_completed"}
+
+    response = requests.post(
+        f"{base_url}/api/utility/dataset-actions/",
+        headers=headers,
+        data=payload,
+        timeout=180,
+    )
 
     result_df = pd.concat(df_list, ignore_index=True)
     return result_df
