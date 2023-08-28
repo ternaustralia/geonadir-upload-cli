@@ -112,6 +112,7 @@ def upload_dataset(**kwargs):
             dataset_name = "untitled"
         logger.info(f"Dataset name: {dataset_name}")
         logger.info(f"Images location: {image_location}")
+        meta = None
         if metadata_json:
             meta = metadata.get(dataset_name, None)
             if meta:
