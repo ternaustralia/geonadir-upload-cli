@@ -6,13 +6,6 @@ import click
 
 from .parallel import process_thread
 
-# BASE_URL = "https://api.geonadir.com"
-# TOKEN_STAG = "Token dhf892hfbn9472vg"
-# dataset_details = [
-#     ('Lan testing','/content/drive/MyDrive/image'),
-#     ('Nishon Tandukar Test - DroneMapper-RedRocks-Oblique','/content/drive/Shareddrives/Naxa Photos Sharing (Internal)/Test Data/DroneMapper-RedRocks-Oblique')
-# ]
-
 LEGAL_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
 logger = logging.getLogger(__name__)
