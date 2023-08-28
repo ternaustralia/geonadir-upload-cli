@@ -3,9 +3,9 @@ import logging
 import os
 import json
 import click
+from importlib.metadata import version
 
 from .parallel import process_thread
-from .__version__ import version
 
 LEGAL_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
@@ -20,7 +20,7 @@ logging.basicConfig(level=log_level)
 def print_version(ctx, param, value):
     if not value or ctx.resilient_parsing:
         return
-    click.echo(f'Version {version}')
+    click.echo(f'Version: {version("geonadir-upload-cli")}')
     ctx.exit()
 
 
