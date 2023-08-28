@@ -90,7 +90,7 @@ def upload_dataset(**kwargs):
     private = kwargs.get("private")
     dry_run = kwargs.get("dry_run")
     metadata_json = kwargs.get("metadata")
-    output_dir = kwargs.get("output_folder", os.getcwd())
+    output_dir = kwargs.get("output_folder")
     if not output_dir:
         output_dir = os.getcwd()
 
