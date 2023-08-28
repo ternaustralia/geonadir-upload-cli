@@ -84,7 +84,7 @@ def cli():
     help="The name of the dataset and the directory of images to be uploaded.",
 )
 @click.option(
-    "--complete",
+    "--complete", "-c",
     default=False,
     show_default=True,
     type=bool,
@@ -99,7 +99,7 @@ def upload_dataset(**kwargs):
     dry_run = kwargs.get("dry_run")
     metadata_json = kwargs.get("metadata")
     output_dir = kwargs.get("output_folder")
-    complete = kwargs.get("complete")  # TODO
+    complete = kwargs.get("complete")
     if not output_dir:
         output_dir = os.getcwd()
 
@@ -109,6 +109,7 @@ def upload_dataset(**kwargs):
         logger.info(f"token: {token}")
         logger.info(f"metadata: {metadata_json}")
         logger.info(f"private: {private}")
+        logger.info(f"complete: {complete}")
         for i in item:
             logger.info("item:")
             dataset_name, image_location = i
@@ -138,7 +139,7 @@ def upload_dataset(**kwargs):
             if meta:
                 logger.info(f"Metadata specified for dataset {dataset_name} in {metadata_json}")
 
-        dataset_details.append((dataset_name, image_location, base_url, token, private, meta))
+        dataset_details.append((dataset_name, image_location, base_url, token, private, meta, complete))
 
     num_threads = len(dataset_details)
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
@@ -147,6 +148,8 @@ def upload_dataset(**kwargs):
         for dataset_name_with_timestamp, df in results:
             df.to_csv(f"{os.path.join(output_dir, dataset_name_with_timestamp)}.csv", index=False)
             logger.info(f"output file: {os.path.join(output_dir, dataset_name_with_timestamp)}.csv")
+    
+    logger.info(f"Orthomosaic triggered: {complete}")
 
 
 if __name__ == "__main__":

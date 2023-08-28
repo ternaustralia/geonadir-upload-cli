@@ -40,7 +40,7 @@ def create_dataset(payload_data, base_url, token):
     return dataset_id
 
 
-def upload_images(dataset_name, dataset_id, img_dir, base_url, token):
+def upload_images(dataset_name, dataset_id, img_dir, base_url, token, complete):
     """
     Upload images from a directory to a dataset.
 
@@ -98,18 +98,19 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token):
             count += 1
             pbar.update(1)
 
-    headers = {
-        "authorization": token
-    }
+    if complete:
+        headers = {
+            "authorization": token
+        }
 
-    payload = {"dataset_id": dataset_id, "flag": "upload_completed"}
+        payload = {"dataset_id": dataset_id, "flag": "upload_completed"}
 
-    response = requests.post(
-        f"{base_url}/api/utility/dataset-actions/",
-        headers=headers,
-        data=payload,
-        timeout=180,
-    )
+        response = requests.post(
+            f"{base_url}/api/utility/dataset-actions/",
+            headers=headers,
+            data=payload,
+            timeout=180,
+        )
 
     result_df = pd.concat(df_list, ignore_index=True)
     return result_df
