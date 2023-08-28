@@ -5,6 +5,7 @@ import json
 import click
 
 from .parallel import process_thread
+from .__version__ import version
 
 LEGAL_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
@@ -16,12 +17,27 @@ if env != "prod":
 logging.basicConfig(level=log_level)
 
 
+def print_version(ctx, param, value):
+    if not value or ctx.resilient_parsing:
+        return
+    click.echo(f'Version {version}')
+    ctx.exit()
+
+
 @click.group()
 def cli():
     pass
 
 
 @cli.command()
+@click.option(
+    '--version',
+    is_flag=True,
+    callback=print_version,
+    expose_value=False,
+    is_eager=True,
+    help="Package version.",
+)
 @click.option(
     "--dry-run",
     is_flag=True,
