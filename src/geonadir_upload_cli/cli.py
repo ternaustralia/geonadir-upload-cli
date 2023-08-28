@@ -83,6 +83,14 @@ def cli():
     multiple=True,
     help="The name of the dataset and the directory of images to be uploaded.",
 )
+@click.option(
+    "--complete",
+    default=False,
+    show_default=True,
+    type=bool,
+    required=False,
+    help="Whether post the uploading complete message to trigger the orthomosaic call.",
+)
 def upload_dataset(**kwargs):
     base_url = kwargs.get("base_url")
     token = kwargs.get("token")
@@ -91,6 +99,7 @@ def upload_dataset(**kwargs):
     dry_run = kwargs.get("dry_run")
     metadata_json = kwargs.get("metadata")
     output_dir = kwargs.get("output_folder")
+    complete = kwargs.get("complete")  # TODO
     if not output_dir:
         output_dir = os.getcwd()
 
