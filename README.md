@@ -18,9 +18,55 @@ You can run this cli tool at any location. Call below command for detail.
 ```
 geonadir-upload upload-dataset --help
 ```
+## option details
+Usage: geonadir-upload upload-dataset [OPTIONS]
 
+Options:
+
+- `--version`: show the version of this tool without any other action.
+
+- `--dry-run`: show all information of this run without actual running.
+
+- `-u, --base-url`: the base url of geonadir api. 
+
+    - Default is https://api.geonadir.com
+
+    - usually leave default
+
+- `-t, --token`: the user token for authentication. 
+
+    - When not specified in command, there will be a password prompt for it. (recommended for security’s sake)
+
+- `-p, --private / --public`: whether datasets are private.
+
+    - Default is public.
+
+    - This option is applied to all datasets in a single run. Use metadata if some of the datasets need to be set differently.
+
+- `-m, --metadata`: the path of metadata json file.
+
+    - the path must exist, otherwise error raised
+
+- `-o, --output-folder`: the folder to put output csv file in.
+
+    - the path must exist, otherwise error raised
+
+- `-c, --complete`: whether to trigger the orthomosaic processing once uploading is finished.
+
+    - Default is false.
+
+    - This option is applied to all datasets in a single run.
+
+- `-i, --item`: the name of the dataset and the path of the images
+
+    - this is a multiple option. user can upload multiple datasets in one command by e.g. 
+`... -i dataset1 path1 -i dataset2 path2 ...`
+
+all path(s) must exist, otherwise error raised
+
+the final dataset name on Geonadir UI will be the name specified here plus the uploading timestamp, e.g., test1-20230825115634
 # Running
-An example of uploading *./testimage* as dataset **test1** and *C:\tmp\testimage* as **test2** with metadata file in *sample_metadata.json*
+An example of uploading `./testimage` as dataset **test1** and `C:\tmp\testimage` as **test2** with metadata file in *sample_metadata.json*
 ```
 geonadir-upload -i test1 testimage -i test2 C:\tmp\testimage -p -m sample_metadata.json
 ```
