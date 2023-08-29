@@ -107,12 +107,15 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token, complete):
             "authorization": token
         }
 
-        payload = {"dataset_id": dataset_id, "flag": "upload_completed"}
+        payload = {
+            'dataset_id': (None, '3198'),
+            'flag': (None, 'upload_completed'),
+        }
 
         response = requests.post(
             f"{base_url}/api/utility/dataset-actions/",
             headers=headers,
-            data=payload,
+            files=payload,
             timeout=180,
         )
 
