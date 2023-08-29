@@ -66,11 +66,11 @@ Options:
 
 the final dataset name on Geonadir UI will be the name specified here plus the uploading timestamp, e.g., test1-20230825115634
 # Running
-An example of uploading `./testimage` as dataset **test1** and `C:\tmp\testimage` as **test2** with metadata file in `./sample_metadata.json`
+An example of privately uploading `./testimage` as dataset **test1** and `C:\tmp\testimage` as **test2** with metadata file in `./sample_metadata.json`, and trigger the orthomosaic process when uploading is finished:
 ```
 geonadir-upload -i test1 testimage -i test2 C:\tmp\testimage -p -m sample_metadata.json
 ```
-The metadata specified in the json file will override the global settings, e.g. is_private.  
+The metadata specified in the json file will override the global settings, e.g. `is_private`.  
 The final dataset name on Geonadir ui will be the name specified by user plus the uploading timestamp, e.g., **test1-20230825115634**
 
 ## sample metadata json
