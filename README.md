@@ -20,7 +20,7 @@ You can run this cli tool from any location. Call below command for detail.
 geonadir-upload upload-dataset --help
 ```
 ## option details
-Usage: geonadir-upload upload-dataset [OPTIONS]
+Usage: `geonadir-upload upload-dataset [OPTIONS]`
 
 Options:
 
@@ -60,7 +60,7 @@ Options:
 
 - `-i, --item`: the name of the dataset and the path of the images
 
-    - this is a multiple option. user can upload multiple datasets in one command by e.g. 
+    - this is a multiple option. user can upload multiple datasets in one command by e.g.  
 `... -i dataset1 path1 -i dataset2 path2 ...`
 
     - all path(s) must exist, otherwise error raised
