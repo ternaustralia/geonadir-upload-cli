@@ -62,11 +62,11 @@ Options:
     - this is a multiple option. user can upload multiple datasets in one command by e.g. 
 `... -i dataset1 path1 -i dataset2 path2 ...`
 
-all path(s) must exist, otherwise error raised
+    - all path(s) must exist, otherwise error raised
 
 the final dataset name on Geonadir UI will be the name specified here plus the uploading timestamp, e.g., test1-20230825115634
 # Running
-An example of uploading `./testimage` as dataset **test1** and `C:\tmp\testimage` as **test2** with metadata file in *sample_metadata.json*
+An example of uploading `./testimage` as dataset **test1** and `C:\tmp\testimage` as **test2** with metadata file in `./sample_metadata.json`
 ```
 geonadir-upload -i test1 testimage -i test2 C:\tmp\testimage -p -m sample_metadata.json
 ```
