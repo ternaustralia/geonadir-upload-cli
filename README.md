@@ -8,6 +8,7 @@ This package is for uploading datasets to Geonadir. You can use it to upload mul
 After cloning this repo, run the commands below to install this package.
 
 ```
+# create a virtual env before installing if you prefer
 (virtualenv env)
 (source env/bin/activate)
 cd your/repo/directory/geonadir-upload-cli
