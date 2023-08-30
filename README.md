@@ -19,12 +19,14 @@ You can run this cli tool from any location. Call below command for detail.
 ```
 geonadir-upload upload-dataset --help
 ```
+Call below command for showing current version of the package.
+```
+geonadir-upload --version
+```
 ## option details
 Usage: `geonadir-upload upload-dataset [OPTIONS]`
 
 Options:
-
-- `--version`: Show the version of this tool without any other action.
 
 - `--dry-run`: Show all information of this run without actual running.
 
