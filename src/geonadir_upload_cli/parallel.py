@@ -1,7 +1,6 @@
 import logging
 import os
 import time
-from datetime import datetime
 
 from .dataset import (create_dataset, paginate_dataset_image_images,
                       upload_images)
@@ -62,14 +61,18 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
         time.sleep(15)
         image_names = paginate_dataset_image_images(url, [])
         logger.debug(image_names)
-        result_df["Is Image in API?"] = result_df["Image Name"].apply(lambda x: any(extract_original_filename_from_url(name) in x for name in image_names))
-        result_df["Image URL"] = result_df["Image Name"].apply(lambda x: first_value(name if extract_original_filename_from_url(name) in x else None for name in image_names))
-    except Exception as e:
-        print(e)
+        result_df["Is Image in API?"] = result_df["Image Name"].apply(
+            lambda x: any(original_filename(name) in x for name in image_names)
+        )
+        result_df["Image URL"] = result_df["Image Name"].apply(
+            lambda x: first_value(name if original_filename(name) in x else None for name in image_names)
+        )
+    except Exception as exc:
+        print(exc)
     return dataset_name, result_df
 
 
-def extract_original_filename_from_url(url):
+def original_filename(url):
     """Extract the original file name from Geonadir image url.
     for url = 'https://geonadir-prod.s3.amazonaws.com/privateuploads/images/ \
         3151-fce3304f-a253-4e91-acd9-3c2aaf876cd3/DJI_20220519122445_0024_766891.JPG \
@@ -87,13 +90,13 @@ def extract_original_filename_from_url(url):
     return "_".join(basename.split("_")[:-1]) + ext  # DJI_20220519122445_0024.JPG
 
 
-def first_value(list):
-    """Extract the first non-None value of a list.
+def first_value(iterable):
+    """Extract the first non-None value
 
     Args:
-        list (list): list
+        iterable (iterable): iterable object
 
     Returns:
         value: non-None value
     """
-    return next((item for item in list if item is not None), None)
+    return next((item for item in iterable if item is not None), None)

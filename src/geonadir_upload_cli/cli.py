@@ -1,9 +1,10 @@
 import concurrent.futures
+import json
 import logging
 import os
-import json
-import click
 from importlib.metadata import version
+
+import click
 
 from .parallel import process_thread
 
@@ -114,6 +115,9 @@ def upload_dataset(**kwargs):
             logger.info("item:")
             dataset_name, image_location = i
             dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
+            if not dataset_name:
+                logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
+                dataset_name = "untitled"
             logger.info(f"\tdataset name: {dataset_name}")
             logger.info(f"\timage location: {image_location}")
             if output_dir:
@@ -133,6 +137,7 @@ def upload_dataset(**kwargs):
         dataset_name, image_location = i
         dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
         if not dataset_name:
+            logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
             dataset_name = "untitled"
         logger.info(f"Dataset name: {dataset_name}")
         logger.info(f"Images location: {image_location}")
@@ -142,7 +147,9 @@ def upload_dataset(**kwargs):
             if meta:
                 logger.info(f"Metadata specified for dataset {dataset_name} in {metadata_json}")
 
-        dataset_details.append((dataset_name, image_location, base_url, token, private, meta, complete))
+        dataset_details.append(
+            (dataset_name, image_location, base_url, token, private, meta, complete)
+        )
 
     num_threads = len(dataset_details) if len(dataset_details) <= 5 else 5
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
@@ -154,7 +161,7 @@ def upload_dataset(**kwargs):
                 logger.info(f"output file: {os.path.join(output_dir, dataset_name)}.csv")
         else:
             logger.info("no output csv file")
-    
+
     logger.info(f"Orthomosaic triggered: {complete}")
 
 
