@@ -74,7 +74,6 @@ An example of privately uploading `./testimage` as dataset **test1** and `C:\tmp
 geonadir-upload -i test1 testimage -i test2 C:\tmp\testimage -p -m sample_metadata.json -o
 ```
 The metadata specified in the json file will override the global settings, e.g. `is_private`.  
-The final dataset name on Geonadir ui will be the name specified by user plus the uploading timestamp, e.g., **test1-20230825115634**
 
 ## sample metadata json
 ```
@@ -100,7 +99,7 @@ The final dataset name on Geonadir ui will be the name specified by user plus th
 ## sample output
 |   **Dataset Name**   | **Project ID** |        **Image Name**       | **Response Code** |  **Upload Time**  | **Image Size** | **Is Image in API?** | **Image URL** |
 |:--------------------:|:--------------:|:---------------------------:|:-----------------:|:-----------------:|----------------|----------------------|---------------|
-| test1-20230825115634 |      3174      | DJI_20220519122501_0041.JPG |        201        | 2.770872116088867 |    22500587    |         True         |  (image_url)  |
+|         test1        |      3174      | DJI_20220519122501_0041.JPG |        201        | 2.770872116088867 |    22500587    |         True         |  (image_url)  |
 |         ...          |      ...       |             ...             |        ...        |        ...        |      ...       |         ...          |      ...      |
 
 

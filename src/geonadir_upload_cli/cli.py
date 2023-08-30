@@ -117,7 +117,7 @@ def upload_dataset(**kwargs):
             logger.info(f"\tdataset name: {dataset_name}")
             logger.info(f"\timage location: {image_location}")
             if output_dir:
-                logger.info(f"\toutput file: {os.path.join(output_dir, '<dataset_name_with_timestamp>.csv')}")
+                logger.info(f"\toutput file: {os.path.join(output_dir, '<dataset_name>.csv')}")
             else:
                 logger.info("\tno output csv file")
         return
@@ -149,9 +149,9 @@ def upload_dataset(**kwargs):
         futures = [executor.submit(process_thread, *params) for params in dataset_details]
         results = [future.result() for future in concurrent.futures.as_completed(futures)]
         if output_dir:
-            for dataset_name_with_timestamp, df in results:
-                df.to_csv(f"{os.path.join(output_dir, dataset_name_with_timestamp)}.csv", index=False)
-                logger.info(f"output file: {os.path.join(output_dir, dataset_name_with_timestamp)}.csv")
+            for dataset_name, df in results:
+                df.to_csv(f"{os.path.join(output_dir, dataset_name)}.csv", index=False)
+                logger.info(f"output file: {os.path.join(output_dir, dataset_name)}.csv")
         else:
             logger.info("no output csv file")
     
