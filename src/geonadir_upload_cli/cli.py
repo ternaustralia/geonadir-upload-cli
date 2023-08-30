@@ -19,6 +19,9 @@ logging.basicConfig(level=log_level)
 
 
 def print_version(ctx, param, value):
+    # print(ctx.__dict__)
+    # print(param.__dict__)
+    # print(value)
     if not value or ctx.resilient_parsing:
         return
     click.echo(f'Version: {version("geonadir-upload-cli")}')
@@ -26,11 +29,6 @@ def print_version(ctx, param, value):
 
 
 @click.group()
-def cli():
-    pass
-
-
-@cli.command()
 @click.option(
     '--version',
     is_flag=True,
@@ -39,6 +37,11 @@ def cli():
     is_eager=True,
     help="Package version.",
 )
+def cli():
+    pass
+
+
+@cli.command()
 @click.option(
     "--dry-run",
     is_flag=True,
