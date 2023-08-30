@@ -52,7 +52,7 @@ Options:
 
     - Default is false.
 
-    - If flagged without specifing output folder, default is the current path of your terminal.
+    - If flagged without specifying output folder, default is the current path of your terminal.
 
     - The path must exist, otherwise error raised.
 
