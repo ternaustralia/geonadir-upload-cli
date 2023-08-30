@@ -72,9 +72,11 @@ def cli():
 )
 @click.option(
     "--output-folder", "-o",
+    is_flag=False,
+    flag_value=os.getcwd(),
     type=click.Path(exists=True),
     required=False,
-    help="Directory where output file will be. Default is the current path of your terminal.",
+    help="Whether output csv is created. Default is false. If flagged without specifing output folder, default is the current path of your terminal.",
 )
 @click.option(
     "--item", "-i",
@@ -100,8 +102,6 @@ def upload_dataset(**kwargs):
     metadata_json = kwargs.get("metadata")
     output_dir = kwargs.get("output_folder")
     complete = kwargs.get("complete")
-    if not output_dir:
-        output_dir = os.getcwd()
 
     if dry_run:
         logger.info("---------------------dry run---------------------")
@@ -116,7 +116,10 @@ def upload_dataset(**kwargs):
             dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
             logger.info(f"\tdataset name: {dataset_name}")
             logger.info(f"\timage location: {image_location}")
-            logger.info(f"\toutput file: {os.path.join(output_dir, '<dataset_name_with_timestamp>.csv')}")
+            if output_dir:
+                logger.info(f"\toutput file: {os.path.join(output_dir, '<dataset_name_with_timestamp>.csv')}")
+            else:
+                logger.info("\tno output csv file")
         return
 
     logger.info(base_url)
@@ -145,9 +148,12 @@ def upload_dataset(**kwargs):
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
         futures = [executor.submit(process_thread, *params) for params in dataset_details]
         results = [future.result() for future in concurrent.futures.as_completed(futures)]
-        for dataset_name_with_timestamp, df in results:
-            df.to_csv(f"{os.path.join(output_dir, dataset_name_with_timestamp)}.csv", index=False)
-            logger.info(f"output file: {os.path.join(output_dir, dataset_name_with_timestamp)}.csv")
+        if output_dir:
+            for dataset_name_with_timestamp, df in results:
+                df.to_csv(f"{os.path.join(output_dir, dataset_name_with_timestamp)}.csv", index=False)
+                logger.info(f"output file: {os.path.join(output_dir, dataset_name_with_timestamp)}.csv")
+        else:
+            logger.info("no output csv file")
     
     logger.info(f"Orthomosaic triggered: {complete}")
 
