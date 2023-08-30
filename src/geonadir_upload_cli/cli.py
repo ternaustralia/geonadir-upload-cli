@@ -76,7 +76,7 @@ def cli():
     flag_value=os.getcwd(),
     type=click.Path(exists=True),
     required=False,
-    help="Whether output csv is created. Default is false. If flagged without specifing output folder, default is the current path of your terminal.",
+    help="Whether output csv is created. Generate output at the specified path. Default is false. If flagged without specifing output folder, default is the current path of your terminal.",
 )
 @click.option(
     "--item", "-i",
