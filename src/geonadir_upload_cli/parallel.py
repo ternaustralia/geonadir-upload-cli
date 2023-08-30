@@ -25,9 +25,6 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
     Returns:
         pd.DataFrame: DataFrame containing upload results for each image.
     """
-    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")  # Get current timestamp
-    dataset_name_with_timestamp = f"{dataset_name}-{timestamp}"  # Add timestamp to dataset name
-
     # payload_data below can be modified to accomodate metadata information
     # {
     #     "id": 2838,
@@ -45,7 +42,7 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
     # }
 
     payload_data = {
-        "dataset_name": dataset_name_with_timestamp,
+        "dataset_name": dataset_name,
         "is_private": private,
         "is_published": True
     }
@@ -59,7 +56,7 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
     # print()
     url = f"https://api.geonadir.com/api/uploadfiles/?page=1&project_id={dataset_id}"
 
-    result_df = upload_images(dataset_name_with_timestamp, dataset_id, img_dir, base_url, token, complete)
+    result_df = upload_images(dataset_name, dataset_id, img_dir, base_url, token, complete)
     try:
         logger.info("sleep 15s")
         time.sleep(15)
@@ -69,7 +66,7 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
         result_df["Image URL"] = result_df["Image Name"].apply(lambda x: first_value(name if extract_original_filename_from_url(name) in x else None for name in image_names))
     except Exception as e:
         print(e)
-    return dataset_name_with_timestamp, result_df
+    return dataset_name, result_df
 
 
 def extract_original_filename_from_url(url):
