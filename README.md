@@ -48,7 +48,7 @@ Options:
 
     - The path must exist, otherwise error raised.
 
-- `-o, --output-folder`: Whether output csv is created.
+- `-o, --output-folder`: Whether output csv is created. Generate output at the specified path.
 
     - Default is false.
 
