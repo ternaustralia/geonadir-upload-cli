@@ -141,7 +141,7 @@ def upload_dataset(**kwargs):
 
         dataset_details.append((dataset_name, image_location, base_url, token, private, meta, complete))
 
-    num_threads = len(dataset_details)
+    num_threads = len(dataset_details) if len(dataset_details) <= 5 else 5
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
         futures = [executor.submit(process_thread, *params) for params in dataset_details]
         results = [future.result() for future in concurrent.futures.as_completed(futures)]
