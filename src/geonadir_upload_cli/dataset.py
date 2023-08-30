@@ -33,14 +33,14 @@ def create_dataset(payload_data, base_url, token):
         payload += f"--kljmyvW1ndjXaOEAg4vPm6RBUqO6MC5A\r\nContent-Disposition: form-data; name=\"{key}\"\r\n\r\n{value}\r\n"
     payload += "--kljmyvW1ndjXaOEAg4vPm6RBUqO6MC5A--\r\n"
 
-    response = requests.post(reqUrl, data=payload, headers=headers, timeout=60)
+    response = requests.post(reqUrl, data=payload, headers=headers, timeout=120)
     response.raise_for_status()
 
     dataset_id = response.json()["id"]
     return dataset_id
 
 
-def upload_images(dataset_name, dataset_id, img_dir, base_url, token, complete):
+def upload_images(dataset_name, dataset_id, img_dir, base_url, token):
     """
     Upload images from a directory to a dataset.
 
@@ -83,7 +83,7 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token, complete):
                 )
 
             response_code = response.status_code
-            # response_code = 200
+
             end_time = time.time()
             upload_time = end_time - start_time
             df = pd.DataFrame(
@@ -102,25 +102,27 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token, complete):
             count += 1
             pbar.update(1)
 
-    if complete:
-        headers = {
-            "authorization": token
-        }
-
-        payload = {
-            'dataset_id': (None, '3198'),
-            'flag': (None, 'upload_completed'),
-        }
-
-        response = requests.post(
-            f"{base_url}/api/utility/dataset-actions/",
-            headers=headers,
-            files=payload,
-            timeout=180,
-        )
-
     result_df = pd.concat(df_list, ignore_index=True)
     return result_df
+
+
+def trigger_ortho_processing(dataset_id, base_url, token):
+    headers = {
+        "authorization": token
+    }
+
+    payload = {
+        'dataset_id': (None, str(dataset_id)),
+        'flag': (None, 'upload_completed'),
+    }
+
+    response = requests.post(
+        f"{base_url}/api/utility/dataset-actions/",
+        headers=headers,
+        files=payload,
+        timeout=180,
+    )
+    response.raise_for_status()
 
 
 def paginate_dataset_image_images(url, image_names):

@@ -3,7 +3,7 @@ import os
 import time
 
 from .dataset import (create_dataset, paginate_dataset_image_images,
-                      upload_images)
+                      trigger_ortho_processing, upload_images)
 
 logger = logging.getLogger(__name__)
 
@@ -50,12 +50,15 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
 
     print(payload_data)
 
-    dataset_id = create_dataset(payload_data, base_url, token)
+    try:
+        dataset_id = create_dataset(payload_data, base_url, token)
+    except Exception as exc:
+        logger.error(f"Create dataset {dataset_name} failed: {str(exc)}")
     # print(f"Uploading https://staging.geonadir.com/image-collection-details/{dataset_id}")
     # print()
     url = f"https://api.geonadir.com/api/uploadfiles/?page=1&project_id={dataset_id}"
 
-    result_df = upload_images(dataset_name, dataset_id, img_dir, base_url, token, complete)
+    result_df = upload_images(dataset_name, dataset_id, img_dir, base_url, token)
     try:
         logger.info("sleep 15s")
         time.sleep(15)
@@ -68,7 +71,13 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
             lambda x: first_value(name if original_filename(name) in x else None for name in image_names)
         )
     except Exception as exc:
-        print(exc)
+        logger.error(f"Retrieving image status for {dataset_name} failed: {str(exc)}")
+    if complete:
+        try:
+            trigger_ortho_processing(dataset_id, base_url, token)
+        except Exception as exc:
+            logger.error(f"Triggering ortho processing for {dataset_name} failed: {str(exc)}")
+
     return dataset_name, result_df
 
 

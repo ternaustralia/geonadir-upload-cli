@@ -153,7 +153,8 @@ def upload_dataset(**kwargs):
         dataset_details.append(
             (dataset_name, image_location, base_url, token, private, meta, complete)
         )
-
+    if complete:
+        logger.info("Orthomosaic will be triggered after uploading.")
     num_threads = len(dataset_details) if len(dataset_details) <= 5 else 5
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
         futures = [executor.submit(process_thread, *params) for params in dataset_details]
@@ -164,8 +165,6 @@ def upload_dataset(**kwargs):
                 logger.info(f"output file: {os.path.join(output_dir, dataset_name)}.csv")
         else:
             logger.info("no output csv file")
-
-    logger.info(f"Orthomosaic triggered: {complete}")
 
 
 if __name__ == "__main__":
