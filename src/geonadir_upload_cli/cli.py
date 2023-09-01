@@ -124,7 +124,7 @@ def upload_dataset(**kwargs):
             logger.info(f"\tdataset name: {dataset_name}")
             logger.info(f"\timage location: {image_location}")
             if output_dir:
-                logger.info(f"\toutput file: {os.path.join(output_dir, '<dataset_name>.csv')}")
+                logger.info(f"\toutput file: {os.path.join(output_dir, f'{dataset_name}.csv')}")
             else:
                 logger.info("\tno output csv file")
         return
