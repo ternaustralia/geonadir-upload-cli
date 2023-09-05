@@ -56,6 +56,7 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
         logger.error(f"Create dataset {dataset_name} failed: {str(exc)}")
     # print(f"Uploading https://staging.geonadir.com/image-collection-details/{dataset_id}")
     # print()
+    logger.info(f"Dataset name: {dataset_name}, dataset ID: {dataset_id}")
     url = f"https://api.geonadir.com/api/uploadfiles/?page=1&project_id={dataset_id}"
 
     result_df = upload_images(dataset_name, dataset_id, img_dir, base_url, token)
