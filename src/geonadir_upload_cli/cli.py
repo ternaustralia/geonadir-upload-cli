@@ -7,6 +7,7 @@ from importlib.metadata import version
 import click
 
 from .parallel import process_thread
+from .dataset import search_datasets
 
 LEGAL_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
@@ -165,6 +166,22 @@ def upload_dataset(**kwargs):
                 logger.info(f"output file: {os.path.join(output_dir, dataset_name)}.csv")
         else:
             logger.info("no output csv file")
+
+
+@cli.command()
+@click.option(
+    "--base-url", "-u",
+    default="https://api.geonadir.com",
+    show_default=True,
+    type=str,
+    required=False,
+    help="Base url of geonadir api.",
+)
+@click.argument('search-str')
+def search_dataset(**kwargs):
+    base_url = kwargs.get("base_url")
+    search = kwargs.get("search_str")
+    print(search_datasets(search, base_url))
 
 
 if __name__ == "__main__":
