@@ -154,8 +154,21 @@ def search_datasets(search_str, base_url):
         "search": search_str
     }
 
-    response = requests.post(
+    response = requests.get(
         f"{base_url}/api/search_datasets",
+        params=payload,
+        timeout=180,
+    )
+    return response.json()
+
+
+def dataset_info(project_id, base_url):
+    payload = {
+        "project_id": project_id
+    }
+
+    response = requests.get(
+        f"{base_url}/api/metadata/",
         params=payload,
         timeout=180,
     )

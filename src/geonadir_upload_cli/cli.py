@@ -7,7 +7,7 @@ from importlib.metadata import version
 import click
 
 from .parallel import process_thread
-from .dataset import search_datasets
+from .dataset import search_datasets, dataset_info
 
 LEGAL_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
@@ -181,7 +181,23 @@ def upload_dataset(**kwargs):
 def search_dataset(**kwargs):
     base_url = kwargs.get("base_url")
     search = kwargs.get("search_str")
-    print(search_datasets(search, base_url))
+    print(json.dumps(search_datasets(search, base_url), indent=4))
+
+
+@cli.command()
+@click.option(
+    "--base-url", "-u",
+    default="https://api.geonadir.com",
+    show_default=True,
+    type=str,
+    required=False,
+    help="Base url of geonadir api.",
+)
+@click.argument('project-id')
+def get_dataset_info(**kwargs):
+    base_url = kwargs.get("base_url")
+    project_id = kwargs.get("project_id")
+    print(json.dumps(dataset_info(project_id, base_url), indent=4))
 
 
 if __name__ == "__main__":
