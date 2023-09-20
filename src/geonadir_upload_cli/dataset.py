@@ -147,3 +147,29 @@ def paginate_dataset_image_images(url, image_names):
     if next_page:
         paginate_dataset_image_images(next_page, image_names)
     return image_names
+
+
+def search_datasets(search_str, base_url):
+    payload = {
+        "search": search_str
+    }
+
+    response = requests.get(
+        f"{base_url}/api/search_datasets",
+        params=payload,
+        timeout=180,
+    )
+    return response.json()
+
+
+def dataset_info(project_id, base_url):
+    payload = {
+        "project_id": project_id
+    }
+
+    response = requests.get(
+        f"{base_url}/api/metadata/",
+        params=payload,
+        timeout=180,
+    )
+    return response.json()
