@@ -2,7 +2,7 @@
 
 ## About
 
-This package is for uploading datasets to Geonadir. You can use it to upload multiple datasets at one time with metadata specified for any or all of them.
+This package is for uploading datasets to Geonadir. You can use it to upload multiple datasets at one time with metadata specified for any or all of them. This cli tool has other functions e.g. searching for dataset or getting dataset information.
 
 ## Setup
 After cloning this repo, run the commands below to install this package.
@@ -103,6 +103,87 @@ The metadata specified in the json file will override the global settings, e.g. 
 |:--------------------:|:--------------:|:---------------------------:|:-----------------:|:-----------------:|----------------|----------------------|---------------|
 |         test1        |      3174      | DJI_20220519122501_0041.JPG |        201        | 2.770872116088867 |    22500587    |         True         |  (image_url)  |
 |         ...          |      ...       |             ...             |        ...        |        ...        |      ...       |         ...          |      ...      |
+
+## other options
+### searching for dataset
+Usage: `geonadir-upload search-dataset SEARCH_STR`
+sample usage and output:
+```
+PS C:\Users\uqtlan> geonadir-upload search-dataset SASMD
+[
+    {
+        "id": 3256,
+        "dataset_name": "SASMDD0006"
+    },
+    {
+        "id": 3198,
+        "dataset_name": "SASMDD0002"
+    },
+    {
+        "id": 3197,
+        "dataset_name": "SASMDD0003"
+    },
+    {
+        "id": 3255,
+        "dataset_name": "SASMDD0005"
+    },
+    {
+        "id": 3199,
+        "dataset_name": "SASMDD0004"
+    },
+    {
+        "id": 2837,
+        "dataset_name": "SASMDD0001"
+    }
+]
+```
+
+### getting dataset information
+Usage: `geonadir-upload get-dataset-info DATASET_ID`
+sample usage and output:
+```
+PS C:\Users\uqtlan> geonadir-upload get-dataset-info 3198
+{
+    "id": 2863,
+    "project_id": {
+        "id": 3198,
+        "user": "TERN Australia",
+        "user_id": 4865,
+        "user_image": null,
+        "project_institution_name": "",
+        "project_name": "SASMDD0002",
+        "tags": "",
+        "category": [
+            "Shrubland"
+        ],
+        "description": "TERN Landscapes, TERN Surveillance Monitoring, Stenson, M., Sparrow, B. & Lucieer, A. (2022): Drone RGB and Multispectral Imagery from TERN plots across Australia. Version 1. Terrestrial Ecosystem Research Network. (Dataset). https://portal.tern.org.au/metadata/TERN/39de90f5-49e3-4567-917c-cf3e3bc93086 Creative Commons Attribution 4.0 International Licence http://creativecommons.org/licenses/by/4.0",
+        "data_captured_by": "",
+        "latitude": -34.0123308611111,
+        "longitude": 140.591931111111,
+        "created_at": "2023-08-28T03:30:41.907924Z",
+        "captured_date": "2022-05-19T12:24:21Z",
+        "location": "Renmark West, Australia",
+        "image_count": 693,
+        "data_credits": "",
+        "is_private": false,
+        "has_ortho": true,
+        "has_dsm": true,
+        "has_dtm": true,
+        "ic_bbox": [
+            -34.01593698,
+            140.58760077,
+            -34.00872474,
+            140.59626145
+        ],
+        "ortho_size": 5071.88,
+        "raw_images_size": 15171.659
+    },
+    "uuid": "b257c851-6ecb-428e-882e-f685b663f9a9",
+    "metadata":{
+        ...
+    }
+}
+```
 
 
 ## Packaging
