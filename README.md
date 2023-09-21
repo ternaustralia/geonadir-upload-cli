@@ -107,6 +107,7 @@ The metadata specified in the json file will override the global settings, e.g. 
 ## other usages
 ### searching for dataset
 Usage: `geonadir-upload search-dataset SEARCH_STR`
+
 sample usage and output:
 ```
 PS C:\Users\uqtlan> geonadir-upload search-dataset SASMD
@@ -140,6 +141,7 @@ PS C:\Users\uqtlan> geonadir-upload search-dataset SASMD
 
 ### getting dataset information
 Usage: `geonadir-upload get-dataset-info DATASET_ID`
+
 sample usage and output:
 ```
 PS C:\Users\uqtlan> geonadir-upload get-dataset-info 3198
