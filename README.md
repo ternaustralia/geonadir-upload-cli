@@ -104,7 +104,7 @@ The metadata specified in the json file will override the global settings, e.g. 
 |         test1        |      3174      | DJI_20220519122501_0041.JPG |        201        | 2.770872116088867 |    22500587    |         True         |  (image_url)  |
 |         ...          |      ...       |             ...             |        ...        |        ...        |      ...       |         ...          |      ...      |
 
-## other options
+## other usages
 ### searching for dataset
 Usage: `geonadir-upload search-dataset SEARCH_STR`
 sample usage and output:
