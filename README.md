@@ -104,6 +104,30 @@ The metadata specified in the json file will override the global settings, e.g. 
 |         test1        |      3174      | DJI_20220519122501_0041.JPG |        201        | 2.770872116088867 |    22500587    |         True         |  (image_url)  |
 |         ...          |      ...       |             ...             |        ...        |        ...        |      ...       |         ...          |      ...      |
 
+## uploading dataset from stac catalog
+
+### command details
+
+### .netrc setting
+before uploading from stac catalog, it is critical to set up `.netrc` file for http requests authentication. Put this file in root folder with content like this or add this to existing `.netrc` file:
+```
+machine <host url>
+login <username>
+password <password>
+```
+#### example: .netrc configuration for TERN data server
+1. Create an API key if you don't have one yet:
+    1. Sign in [TERN Account](https://account.tern.org.au/).
+    2. Click on **Create API key** on the left.
+    3. Type a name for your API key and click on **Request API Key**.
+    4. Memorize the key.
+2. Once you have it, add content below to `<root folder>/.netrc` (or create one if it's not there):
+```
+machine data.tern.org.au
+login apikey
+password <apikey>  # the API key generated in the previous step
+```
+
 ## other usages
 ### searching for dataset
 Usage: `geonadir-upload search-dataset SEARCH_STR`
