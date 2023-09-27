@@ -123,7 +123,7 @@ password <password>
     4. Memorize the key.
 2. Once you have it, add content below to `<root folder>/.netrc` (or create one if it's not there).
 
-**Note**: here username is string ***apikey*** and password is the API key generated before or in the previous step.
+    **Note**: here username is string ***apikey*** and password is the API key generated before or in the previous step.
 ```
 machine data.tern.org.au
 login apikey
