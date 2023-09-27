@@ -21,6 +21,7 @@ keywords=[]
 dependencies = [
     "click",
     "pandas",
+    "pystac",
     "requests",  # >=2.21.0 requests-toolbelt>=0.8.0
     "tqdm"       # >=4.19.7
 ]

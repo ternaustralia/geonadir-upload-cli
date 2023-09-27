@@ -2,6 +2,7 @@ import concurrent.futures
 import json
 import logging
 import os
+import pystac
 
 from .parallel import process_thread
 
@@ -24,6 +25,7 @@ def normal_upload(**kwargs):
     metadata_json = kwargs.get("metadata")
     output_dir = kwargs.get("output_folder")
     complete = kwargs.get("complete")
+    root_catalog_url = kwargs.get("root_catalog_url")
 
     if dry_run:
         logger.info("---------------------dry run---------------------")
@@ -36,11 +38,26 @@ def normal_upload(**kwargs):
             logger.info("item:")
             dataset_name, image_location = i
             dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
-            if not dataset_name:
-                logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
-                dataset_name = "untitled"
-            logger.info(f"\tdataset name: {dataset_name}")
-            logger.info(f"\timage location: {image_location}")
+            if os.path.splitext(image_location)[1] == ".json":
+                try:
+                    collection = pystac.Collection.from_file(image_location)
+                    if dataset_name == "collection_title":
+                        logger.info("\tuse collection title as Geonadir dataset title.")
+                        dataset_name = collection.title
+                    if not dataset_name:
+                        logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
+                        dataset_name = "untitled"
+                except Exception as exc:
+                    logger.error(f"\t{image_location} illegal: {str(exc)}")
+                logger.info(f"\troot catalog url: {root_catalog_url}")
+                logger.info(f"\tdataset name: {dataset_name}")
+                logger.info(f"\tcollection.json location: {image_location}")
+            else:
+                if not dataset_name:
+                    logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
+                    dataset_name = "untitled"
+                logger.info(f"\tdataset name: {dataset_name}")
+                logger.info(f"\timage location: {image_location}")
             if output_dir:
                 logger.info(f"\toutput file: {os.path.join(output_dir, f'{dataset_name}.csv')}")
             else:
@@ -57,11 +74,26 @@ def normal_upload(**kwargs):
     for i in item:
         dataset_name, image_location = i
         dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
-        if not dataset_name:
-            logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
-            dataset_name = "untitled"
-        logger.info(f"Dataset name: {dataset_name}")
-        logger.info(f"Images location: {image_location}")
+        if os.path.splitext(image_location)[1] == ".json":
+            try:
+                collection = pystac.Collection.from_file(image_location)
+                if dataset_name == "collection_title":
+                    logger.info("Use collection title as Geonadir dataset title.")
+                    dataset_name = collection.title
+                if not dataset_name:
+                    logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
+                    dataset_name = "untitled"
+            except Exception as exc:
+                logger.error(f"{image_location} illegal: {str(exc)}")
+            logger.info(f"Root catalog url: {root_catalog_url}")
+            logger.info(f"Dataset name: {dataset_name}")
+            logger.info(f"collection.json location: {image_location}")
+        else:
+            if not dataset_name:
+                logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
+                dataset_name = "untitled"
+            logger.info(f"Dataset name: {dataset_name}")
+            logger.info(f"Images location: {image_location}")
         meta = None
         if metadata_json:
             meta = metadata.get(dataset_name, None)
@@ -69,7 +101,7 @@ def normal_upload(**kwargs):
                 logger.info(f"Metadata specified for dataset {dataset_name} in {metadata_json}")
 
         dataset_details.append(
-            (dataset_name, image_location, base_url, token, private, meta, complete)
+            (dataset_name, image_location, base_url, token, private, meta, complete, root_catalog_url)
         )
     if complete:
         logger.info("Orthomosaic will be triggered after uploading.")

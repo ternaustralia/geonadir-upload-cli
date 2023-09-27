@@ -49,12 +49,26 @@ def cli():
     help="Dry-run.",
 )
 @click.option(
+    "--from-collection",
+    is_flag=True,
+    show_default=True,
+    help="Dry-run.",
+)
+@click.option(
     "--base-url", "-u",
     default="https://api.geonadir.com",
     show_default=True,
     type=str,
     required=False,
     help="Base url of geonadir api.",
+)
+@click.option(
+    "--root-catalog-url", "-u",
+    default="https://data-test.tern.org.au/catalog.json",
+    show_default=True,
+    type=str,
+    required=False,
+    help="Data server url of root catalog. Applicable when uploading from collection.",
 )
 @click.password_option(
     "--token", "-t",
@@ -87,10 +101,13 @@ def cli():
     type=(str, click.Path(exists=True)),
     required=True,
     multiple=True,
-    help="The name of the dataset and the directory of images to be uploaded.",
+    help="The name of the dataset and the directory of images to be uploaded, or the name of the dataset and the directory of stac collection. \
+        Type 'collection_title' for dataset name when uploading from stac collection if you want to use title in collection.json as dataset title, \
+        e.g. ... --item collection_title ./collection.json ...",
 )
 @click.option(
     "--complete", "-c",
+    is_flag=True,
     default=False,
     show_default=True,
     type=bool,
