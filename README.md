@@ -121,11 +121,13 @@ password <password>
     2. Click on **Create API key** on the left.
     3. Type a name for your API key and click on **Request API Key**.
     4. Memorize the key.
-2. Once you have it, add content below to `<root folder>/.netrc` (or create one if it's not there):
+2. Once you have it, add content below to `<root folder>/.netrc` (or create one if it's not there).
+
+**Note**: here username is string ***apikey*** and password is the API key generated before or in the previous step.
 ```
 machine data.tern.org.au
 login apikey
-password <apikey>  # the API key generated in the previous step
+password <apikey>
 ```
 
 ## other usages
