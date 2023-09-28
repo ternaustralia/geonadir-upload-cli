@@ -5,6 +5,7 @@ import os
 import pystac
 
 from .parallel import process_thread
+from .stac import really_get_all_collections
 
 LEGAL_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
@@ -14,6 +15,16 @@ log_level = logging.INFO
 if env != "prod":
     log_level = logging.DEBUG
 logging.basicConfig(level=log_level)
+
+
+def upload_from_catalog(**kwargs):
+    catalog_file = kwargs.get("item")
+    catalog = pystac.Catalog.from_file(catalog_file)
+    collections_list = []
+    for collection in really_get_all_collections(catalog):
+        collections_list.append(("collection_title", collection.self_href))
+    kwargs["item"] = collections_list
+    normal_upload(**kwargs)
 
 
 def normal_upload(**kwargs):
@@ -58,10 +69,10 @@ def normal_upload(**kwargs):
                     dataset_name = "untitled"
                 logger.info(f"\tdataset name: {dataset_name}")
                 logger.info(f"\timage location: {image_location}")
-            if output_dir:
-                logger.info(f"\toutput file: {os.path.join(output_dir, f'{dataset_name}.csv')}")
-            else:
-                logger.info("\tno output csv file")
+        if output_dir:
+            logger.info(f"\toutput file: {os.path.join(output_dir, f'{dataset_name}.csv')}")
+        else:
+            logger.info("\tno output csv file")
         return
 
     logger.info(base_url)

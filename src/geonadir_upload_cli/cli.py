@@ -6,7 +6,7 @@ from importlib.metadata import version
 import click
 
 from .dataset import dataset_info, search_datasets
-from .upload import normal_upload
+from .upload import normal_upload, upload_from_catalog
 
 LEGAL_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
@@ -49,12 +49,6 @@ def cli():
     help="Dry-run.",
 )
 @click.option(
-    "--from-collection",
-    is_flag=True,
-    show_default=True,
-    help="Dry-run.",
-)
-@click.option(
     "--base-url", "-u",
     default="https://api.geonadir.com",
     show_default=True,
@@ -63,12 +57,12 @@ def cli():
     help="Base url of geonadir api.",
 )
 @click.option(
-    "--root-catalog-url", "-u",
+    "--root-catalog-url", "-r",
     default="https://data-test.tern.org.au/catalog.json",
     show_default=True,
     type=str,
     required=False,
-    help="Data server url of root catalog. Applicable when uploading from collection.",
+    help="Data server url of root catalog. Necessary when uploading from STAC object.",
 )
 @click.password_option(
     "--token", "-t",
@@ -116,6 +110,74 @@ def cli():
 )
 def upload_dataset(**kwargs):
     normal_upload(**kwargs)
+
+
+@cli.command()
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    show_default=True,
+    help="Dry-run.",
+)
+@click.option(
+    "--base-url", "-u",
+    default="https://api.geonadir.com",
+    show_default=True,
+    type=str,
+    required=False,
+    help="Base url of geonadir api.",
+)
+@click.option(
+    "--root-catalog-url", "-r",
+    default="https://data-test.tern.org.au/catalog.json",
+    show_default=True,
+    type=str,
+    required=False,
+    help="Data server url of root catalog. Necessary when uploading from STAC object.",
+)
+@click.password_option(
+    "--token", "-t",
+    help="User token for authentication.",
+)
+@click.option(
+    "--private/--public", "-p",
+    default=False,
+    show_default=True,
+    type=bool,
+    required=False,
+    help="Whether dataset is private.",
+)
+@click.option(
+    "--metadata", "-m",
+    type=click.Path(exists=True),
+    required=False,
+    help="Metadata json file.",
+)
+@click.option(
+    "--output-folder", "-o",
+    is_flag=False,
+    flag_value=os.getcwd(),
+    type=click.Path(exists=True),
+    required=False,
+    help="Whether output csv is created. Generate output at the specified path. Default is false. If flagged without specifing output folder, default is the current path of your terminal.",
+)
+@click.option(
+    "--item", "-i",
+    type=click.Path(exists=True),
+    required=True,
+    help="The directory of catalog.json.",
+)
+@click.option(
+    "--complete", "-c",
+    is_flag=True,
+    default=False,
+    show_default=True,
+    type=bool,
+    required=False,
+    help="Whether post the uploading complete message to trigger the orthomosaic call.",
+)
+def catalog_upload(**kwargs):
+    upload_from_catalog(**kwargs)
 
 
 @cli.command()

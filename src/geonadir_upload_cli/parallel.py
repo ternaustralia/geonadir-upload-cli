@@ -51,7 +51,10 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
         collection = pystac.Collection.from_file(img_dir)
         citation = collection.extra_fields.get('sci:citation')
         if citation:
-            payload_data["description"] = citation
+            payload_data["data_credits"] = citation
+        description = collection.description
+        if description:
+            payload_data["description"] = description
 
     if metadata:
         payload_data.update(**metadata)

@@ -23,7 +23,8 @@ Call below command for showing current version of the package.
 ```
 geonadir-upload --version
 ```
-## option details
+## command details
+### upload dataset from local image directory or single STAC collection file
 Usage: `geonadir-upload upload-dataset [OPTIONS]`
 
 Options:
@@ -50,6 +51,10 @@ Options:
 
     - The path must exist, otherwise error raised.
 
+- `-r, --root-catalog-url`: Url of root catalog. Necessary when uploading from STAC object.
+
+    - Default is https://data-test.tern.org.au/catalog.json, which is the root catalog of TERN data server.
+
 - `-o, --output-folder`: Whether output csv is created. Generate output at the specified path.
 
     - Default is false.
@@ -73,14 +78,71 @@ Options:
 `... --item collection_title ./collection.json ...`
 
     - All path(s) must exist, otherwise error raised.
-# Running
+
+### upload datasets from all collections of STAC catalog
+Usage: `geonadir-upload catalog-upload [OPTIONS]`
+
+This command uploads all collections in the specified STAC catalog (not necessarily the root catalog) and all its sub-catalogs if any. Each collection will be uploaded as a Geonadir dataset with dataset name being collection title. Other options are same as single-datasets uploading.
+
+Options:
+
+- `--dry-run`: Show all information of this run without actual running.
+
+- `-u, --base-url`: The base url of geonadir api. 
+
+    - Default is https://api.geonadir.com.
+
+    - Usually leave default.
+
+- `-t, --token`: The user token for authentication. 
+
+    - When not specified in command, there will be a password prompt for it. (recommended for security’s sake)
+
+- `-p, --private / --public`: Whether datasets are private.
+
+    - Default is public.
+
+    - This option is applied to all datasets in a single run. Use metadata if some of the datasets need to be set differently.
+
+- `-m, --metadata`: The path of metadata json file.
+
+    - The path must exist, otherwise error raised.
+
+- `-r, --root-catalog-url`: Url of root catalog. Necessary when uploading from STAC object.
+
+    - Default is https://data-test.tern.org.au/catalog.json, which is the root catalog of TERN data server.
+
+- `-o, --output-folder`: Whether output csv is created. Generate output at the specified path.
+
+    - Default is false.
+
+    - If flagged without specifying output folder, default is the current path of your terminal.
+
+    - The path must exist, otherwise error raised.
+
+- `-c, --complete`: Whether to trigger the orthomosaic processing once uploading is finished.
+
+    - Default is false.
+
+    - This option is applied to all datasets in a single run.
+
+- `-i, --item`: The name of the dataset and the directory of images to be uploaded, or the name of the dataset and the directory of stac collection.
+
+    - This is a multiple option. user can upload multiple datasets in one command by e.g.  
+`... -i dataset1 path1 -i dataset2 path2 ...`
+
+    - Type 'collection_title' for dataset name when uploading from stac collection if you want to use title in collection.json as dataset title, e.g.
+`... --item collection_title ./collection.json ...`
+
+    - All path(s) must exist, otherwise error raised.
+## Running
 An example of privately uploading `./testimage` as dataset **test1** and `C:\tmp\testimage` as **test2** with metadata file in `./sample_metadata.json`, generating the output csv files in the current folder, and trigger the orthomosaic process when uploading is finished:
 ```
 geonadir-upload -i test1 testimage -i test2 C:\tmp\testimage -p -m sample_metadata.json -o
 ```
 The metadata specified in the json file will override the global settings, e.g. `is_private`.  
 
-## sample metadata json
+### sample metadata json
 ```
 {
     "test1": {
@@ -101,17 +163,14 @@ The metadata specified in the json file will override the global settings, e.g. 
     }
 }
 ```
-## sample output
+### sample output
 |   **Dataset Name**   | **Project ID** |        **Image Name**       | **Response Code** |  **Upload Time**  | **Image Size** | **Is Image in API?** | **Image URL** |
 |:--------------------:|:--------------:|:---------------------------:|:-----------------:|:-----------------:|----------------|----------------------|---------------|
 |         test1        |      3174      | DJI_20220519122501_0041.JPG |        201        | 2.770872116088867 |    22500587    |         True         |  (image_url)  |
 |         ...          |      ...       |             ...             |        ...        |        ...        |      ...       |         ...          |      ...      |
 
-## uploading dataset from stac catalog
 
-### command details
-
-### .netrc setting
+### .netrc setting for uploading dataset from stac catalog
 before uploading from stac catalog, it is critical to set up `.netrc` file for http requests authentication. Put this file in root folder with content like this or add this to existing `.netrc` file:
 ```
 machine <host url>
