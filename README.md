@@ -82,7 +82,7 @@ Options:
 ### upload datasets from all collections of STAC catalog
 Usage: `geonadir-upload catalog-upload [OPTIONS]`
 
-This command uploads all collections in the specified STAC catalog (not necessarily the root catalog) and all its sub-catalogs if any. Each collection will be uploaded as a Geonadir dataset with dataset name being collection title. Other options are same as single-datasets uploading.
+This command uploads all collections in the specified STAC catalog (not necessarily the root catalog) and all its sub-catalogs if any. Each collection will be uploaded as a Geonadir dataset with dataset name being collection title. One catalog each time. Other options are same as single-datasets uploading.
 
 Options:
 
@@ -126,15 +126,10 @@ Options:
 
     - This option is applied to all datasets in a single run.
 
-- `-i, --item`: The name of the dataset and the directory of images to be uploaded, or the name of the dataset and the directory of stac collection.
+- `-i, --item`: The path of the STAC catalog json file.
 
-    - This is a multiple option. user can upload multiple datasets in one command by e.g.  
-`... -i dataset1 path1 -i dataset2 path2 ...`
+    - Path must exist, otherwise error raised.
 
-    - Type 'collection_title' for dataset name when uploading from stac collection if you want to use title in collection.json as dataset title, e.g.
-`... --item collection_title ./collection.json ...`
-
-    - All path(s) must exist, otherwise error raised.
 ## Running
 An example of privately uploading `./testimage` as dataset **test1** and `C:\tmp\testimage` as **test2** with metadata file in `./sample_metadata.json`, generating the output csv files in the current folder, and trigger the orthomosaic process when uploading is finished:
 ```
