@@ -3,9 +3,10 @@ import os
 import time
 
 import pandas as pd
-import pystac
 import requests
 import tqdm as tq
+
+from .stac import get_filelist_from_collection
 
 logger = logging.getLogger(__name__)
 
@@ -123,22 +124,12 @@ def upload_images_from_collection(dataset_name, dataset_id, collection, base_url
     Returns:
         pd.DataFrame: DataFrame containing upload results for each image.
     """
-    collection = pystac.Collection.from_file(collection)
-    catalog = collection.get_parent()
-    root_path = collection.get_root().self_href.removesuffix("/catalog.json")  # /home/user(/catalog.json)
-    root_remote_path = root_catalog_url.removesuffix("/catalog.json")  # https://data-test.tern.org.au(/catalog.json)
-    self_href = catalog.self_href.removesuffix("/catalog.json")  # /home/user/uas_raw/surveillance/imagery(/catalog.json)
-    catalog.normalize_hrefs(root_remote_path + self_href.removeprefix(root_path))  # normalize to 'https://data-test.tern.org.au/uas_raw/surveillance/imagery'
-    collection = catalog.get_child(collection.id)
-    file_list = {}
-    for name, asset in collection.assets.items():
-        if name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp')):
-            file_list[name] = asset.get_absolute_href()
+    file_dict = get_filelist_from_collection(collection, root_catalog_url)
 
     count = 0
     df_list = []
-    with tq.tqdm(total=len(file_list), position=0) as pbar:
-        for file_path, file_url in file_list.items():
+    with tq.tqdm(total=len(file_dict), position=0) as pbar:
+        for file_path, file_url in file_dict.items():
             try:
                 r = requests.get(file_url)
                 r.raise_for_status()
