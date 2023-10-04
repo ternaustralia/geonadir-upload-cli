@@ -135,9 +135,9 @@ def upload_images_from_collection(dataset_name, dataset_id, collection, base_url
                 r.raise_for_status()
             except Exception as exc:
                 if r.status_code == 401:
-                    logger.error("Authentication failed. See readme for instruction.")
+                    logger.error(f"Authentication failed for {dataset_name}. See readme for instruction.")
                 else:
-                    logger.error("Error when retrieving files from remote.")
+                    logger.error(f"Error when retrieving files for {dataset_name} from remote.")
                 raise exc
             with open(file_path, 'wb') as fd:
                 fd.write(r.content)

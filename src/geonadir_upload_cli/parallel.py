@@ -10,14 +10,14 @@ from .dataset import (create_dataset, paginate_dataset_image_images,
 logger = logging.getLogger(__name__)
 
 
-def process_thread(dataset_name, img_dir, base_url, token, private, metadata, complete, root_catalog_url):
+def process_thread(dataset_name, img_dir, base_url, token, private, metadata, complete, remote_collection_json):
     """
     Process a thread for uploading images to a dataset.
 
     Args:
         dataset_name (str): Name of the dataset to upload images to.
         dataset_id (str): ID of the dataset to upload images to.
-        img_dir (str): Directory path where the images are located, or path of collection.json file.
+        img_dir (str): Directory path where the images are located, or url of collection.json file.
         base_url (str): Base url of Geonadir api.
         token (str): User token.
         complete (str): Whether to trigger orthomosaic processing after finishing uploading.
@@ -47,7 +47,7 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
         "is_private": private,
         "is_published": True
     }
-    if os.path.splitext(img_dir)[1] == ".json":
+    if remote_collection_json:
         collection = pystac.Collection.from_file(img_dir)
         citation = collection.extra_fields.get('sci:citation')
         if citation:
@@ -71,7 +71,7 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
     url = f"{base_url}/api/uploadfiles/?page=1&project_id={dataset_id}"
 
     if os.path.splitext(img_dir)[1] == ".json":
-        result_df = upload_images_from_collection(dataset_name, dataset_id, img_dir, base_url, token, root_catalog_url)
+        result_df = upload_images_from_collection(dataset_name, dataset_id, img_dir, base_url, token, remote_collection_json)
     else:
         result_df = upload_images(dataset_name, dataset_id, img_dir, base_url, token)
 

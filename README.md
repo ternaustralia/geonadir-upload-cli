@@ -24,8 +24,8 @@ Call below command for showing current version of the package.
 geonadir-upload --version
 ```
 ## command details
-### upload dataset from local image directory or single STAC collection file
-Usage: `geonadir-upload upload-dataset [OPTIONS]`
+### upload dataset from local image directory
+Usage: `geonadir-upload local-upload [OPTIONS]`
 
 Options:
 
@@ -51,9 +51,53 @@ Options:
 
     - The path must exist, otherwise error raised.
 
-- `-r, --root-catalog-url`: Url of root catalog. Necessary when uploading from STAC object.
+- `-o, --output-folder`: Whether output csv is created. Generate output at the specified path.
 
-    - Default is https://data-test.tern.org.au/catalog.json, which is the root catalog of TERN data server.
+    - Default is false.
+
+    - If flagged without specifying output folder, default is the current path of your terminal.
+
+    - The path must exist, otherwise error raised.
+
+- `-c, --complete`: Whether to trigger the orthomosaic processing once uploading is finished.
+
+    - Default is false.
+
+    - This option is applied to all datasets in a single run.
+
+- `-i, --item`: The name of the dataset and the directory of images to be uploaded.
+
+    - This is a multiple option. user can upload multiple datasets in one command by e.g.  
+`... -i dataset1 path1 -i dataset2 path2 ...`
+
+    - All path(s) must exist, otherwise error raised.
+
+### upload dataset from single remote STAC collection.json file
+Usage: `geonadir-upload collection-upload [OPTIONS]`
+
+Options:
+
+- `--dry-run`: Show all information of this run without actual running.
+
+- `-u, --base-url`: The base url of geonadir api. 
+
+    - Default is https://api.geonadir.com.
+
+    - Usually leave default.
+
+- `-t, --token`: The user token for authentication. 
+
+    - When not specified in command, there will be a password prompt for it. (recommended for security’s sake)
+
+- `-p, --private / --public`: Whether datasets are private.
+
+    - Default is public.
+
+    - This option is applied to all datasets in a single run. Use metadata if some of the datasets need to be set differently.
+
+- `-m, --metadata`: The path of metadata json file.
+
+    - The path must exist, otherwise error raised.
 
 - `-o, --output-folder`: Whether output csv is created. Generate output at the specified path.
 
@@ -69,13 +113,13 @@ Options:
 
     - This option is applied to all datasets in a single run.
 
-- `-i, --item`: The name of the dataset and the directory of images to be uploaded, or the name of the dataset and the directory of stac collection.
+- `-i, --item`: The name of the dataset and the url of stac collection.
 
     - This is a multiple option. user can upload multiple datasets in one command by e.g.  
-`... -i dataset1 path1 -i dataset2 path2 ...`
+`... -i dataset1 url1 -i dataset2 url2 ...`
 
     - Type 'collection_title' for dataset name when uploading from stac collection if you want to use title in collection.json as dataset title, e.g.
-`... --item collection_title ./collection.json ...`
+`... --item collection_title https://url/to/collection.json ...`
 
     - All path(s) must exist, otherwise error raised.
 

@@ -6,7 +6,7 @@ from importlib.metadata import version
 import click
 
 from .dataset import dataset_info, search_datasets
-from .upload import normal_upload, upload_from_catalog
+from .upload import normal_upload, upload_from_catalog, upload_from_collection
 
 LEGAL_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
@@ -56,13 +56,66 @@ def cli():
     required=False,
     help="Base url of geonadir api.",
 )
+@click.password_option(
+    "--token", "-t",
+    help="User token for authentication.",
+)
 @click.option(
-    "--root-catalog-url", "-r",
-    default="https://data-test.tern.org.au/catalog.json",
+    "--private/--public", "-p",
+    default=False,
+    show_default=True,
+    type=bool,
+    required=False,
+    help="Whether dataset is private.",
+)
+@click.option(
+    "--metadata", "-m",
+    type=click.Path(exists=True),
+    required=False,
+    help="Metadata json file.",
+)
+@click.option(
+    "--output-folder", "-o",
+    is_flag=False,
+    flag_value=os.getcwd(),
+    type=click.Path(exists=True),
+    required=False,
+    help="Whether output csv is created. Generate output at the specified path. Default is false. If flagged without specifing output folder, default is the current path of your terminal.",
+)
+@click.option(
+    "--item", "-i",
+    type=(str, click.Path()),
+    required=True,
+    multiple=True,
+    help="The name of the dataset and the directory of images to be uploaded.",
+)
+@click.option(
+    "--complete", "-c",
+    is_flag=True,
+    default=False,
+    show_default=True,
+    type=bool,
+    required=False,
+    help="Whether post the uploading complete message to trigger the orthomosaic call.",
+)
+def local_upload(**kwargs):
+    normal_upload(**kwargs)
+
+
+@cli.command()
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    show_default=True,
+    help="Dry-run.",
+)
+@click.option(
+    "--base-url", "-u",
+    default="https://api.geonadir.com",
     show_default=True,
     type=str,
     required=False,
-    help="Data server url of root catalog. Necessary when uploading from STAC object.",
+    help="Base url of geonadir api.",
 )
 @click.password_option(
     "--token", "-t",
@@ -92,10 +145,10 @@ def cli():
 )
 @click.option(
     "--item", "-i",
-    type=(str, click.Path(exists=True)),
+    type=(str, str),
     required=True,
     multiple=True,
-    help="The name of the dataset and the directory of images to be uploaded, or the name of the dataset and the directory of stac collection. \
+    help="The name of the dataset and the directory of stac collection. \
         Type 'collection_title' for dataset name when uploading from stac collection if you want to use title in collection.json as dataset title, \
         e.g. ... --item collection_title ./collection.json ...",
 )
@@ -108,8 +161,8 @@ def cli():
     required=False,
     help="Whether post the uploading complete message to trigger the orthomosaic call.",
 )
-def upload_dataset(**kwargs):
-    normal_upload(**kwargs)
+def collection_upload(**kwargs):
+    upload_from_collection(**kwargs)
 
 
 @cli.command()
