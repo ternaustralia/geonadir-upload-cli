@@ -1,8 +1,9 @@
 import logging
 import os
+import urllib
+
 import pystac
 import requests
-import urllib
 
 logger = logging.getLogger(__name__)
 

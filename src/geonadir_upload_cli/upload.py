@@ -2,9 +2,10 @@ import concurrent.futures
 import json
 import logging
 import os
+import tempfile
+
 import pystac
 import requests
-import tempfile
 
 from .parallel import process_thread
 from .stac import really_get_all_collections

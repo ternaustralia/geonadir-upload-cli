@@ -1,7 +1,8 @@
 import logging
 import os
-import pystac
 import time
+
+import pystac
 
 from .dataset import (create_dataset, paginate_dataset_image_images,
                       trigger_ortho_processing, upload_images,
@@ -16,15 +17,18 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
 
     Args:
         dataset_name (str): Name of the dataset to upload images to.
-        dataset_id (str): ID of the dataset to upload images to.
-        img_dir (str): Directory path where the images are located, or url of collection.json file.
+        img_dir (str): Local directory of images or collection.json.
         base_url (str): Base url of Geonadir api.
         token (str): User token.
-        complete (str): Whether to trigger orthomosaic processing after finishing uploading.
+        private (bool): Whether the dataset is private.
         metadata (str): Metadata json file directory.
+        complete (str): Whether to trigger orthomosaic processing after finishing uploading.
+        remote_collection_json (str): Remote url of collection.json. Applicable when uploading from collection.
 
     Returns:
-        pd.DataFrame: DataFrame containing upload results for each image.
+        dataset_name (str): Geonadir dataset name.
+        result_df (pd.DataFrame): DataFrame containing upload results for each image, or False if error raised before DF generated.
+        error (str): At which step the error happened, or False if not applicable.
     """
     # payload_data below can be modified to accomodate metadata information
     # {
@@ -106,7 +110,8 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
 
 
 def original_filename(url):
-    """Extract the original file name from Geonadir image url.
+    """
+    Extract the original file name from Geonadir image url.
     for url = 'https://geonadir-prod.s3.amazonaws.com/privateuploads/images/ \
         3151-fce3304f-a253-4e91-acd9-3c2aaf876cd3/DJI_20220519122445_0024_766891.JPG \
         ?AWSAccessKeyId=<key_id>&Signature=<sig>&Expires=1692857952',
@@ -117,7 +122,7 @@ def original_filename(url):
 
     Returns:
         name: the name of the original image
-    """    
+    """
     url_name = url.split("?")[0].split("/")[-1]  # DJI_20220519122445_0024_766891.JPG
     basename, ext = os.path.splitext(url_name)
     return "_".join(basename.split("_")[:-1]) + ext  # DJI_20220519122445_0024.JPG

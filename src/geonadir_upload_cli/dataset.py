@@ -110,21 +110,22 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token):
     return result_df
 
 
-def upload_images_from_collection(dataset_name, dataset_id, collection, base_url, token, root_catalog_url):
+def upload_images_from_collection(dataset_name, dataset_id, collection, base_url, token, remote_collection_json):
     """
     Upload images from a directory to a dataset.
 
     Args:
         dataset_name (str): Name of the dataset to upload images to.
         dataset_id (str): ID of the dataset to upload images to.
-        img_dir (str): Directory path where the images are located.
+        collection (str): Path of local collection.json.
         base_url (str): Base url of Geonadir api.
         token (str): User token.
+        remote_collection_json (str): Remote url of collection.json.
 
     Returns:
         pd.DataFrame: DataFrame containing upload results for each image.
     """
-    file_dict = get_filelist_from_collection(collection, root_catalog_url)
+    file_dict = get_filelist_from_collection(collection, remote_collection_json)
     if not file_dict:
         raise Exception(f"no applicable asset file in collection {collection}")
 
