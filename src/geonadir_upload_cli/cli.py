@@ -148,7 +148,7 @@ def local_upload(**kwargs):
     type=(str, str),
     required=True,
     multiple=True,
-    help="The name of the dataset and the directory of stac collection. \
+    help="The name of the dataset and the remote url of stac collection. \
         Type 'collection_title' for dataset name when uploading from stac collection if you want to use title in collection.json as dataset title, \
         e.g. ... --item collection_title ./collection.json ...",
 )
@@ -210,7 +210,7 @@ def collection_upload(**kwargs):
     "--item", "-i",
     type=str,
     required=True,
-    help="The directory of catalog.json.",
+    help="The remote url of catalog.json.",
 )
 @click.option(
     "--complete", "-c",
