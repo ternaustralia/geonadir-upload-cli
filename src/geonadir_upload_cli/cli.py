@@ -180,14 +180,6 @@ def collection_upload(**kwargs):
     required=False,
     help="Base url of geonadir api.",
 )
-@click.option(
-    "--root-catalog-url", "-r",
-    default="https://data-test.tern.org.au/catalog.json",
-    show_default=True,
-    type=str,
-    required=False,
-    help="Data server url of root catalog. Necessary when uploading from STAC object.",
-)
 @click.password_option(
     "--token", "-t",
     help="User token for authentication.",
@@ -216,7 +208,7 @@ def collection_upload(**kwargs):
 )
 @click.option(
     "--item", "-i",
-    type=click.Path(exists=True),
+    type=str,
     required=True,
     help="The directory of catalog.json.",
 )

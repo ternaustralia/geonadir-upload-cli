@@ -152,10 +152,6 @@ Options:
 
     - The path must exist, otherwise error raised.
 
-- `-r, --root-catalog-url`: Url of root catalog. Necessary when uploading from STAC object.
-
-    - Default is https://data-test.tern.org.au/catalog.json, which is the root catalog of TERN data server.
-
 - `-o, --output-folder`: Whether output csv is created. Generate output at the specified path.
 
     - Default is false.
@@ -170,9 +166,7 @@ Options:
 
     - This option is applied to all datasets in a single run.
 
-- `-i, --item`: The path of the STAC catalog json file.
-
-    - Path must exist, otherwise error raised.
+- `-i, --item`: The remote url of the STAC catalog json file.
 
 ## Running
 An example of privately uploading `./testimage` as dataset **test1** and `C:\tmp\testimage` as **test2** with metadata file in `./sample_metadata.json`, generating the output csv files in the current folder, and trigger the orthomosaic process when uploading is finished:

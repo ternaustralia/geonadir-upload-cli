@@ -65,15 +65,20 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
         dataset_id = create_dataset(payload_data, base_url, token)
     except Exception as exc:
         logger.error(f"Create dataset {dataset_name} failed: {str(exc)}")
+        return dataset_name, False, "create_dataset"
     # print(f"Uploading https://staging.geonadir.com/image-collection-details/{dataset_id}")
     # print()
     logger.info(f"Dataset name: {dataset_name}, dataset ID: {dataset_id}")
     url = f"{base_url}/api/uploadfiles/?page=1&project_id={dataset_id}"
 
-    if os.path.splitext(img_dir)[1] == ".json":
-        result_df = upload_images_from_collection(dataset_name, dataset_id, img_dir, base_url, token, remote_collection_json)
-    else:
-        result_df = upload_images(dataset_name, dataset_id, img_dir, base_url, token)
+    try:
+        if os.path.splitext(img_dir)[1] == ".json":
+            result_df = upload_images_from_collection(dataset_name, dataset_id, img_dir, base_url, token, remote_collection_json)
+        else:
+            result_df = upload_images(dataset_name, dataset_id, img_dir, base_url, token)
+    except Exception as exc:
+        logger.error(f"Uploading images failed: {str(exc)}")
+        return dataset_name, False, "upload_images"
 
     try:
         logger.info("sleep 15s")
@@ -88,13 +93,16 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
         )
     except Exception as exc:
         logger.error(f"Retrieving image status for {dataset_name} failed: {str(exc)}")
+        return dataset_name, result_df, "paginate_dataset_image_images"
+
     if complete:
         try:
             trigger_ortho_processing(dataset_id, base_url, token)
         except Exception as exc:
             logger.error(f"Triggering ortho processing for {dataset_name} failed: {str(exc)}")
+            return dataset_name, result_df, "trigger_ortho_processing"
 
-    return dataset_name, result_df
+    return dataset_name, result_df, False
 
 
 def original_filename(url):

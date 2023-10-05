@@ -20,13 +20,15 @@ logging.basicConfig(level=log_level)
 
 
 def upload_from_catalog(**kwargs):
-    catalog_file = kwargs.get("item")
-    catalog = pystac.Catalog.from_file(catalog_file)
+    catalog_url = kwargs.get("item")
+    tmpdir = tempfile.TemporaryDirectory()
     collections_list = []
-    for collection in really_get_all_collections(catalog):
-        collections_list.append(("collection_title", collection.self_href))
+    for collection_url in really_get_all_collections(catalog_url, tmpdir.name):
+        collections_list.append(("collection_title", collection_url))
     kwargs["item"] = collections_list
-    normal_upload(**kwargs)
+    upload_from_collection(**kwargs)
+    logger.info(f"cleanup {tmpdir.name}")
+    tmpdir.cleanup()
 
 
 def normal_upload(**kwargs):
@@ -118,11 +120,11 @@ def upload_from_collection(**kwargs):
         logger.info(f"private: {private}")
         logger.info(f"complete: {complete}")
         for i in item:
-            logger.info("item:")
             dataset_name, image_location = i
             dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
             remote_collection_json = image_location
             logger.info(f"retreiving collection.json from {remote_collection_json}")
+            logger.info("item:")
             try:
                 r = requests.get(image_location)
                 r.raise_for_status()
@@ -215,12 +217,22 @@ def upload_from_collection(**kwargs):
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
         futures = [executor.submit(process_thread, *params) for params in dataset_details]
         results = [future.result() for future in concurrent.futures.as_completed(futures)]
-        if output_dir:
-            for dataset_name, df in results:
-                df.to_csv(f"{os.path.join(output_dir, dataset_name)}.csv", index=False)
-                logger.info(f"output file: {os.path.join(output_dir, dataset_name)}.csv")
-        else:
-            logger.info("no output csv file")
+        for dataset_name, df, error in results:
+            if error:
+                logger.warning(f"{dataset_name} uploading failed when {error}")
+            else:
+                logger.info(f"{dataset_name} uploading success")
+            if output_dir:
+                if df:
+                    df.to_csv(f"{os.path.join(output_dir, dataset_name)}.csv", index=False)
+                    if error:
+                        logger.warning(f"(probably incomplete) output file: {os.path.join(output_dir, dataset_name)}.csv")
+                    else:
+                        logger.info(f"output file: {os.path.join(output_dir, dataset_name)}.csv")
+                else:
+                    logger.warning(f"output file for {dataset_name} not applicable")
+            else:
+                logger.info(f"no output csv file for {dataset_name}")
 
     logger.info(f"cleanup {', '.join([i.name for i in tmpdirs])}")
     for i in tmpdirs:

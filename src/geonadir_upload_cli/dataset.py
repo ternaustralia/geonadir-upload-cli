@@ -125,9 +125,12 @@ def upload_images_from_collection(dataset_name, dataset_id, collection, base_url
         pd.DataFrame: DataFrame containing upload results for each image.
     """
     file_dict = get_filelist_from_collection(collection, root_catalog_url)
+    if not file_dict:
+        raise Exception(f"no applicable asset file in collection {collection}")
 
     count = 0
     df_list = []
+
     with tq.tqdm(total=len(file_dict), position=0) as pbar:
         for file_path, file_url in file_dict.items():
             try:
