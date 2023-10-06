@@ -21,7 +21,7 @@ def get_filelist_from_collection(collection_path:str, remote_collection_json:str
 def really_get_all_collections(catalog_url:str, local_folder:str):
     # catalog_url = "https://data-test.tern.org.au/uas_raw/catalog.json"
     logger.info(f"getting child collection urls from {catalog_url}")
-    r = requests.get(catalog_url)
+    r = requests.get(catalog_url, timeout=60)
     r.raise_for_status()
     catalog_location = os.path.join(local_folder, "catalog.json")
     with open(catalog_location, 'wb') as fd:

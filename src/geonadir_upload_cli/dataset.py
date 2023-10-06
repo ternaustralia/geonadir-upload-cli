@@ -135,7 +135,7 @@ def upload_images_from_collection(dataset_name, dataset_id, collection, base_url
     with tq.tqdm(total=len(file_dict), position=0) as pbar:
         for file_path, file_url in file_dict.items():
             try:
-                r = requests.get(file_url)
+                r = requests.get(file_url, timeout=60)
                 r.raise_for_status()
             except Exception as exc:
                 if r.status_code == 401:

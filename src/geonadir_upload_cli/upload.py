@@ -23,14 +23,13 @@ logging.basicConfig(level=log_level)
 
 def upload_from_catalog(**kwargs):
     catalog_url = kwargs.get("item")
-    tmpdir = tempfile.TemporaryDirectory()
-    collections_list = []
-    for collection_url in really_get_all_collections(catalog_url, tmpdir.name):
-        collections_list.append(("collection_title", collection_url))
-    kwargs["item"] = collections_list
-    upload_from_collection(**kwargs)
-    logger.info(f"cleanup {tmpdir.name}")
-    tmpdir.cleanup()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        collections_list = []
+        for collection_url in really_get_all_collections(catalog_url, tmpdir.name):
+            collections_list.append(("collection_title", collection_url))
+        kwargs["item"] = collections_list
+        upload_from_collection(**kwargs)
+        logger.info(f"cleanup {tmpdir.name}")
 
 
 def normal_upload(**kwargs):
@@ -50,19 +49,19 @@ def normal_upload(**kwargs):
         logger.info(f"metadata: {metadata_json}")
         logger.info(f"private: {private}")
         logger.info(f"complete: {complete}")
-        for i in item:
-            logger.info("item:")
+        for count, i in enumerate(item):
+            logger.info(f"--item {count + 1}:")
             dataset_name, image_location = i
             dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
             if not dataset_name:
                 logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
                 dataset_name = "untitled"
-            logger.info(f"\tdataset name: {dataset_name}")
-            logger.info(f"\timage location: {image_location}")
+            logger.info(f"dataset name: {dataset_name}")
+            logger.info(f"image location: {image_location}")
         if output_dir:
-            logger.info(f"\toutput file: {os.path.join(output_dir, f'{dataset_name}.csv')}")
+            logger.info(f"output file: {os.path.join(output_dir, f'{dataset_name}.csv')}")
         else:
-            logger.info("\tno output csv file")
+            logger.info("no output csv file")
 
     logger.info(base_url)
     token = "Token " + token
@@ -132,7 +131,7 @@ def upload_from_collection(**kwargs):
             dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
             remote_collection_json = image_location
             logger.info("")
-            logger.info(f"--item {count+1}:")
+            logger.info(f"--item {count + 1}:")
             logger.info(f"collection url: {image_location}")
             tmpdir = tempfile.TemporaryDirectory()
             tmpdirs.append(tmpdir)
@@ -256,7 +255,7 @@ def generate_four_timestamps(**kwargs):
 
 
 def download_to_dir(url, directory):
-    r = requests.get(url)
+    r = requests.get(url, timeout=60)
     try:
         r.raise_for_status()
         image_location = os.path.join(directory, "collection.json")
@@ -268,8 +267,7 @@ def download_to_dir(url, directory):
         else:
             logger.error(f"{image_location} doesn't exist or is undownloadable: {str(exc)}")
         return False
-    finally:
-        return True
+    return True
 
 
 def deal_with_collection(collection_location, exclude, cb, ca, ub, ua):
