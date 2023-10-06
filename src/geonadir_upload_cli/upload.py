@@ -3,13 +3,12 @@ import json
 import logging
 import os
 import tempfile
-from datetime import datetime
 
 import pystac
 import requests
 
 from .parallel import process_thread
-from .stac import really_get_all_collections
+from .util import really_get_all_collections, generate_four_timestamps, download_to_dir, deal_with_collection
 
 LEGAL_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
@@ -223,85 +222,3 @@ def upload_from_collection(**kwargs):
     logger.info(f"cleanup {', '.join([i.name for i in tmpdirs])}")
     for i in tmpdirs:
         i.cleanup()
-
-
-def generate_four_timestamps(**kwargs):
-    try:
-        created_before = kwargs.get("created_before", "9999-12-31")
-        cb = datetime.fromisoformat(created_before)
-    except Exception as exc:
-        logger.warning(f"create_before = {created_before} is not a legal iso format timestamp.")
-        cb = datetime(9999, 12, 31, 0, 0)
-    try:
-        created_after = kwargs.get("created_after", "0001-01-01")
-        ca = datetime.fromisoformat(created_after)
-    except Exception as exc:
-        logger.warning(f"created_after = {created_after} is not a legal iso format timestamp.")
-        ca = datetime(1, 1, 1, 0, 0)
-    try:
-        updated_before = kwargs.get("updated_before", "9999-12-31")
-        ub = datetime.fromisoformat(updated_before)
-    except Exception as exc:
-        logger.warning(f"create_before = {updated_before} is not a legal iso format timestamp.")
-        ub = datetime(9999, 12, 31, 0, 0)
-    try:
-        updated_after = kwargs.get("updated_after", "0001-01-01")
-        ua = datetime.fromisoformat(updated_after)
-    except Exception as exc:
-        logger.warning(f"created_after = {updated_after} is not a legal iso format timestamp.")
-        ua = datetime(1, 1, 1, 0, 0)
-
-    return cb, ca, ub, ua
-
-
-def download_to_dir(url, directory):
-    r = requests.get(url, timeout=60)
-    try:
-        r.raise_for_status()
-        image_location = os.path.join(directory, "collection.json")
-        with open(image_location, 'wb') as fd:
-            fd.write(r.content)
-    except Exception as exc:
-        if r.status_code == 401:
-            logger.error(f"Authentication failed for downloading {image_location}. See readme for instruction.")
-        else:
-            logger.error(f"{image_location} doesn't exist or is undownloadable: {str(exc)}")
-        return False
-    return True
-
-
-def deal_with_collection(collection_location, exclude, cb, ca, ub, ua):
-    try:
-        collection = pystac.Collection.from_file(collection_location)
-        dataset_name = collection.title
-        dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
-        if not dataset_name:
-            logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
-            dataset_name = "untitled"
-        if exclude:
-            excluded = False
-            for word in exclude:
-                if word.lower() in dataset_name.lower():
-                    excluded = True
-                    logger.warning(f"Dataset {dataset_name} excluded for containing word {word}")
-                    break
-            if excluded:
-                return False
-        try:
-            summary = collection.summaries
-            other = summary.other
-            created = datetime.fromisoformat(other.get("created"))
-            updated = datetime.fromisoformat(other.get("updated"))
-            if created > cb or created < ca:
-                logger.warning(f"{dataset_name} created at {created}, not between {ca} and {cb}")
-                return False
-            if updated > ub or updated < ua:
-                logger.warning(f"{dataset_name} updated at {updated}, not between {ua} and {ub}")
-                return False
-        except Exception as exc:
-            logger.warning(f"Can't find legal created/updated timestamp for {dataset_name}:")
-            logger.warning(f"\t{str(exc)}")
-    except Exception as exc:
-        logger.error(f"{collection_location} illegal: {str(exc)}")
-        return False
-    return dataset_name
