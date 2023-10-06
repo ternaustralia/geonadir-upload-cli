@@ -115,13 +115,29 @@ Options:
 
 - `-i, --item`: The name of the dataset and the url of stac collection.
 
-    - This is a multiple option. user can upload multiple datasets by e.g.  
+    - This is a multiple option. User can upload multiple datasets by e.g.  
 `... -i dataset1 url1 -i dataset2 url2 ...`
 
     - Type 'collection_title' for dataset name when uploading from stac collection if you want to use title in collection.json as dataset title, e.g.
 `... --item collection_title https://url/to/collection.json ...`
 
     - All path(s) must exist, otherwise error raised.
+
+- `-cb, --created-before`: Only upload collections created before this timestamp.
+
+    - Must be of ISO format.
+
+- `-ca, --created-after`: Only upload collections created after this timestamp.
+
+    - Must be of ISO format.
+
+- `-ub, --updated-before`: Only upload collections updated before this timestamp.
+
+    - Must be of ISO format.
+
+- `-ua, --updated-after`: Only upload collections updated after this timestamp.
+
+    - Must be of ISO format.
 
 ### upload datasets from all collections of STAC catalog
 Usage: `geonadir-upload catalog-upload [OPTIONS]`
@@ -170,10 +186,26 @@ Options:
 
 - `-x, --exclude`: Exclude collections with keyword in title.
 
-    - This is a multiple option. user can specify multiple keywords by e.g.  
+    - This is a multiple option. User can specify multiple keywords by e.g.  
 `... -x keyword1 -x keyword2 ...`
 
     - Ignore case.
+
+- `-cb, --created-before`: Only upload collections created before this timestamp.
+
+    - Must be of ISO format.
+
+- `-ca, --created-after`: Only upload collections created after this timestamp.
+
+    - Must be of ISO format.
+
+- `-ub, --updated-before`: Only upload collections updated before this timestamp.
+
+    - Must be of ISO format.
+
+- `-ua, --updated-after`: Only upload collections updated after this timestamp.
+
+    - Must be of ISO format.
 
 ## Running
 An example of privately uploading `./testimage` as dataset **test1** and `C:\tmp\testimage` as **test2** with metadata file in `./sample_metadata.json`, generating the output csv files in the current folder, and trigger the orthomosaic process when uploading is finished:

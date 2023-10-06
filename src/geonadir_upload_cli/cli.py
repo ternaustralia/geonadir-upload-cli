@@ -80,7 +80,8 @@ def cli():
     flag_value=os.getcwd(),
     type=click.Path(exists=True),
     required=False,
-    help="Whether output csv is created. Generate output at the specified path. Default is false. If flagged without specifing output folder, default is the current path of your terminal.",
+    help="Whether output csv is created. Generate output at the specified path. Default is false. \
+        If flagged without specifing output folder, default is the current path of your terminal.",
 )
 @click.option(
     "--item", "-i",
@@ -141,7 +142,8 @@ def local_upload(**kwargs):
     flag_value=os.getcwd(),
     type=click.Path(exists=True),
     required=False,
-    help="Whether output csv is created. Generate output at the specified path. Default is false. If flagged without specifing output folder, default is the current path of your terminal.",
+    help="Whether output csv is created. Generate output at the specified path. Default is false. \
+        If flagged without specifing output folder, default is the current path of your terminal.",
 )
 @click.option(
     "--item", "-i",
@@ -160,6 +162,38 @@ def local_upload(**kwargs):
     type=bool,
     required=False,
     help="Whether post the uploading complete message to trigger the orthomosaic call.",
+)
+@click.option(
+    "--created-after", "-ca",
+    type=str,
+    required=False,
+    default="0001-01-01",
+    show_default=True,
+    help="Only upload collection created later than specified date. Must be of ISO format.",
+)
+@click.option(
+    "--created-before", "-cb",
+    type=str,
+    required=False,
+    default="9999-12-31",
+    show_default=True,
+    help="Only upload collection created earlier than specified date. Must be of ISO format.",
+)
+@click.option(
+    "--updated-after", "-ua",
+    type=str,
+    required=False,
+    default="0001-01-01",
+    show_default=True,
+    help="Only upload collection updated later than specified date. Must be of ISO format.",
+)
+@click.option(
+    "--updated-before", "-ub",
+    type=str,
+    required=False,
+    default="9999-12-31",
+    show_default=True,
+    help="Only upload collection updated earlier than specified date. Must be of ISO format.",
 )
 def collection_upload(**kwargs):
     upload_from_collection(**kwargs)
@@ -227,6 +261,38 @@ def collection_upload(**kwargs):
     required=False,
     multiple=True,
     help="Exclude collections with certain words in the title.",
+)
+@click.option(
+    "--created-after", "-ca",
+    type=str,
+    required=False,
+    default="0001-01-01",
+    show_default=True,
+    help="Only upload collection created later than specified date. Must be of ISO format.",
+)
+@click.option(
+    "--created-before", "-cb",
+    type=str,
+    required=False,
+    default="9999-12-31",
+    show_default=True,
+    help="Only upload collection created earlier than specified date. Must be of ISO format.",
+)
+@click.option(
+    "--updated-after", "-ua",
+    type=str,
+    required=False,
+    default="0001-01-01",
+    show_default=True,
+    help="Only upload collection updated later than specified date. Must be of ISO format.",
+)
+@click.option(
+    "--updated-before", "-ub",
+    type=str,
+    required=False,
+    default="9999-12-31",
+    show_default=True,
+    help="Only upload collection updated earlier than specified date. Must be of ISO format.",
 )
 def catalog_upload(**kwargs):
     upload_from_catalog(**kwargs)

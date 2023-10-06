@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import tempfile
+from datetime import datetime
 
 import pystac
 import requests
@@ -112,6 +113,8 @@ def upload_from_collection(**kwargs):
     complete = kwargs.get("complete")
     exclude = kwargs.get("exclude", None)
 
+    cb, ca, ub, ua = generate_four_timestamps(**kwargs)
+
     tmpdirs = []
 
     if dry_run:
@@ -161,6 +164,20 @@ def upload_from_collection(**kwargs):
                             break
                     if excluded:
                         continue
+                try:
+                    summary = collection.summaries
+                    other = summary.other
+                    created = datetime.fromisoformat(other.get("created"))
+                    updated = datetime.fromisoformat(other.get("updated"))
+                    if created > cb or created < ca:
+                        logger.warning(f"{dataset_name} created at {created}, not between {ca} and {cb}")
+                        continue
+                    if updated > ub or updated < ua:
+                        logger.warning(f"{dataset_name} updated at {updated}, not between {ua} and {ub}")
+                        continue
+                except Exception as exc:
+                    logger.warning(f"\tCan't find legal created/updated timestamp for {dataset_name}:")
+                    logger.warning(f"\t\t{str(exc)}")
             except Exception as exc:
                 logger.error(f"\t{image_location} illegal: {str(exc)}")
             logger.info(f"\tdataset name: {dataset_name}")
@@ -219,6 +236,20 @@ def upload_from_collection(**kwargs):
                         break
                 if excluded:
                     continue
+            try:
+                summary = collection.summaries
+                other = summary.other
+                created = datetime.fromisoformat(other.get("created"))
+                updated = datetime.fromisoformat(other.get("updated"))
+                if created > cb or created < ca:
+                    logger.warning(f"{dataset_name} created at {created}, not between {ca} and {cb}")
+                    continue
+                if updated > ub or updated < ua:
+                    logger.warning(f"{dataset_name} updated at {updated}, not between {ua} and {ub}")
+                    continue
+            except Exception as exc:
+                logger.warning(f"\tCan't find legal created/updated timestamp for {dataset_name}:")
+                logger.warning(f"\t\t{str(exc)}")
         except Exception as exc:
             logger.error(f"{image_location} illegal: {str(exc)}")
             continue
@@ -263,3 +294,31 @@ def upload_from_collection(**kwargs):
     for i in tmpdirs:
         i.cleanup()
 
+
+def generate_four_timestamps(**kwargs):
+    try:
+        created_before = kwargs.get("created_before", "9999-12-31")
+        cb = datetime.fromisoformat(created_before)
+    except Exception as exc:
+        logger.warning(f"create_before = {created_before} is not a legal iso format timestamp.")
+        cb = datetime(9999, 12, 31, 0, 0)
+    try:
+        created_after = kwargs.get("created_after", "0001-01-01")
+        ca = datetime.fromisoformat(created_after)
+    except Exception as exc:
+        logger.warning(f"created_after = {created_after} is not a legal iso format timestamp.")
+        ca = datetime(1, 1, 1, 0, 0)
+    try:
+        updated_before = kwargs.get("updated_before", "9999-12-31")
+        ub = datetime.fromisoformat(updated_before)
+    except Exception as exc:
+        logger.warning(f"create_before = {updated_before} is not a legal iso format timestamp.")
+        ub = datetime(9999, 12, 31, 0, 0)
+    try:
+        updated_after = kwargs.get("updated_after", "0001-01-01")
+        ua = datetime.fromisoformat(updated_after)
+    except Exception as exc:
+        logger.warning(f"created_after = {updated_after} is not a legal iso format timestamp.")
+        ua = datetime(1, 1, 1, 0, 0)
+
+    return cb, ca, ub, ua
