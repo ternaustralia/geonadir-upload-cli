@@ -125,19 +125,19 @@ Options:
 
 - `-cb, --created-before`: Only upload collections created before this timestamp.
 
-    - Must be of ISO format.
+    - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
 
 - `-ca, --created-after`: Only upload collections created after this timestamp.
 
-    - Must be of ISO format.
+    - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
 
 - `-ub, --updated-before`: Only upload collections updated before this timestamp.
 
-    - Must be of ISO format.
+    - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
 
 - `-ua, --updated-after`: Only upload collections updated after this timestamp.
 
-    - Must be of ISO format.
+    - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
 
 ### upload datasets from all collections of STAC catalog
 Usage: `geonadir-upload catalog-upload [OPTIONS]`
@@ -193,19 +193,19 @@ Options:
 
 - `-cb, --created-before`: Only upload collections created before this timestamp.
 
-    - Must be of ISO format.
+    - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
 
 - `-ca, --created-after`: Only upload collections created after this timestamp.
 
-    - Must be of ISO format.
+    - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
 
 - `-ub, --updated-before`: Only upload collections updated before this timestamp.
 
-    - Must be of ISO format.
+    - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
 
 - `-ua, --updated-after`: Only upload collections updated after this timestamp.
 
-    - Must be of ISO format.
+    - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
 
 ## Running
 An example of privately uploading `./testimage` as dataset **test1** and `C:\tmp\testimage` as **test2** with metadata file in `./sample_metadata.json`, generating the output csv files in the current folder, and trigger the orthomosaic process when uploading is finished:
