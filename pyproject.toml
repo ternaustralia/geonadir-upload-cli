@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "geonadir-upload-cli"
-description = "My short description for my project."
+description = "Geonadir upload CLI tool."
 readme = "README.md"
 requires-python = ">=3.8.0"  # >= 3.6.0
 license = {text = "MIT"}  # Apache 2.0 ?
