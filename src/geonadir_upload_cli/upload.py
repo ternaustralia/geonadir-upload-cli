@@ -116,6 +116,7 @@ def upload_from_collection(**kwargs):
     cb, ca, ub, ua = generate_four_timestamps(**kwargs)
 
     tmpdirs = []
+    uploads = []
 
     if dry_run:
         logger.info("---------------------dry run---------------------")
@@ -126,66 +127,36 @@ def upload_from_collection(**kwargs):
         logger.info(f"complete: {complete}")
         if exclude:
             logger.info(f"excluding keywords: {str(exclude)}")
-        for i in item:
+        for count, i in enumerate(item):
             dataset_name, image_location = i
             dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
             remote_collection_json = image_location
-            logger.info(f"retreiving collection.json from {remote_collection_json}")
-            logger.info("item:")
-            try:
-                r = requests.get(image_location)
-                r.raise_for_status()
-                tmpdir = tempfile.TemporaryDirectory()
-                tmpdirs.append(tmpdir)
-                image_location = os.path.join(tmpdir.name, "collection.json")
-                with open(image_location, 'wb') as fd:
-                    fd.write(r.content)
-            except Exception as exc:
-                if r.status_code == 401:
-                    logger.error(f"Authentication failed for downloading {image_location}. See readme for instruction.")
-                else:
-                    logger.error(f"{image_location} doesn't exist or is undownloadable: {str(exc)}")
+            logger.info("")
+            logger.info(f"--item {count+1}:")
+            logger.info(f"collection url: {image_location}")
+            tmpdir = tempfile.TemporaryDirectory()
+            tmpdirs.append(tmpdir)
+            success = download_to_dir(image_location, tmpdir.name)
+            if not success:
                 continue
-            try:
-                collection = pystac.Collection.from_file(image_location)
-                if dataset_name == "collection_title":
-                    logger.info("\tuse collection title as Geonadir dataset title.")
-                    dataset_name = collection.title
-                    dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
-                if not dataset_name:
-                    logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
-                    dataset_name = "untitled"
-                if exclude:
-                    excluded = False
-                    for word in exclude:
-                        if word.lower() in dataset_name.lower():
-                            excluded = True
-                            logger.warning(f"\tDataset {dataset_name} excluded for containing word {word}")
-                            break
-                    if excluded:
-                        continue
-                try:
-                    summary = collection.summaries
-                    other = summary.other
-                    created = datetime.fromisoformat(other.get("created"))
-                    updated = datetime.fromisoformat(other.get("updated"))
-                    if created > cb or created < ca:
-                        logger.warning(f"{dataset_name} created at {created}, not between {ca} and {cb}")
-                        continue
-                    if updated > ub or updated < ua:
-                        logger.warning(f"{dataset_name} updated at {updated}, not between {ua} and {ub}")
-                        continue
-                except Exception as exc:
-                    logger.warning(f"\tCan't find legal created/updated timestamp for {dataset_name}:")
-                    logger.warning(f"\t\t{str(exc)}")
-            except Exception as exc:
-                logger.error(f"\t{image_location} illegal: {str(exc)}")
-            logger.info(f"\tdataset name: {dataset_name}")
-            logger.info(f"\tcollection.json location: {image_location}")
-        if output_dir:
-            logger.info(f"\toutput file: {os.path.join(output_dir, f'{dataset_name}.csv')}")
-        else:
-            logger.info("\tno output csv file")
+            title = deal_with_collection(image_location, exclude, cb, ca, ub, ua)
+            if not title:
+                continue
+            if dataset_name == "collection_title":
+                dataset_name = title
+            uploads.append(dataset_name)
+            logger.info(f"dataset name: {dataset_name}")
+            if output_dir:
+                logger.info(f"output file: {os.path.join(output_dir, f'{dataset_name}.csv')}")
+            else:
+                logger.info("no output csv file")
+
+        logger.info("")
+        logger.info("---------------Datasets to be uploaded---------------")
+        for dataset in uploads:
+            logger.info(dataset)
+        logger.info("-----------------------------------------------------")
+        logger.info("")
 
         logger.info(f"cleanup {', '.join([i.name for i in tmpdirs])}")
         for i in tmpdirs:
@@ -204,57 +175,17 @@ def upload_from_collection(**kwargs):
         dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
         remote_collection_json = image_location
         logger.info(f"retreiving collection.json from {remote_collection_json}")
-        try:
-            r = requests.get(image_location)
-            r.raise_for_status()
-            tmpdir = tempfile.TemporaryDirectory()
-            tmpdirs.append(tmpdir)
-            image_location = os.path.join(tmpdir.name, "collection.json")
-            with open(image_location, 'wb') as fd:
-                fd.write(r.content)
-        except Exception as exc:
-            if r.status_code == 401:
-                logger.error(f"Authentication failed for downloading {image_location}. See readme for instruction.")
-            else:
-                logger.error(f"{image_location} doesn't exist or is undownloadable: {str(exc)}")
+        tmpdir = tempfile.TemporaryDirectory()
+        tmpdirs.append(tmpdir)
+        success = download_to_dir(image_location, tmpdir.name)
+        if not success:
             continue
-        try:
-            collection = pystac.Collection.from_file(image_location)
-            if dataset_name == "collection_title":
-                logger.info("Use collection title as Geonadir dataset title.")
-                dataset_name = collection.title
-                dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
-            if not dataset_name:
-                logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
-                dataset_name = "untitled"
-            if exclude:
-                excluded = False
-                for word in exclude:
-                    if word.lower() in dataset_name.lower():
-                        excluded = True
-                        logger.warning(f"\tDataset {dataset_name} excluded for containing word {word}")
-                        break
-                if excluded:
-                    continue
-            try:
-                summary = collection.summaries
-                other = summary.other
-                created = datetime.fromisoformat(other.get("created"))
-                updated = datetime.fromisoformat(other.get("updated"))
-                if created > cb or created < ca:
-                    logger.warning(f"{dataset_name} created at {created}, not between {ca} and {cb}")
-                    continue
-                if updated > ub or updated < ua:
-                    logger.warning(f"{dataset_name} updated at {updated}, not between {ua} and {ub}")
-                    continue
-            except Exception as exc:
-                logger.warning(f"\tCan't find legal created/updated timestamp for {dataset_name}:")
-                logger.warning(f"\t\t{str(exc)}")
-        except Exception as exc:
-            logger.error(f"{image_location} illegal: {str(exc)}")
+        title = deal_with_collection(image_location, exclude, cb, ca, ub, ua)
+        if not title:
             continue
+        if dataset_name == "collection_title":
+            dataset_name = title
         logger.info(f"Dataset name: {dataset_name}")
-        logger.info(f"collection.json location: {image_location}")
         meta = None
         if metadata_json:
             meta = metadata.get(dataset_name, None)
@@ -322,3 +253,57 @@ def generate_four_timestamps(**kwargs):
         ua = datetime(1, 1, 1, 0, 0)
 
     return cb, ca, ub, ua
+
+
+def download_to_dir(url, directory):
+    r = requests.get(url)
+    try:
+        r.raise_for_status()
+        image_location = os.path.join(directory, "collection.json")
+        with open(image_location, 'wb') as fd:
+            fd.write(r.content)
+    except Exception as exc:
+        if r.status_code == 401:
+            logger.error(f"Authentication failed for downloading {image_location}. See readme for instruction.")
+        else:
+            logger.error(f"{image_location} doesn't exist or is undownloadable: {str(exc)}")
+        return False
+    finally:
+        return True
+
+
+def deal_with_collection(collection_location, exclude, cb, ca, ub, ua):
+    try:
+        collection = pystac.Collection.from_file(collection_location)
+        dataset_name = collection.title
+        dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
+        if not dataset_name:
+            logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
+            dataset_name = "untitled"
+        if exclude:
+            excluded = False
+            for word in exclude:
+                if word.lower() in dataset_name.lower():
+                    excluded = True
+                    logger.warning(f"Dataset {dataset_name} excluded for containing word {word}")
+                    break
+            if excluded:
+                return False
+        try:
+            summary = collection.summaries
+            other = summary.other
+            created = datetime.fromisoformat(other.get("created"))
+            updated = datetime.fromisoformat(other.get("updated"))
+            if created > cb or created < ca:
+                logger.warning(f"{dataset_name} created at {created}, not between {ca} and {cb}")
+                return False
+            if updated > ub or updated < ua:
+                logger.warning(f"{dataset_name} updated at {updated}, not between {ua} and {ub}")
+                return False
+        except Exception as exc:
+            logger.warning(f"Can't find legal created/updated timestamp for {dataset_name}:")
+            logger.warning(f"\t{str(exc)}")
+    except Exception as exc:
+        logger.error(f"{collection_location} illegal: {str(exc)}")
+        return False
+    return dataset_name
