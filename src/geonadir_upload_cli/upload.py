@@ -110,6 +110,7 @@ def upload_from_collection(**kwargs):
     metadata_json = kwargs.get("metadata")
     output_dir = kwargs.get("output_folder")
     complete = kwargs.get("complete")
+    exclude = kwargs.get("exclude", None)
 
     tmpdirs = []
 
@@ -120,6 +121,8 @@ def upload_from_collection(**kwargs):
         logger.info(f"metadata: {metadata_json}")
         logger.info(f"private: {private}")
         logger.info(f"complete: {complete}")
+        if exclude:
+            logger.info(f"excluding keywords: {str(exclude)}")
         for i in item:
             dataset_name, image_location = i
             dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
@@ -149,6 +152,15 @@ def upload_from_collection(**kwargs):
                 if not dataset_name:
                     logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
                     dataset_name = "untitled"
+                if exclude:
+                    excluded = False
+                    for word in exclude:
+                        if word.lower() in dataset_name.lower():
+                            excluded = True
+                            logger.warning(f"\tDataset {dataset_name} excluded for containing word {word}")
+                            break
+                    if excluded:
+                        continue
             except Exception as exc:
                 logger.error(f"\t{image_location} illegal: {str(exc)}")
             logger.info(f"\tdataset name: {dataset_name}")
@@ -198,6 +210,15 @@ def upload_from_collection(**kwargs):
             if not dataset_name:
                 logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
                 dataset_name = "untitled"
+            if exclude:
+                excluded = False
+                for word in exclude:
+                    if word.lower() in dataset_name.lower():
+                        excluded = True
+                        logger.warning(f"\tDataset {dataset_name} excluded for containing word {word}")
+                        break
+                if excluded:
+                    continue
         except Exception as exc:
             logger.error(f"{image_location} illegal: {str(exc)}")
             continue
@@ -215,25 +236,28 @@ def upload_from_collection(**kwargs):
     if complete:
         logger.info("Orthomosaic will be triggered after uploading.")
     num_threads = len(dataset_details) if len(dataset_details) <= 5 else 5
-    with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
-        futures = [executor.submit(process_thread, *params) for params in dataset_details]
-        results = [future.result() for future in concurrent.futures.as_completed(futures)]
-        for dataset_name, df, error in results:
-            if error:
-                logger.warning(f"{dataset_name} uploading failed when {error}")
-            else:
-                logger.info(f"{dataset_name} uploading success")
-            if output_dir:
-                if df:
-                    df.to_csv(f"{os.path.join(output_dir, dataset_name)}.csv", index=False)
-                    if error:
-                        logger.warning(f"(probably incomplete) output file: {os.path.join(output_dir, dataset_name)}.csv")
-                    else:
-                        logger.info(f"output file: {os.path.join(output_dir, dataset_name)}.csv")
+    if not num_threads:
+        logger.error("No dataset to upload.")
+    else:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
+            futures = [executor.submit(process_thread, *params) for params in dataset_details]
+            results = [future.result() for future in concurrent.futures.as_completed(futures)]
+            for dataset_name, df, error in results:
+                if error:
+                    logger.warning(f"{dataset_name} uploading failed when {error}")
                 else:
-                    logger.warning(f"output file for {dataset_name} not applicable")
-            else:
-                logger.info(f"no output csv file for {dataset_name}")
+                    logger.info(f"{dataset_name} uploading success")
+                if output_dir:
+                    if df:
+                        df.to_csv(f"{os.path.join(output_dir, dataset_name)}.csv", index=False)
+                        if error:
+                            logger.warning(f"(probably incomplete) output file: {os.path.join(output_dir, dataset_name)}.csv")
+                        else:
+                            logger.info(f"output file: {os.path.join(output_dir, dataset_name)}.csv")
+                    else:
+                        logger.warning(f"output file for {dataset_name} not applicable")
+                else:
+                    logger.info(f"no output csv file for {dataset_name}")
 
     logger.info(f"cleanup {', '.join([i.name for i in tmpdirs])}")
     for i in tmpdirs:

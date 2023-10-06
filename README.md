@@ -67,7 +67,7 @@ Options:
 
 - `-i, --item`: The name of the dataset and the directory of images to be uploaded.
 
-    - This is a multiple option. user can upload multiple datasets in one command by e.g.  
+    - This is a multiple option. user can upload multiple datasets by e.g.  
 `... -i dataset1 path1 -i dataset2 path2 ...`
 
     - All path(s) must exist, otherwise error raised.
@@ -115,7 +115,7 @@ Options:
 
 - `-i, --item`: The name of the dataset and the url of stac collection.
 
-    - This is a multiple option. user can upload multiple datasets in one command by e.g.  
+    - This is a multiple option. user can upload multiple datasets by e.g.  
 `... -i dataset1 url1 -i dataset2 url2 ...`
 
     - Type 'collection_title' for dataset name when uploading from stac collection if you want to use title in collection.json as dataset title, e.g.
@@ -167,6 +167,13 @@ Options:
     - This option is applied to all datasets in a single run.
 
 - `-i, --item`: The remote url of the STAC catalog json file.
+
+- `-x, --exclude`: Exclude collections with keyword in title.
+
+    - This is a multiple option. user can specify multiple keywords by e.g.  
+`... -x keyword1 -x keyword2 ...`
+
+    - Ignore case.
 
 ## Running
 An example of privately uploading `./testimage` as dataset **test1** and `C:\tmp\testimage` as **test2** with metadata file in `./sample_metadata.json`, generating the output csv files in the current folder, and trigger the orthomosaic process when uploading is finished:

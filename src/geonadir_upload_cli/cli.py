@@ -221,6 +221,13 @@ def collection_upload(**kwargs):
     required=False,
     help="Whether post the uploading complete message to trigger the orthomosaic call.",
 )
+@click.option(
+    "--exclude", "-x",
+    type=str,
+    required=False,
+    multiple=True,
+    help="Exclude collections with certain words in the title.",
+)
 def catalog_upload(**kwargs):
     upload_from_catalog(**kwargs)
 

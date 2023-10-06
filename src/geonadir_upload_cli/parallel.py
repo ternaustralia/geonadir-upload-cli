@@ -62,8 +62,9 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
 
     if metadata:
         payload_data.update(**metadata)
-
-    print(payload_data)
+    logger.info("\n")
+    logger.info(f"Metadata for dataset {dataset_name}:")
+    logger.info(str(payload_data))
 
     try:
         dataset_id = create_dataset(payload_data, base_url, token)
