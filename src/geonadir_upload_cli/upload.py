@@ -24,11 +24,11 @@ def upload_from_catalog(**kwargs):
     catalog_url = kwargs.get("item")
     with tempfile.TemporaryDirectory() as tmpdir:
         collections_list = []
-        for collection_url in really_get_all_collections(catalog_url, tmpdir.name):
+        for collection_url in really_get_all_collections(catalog_url, tmpdir):
             collections_list.append(("collection_title", collection_url))
         kwargs["item"] = collections_list
         upload_from_collection(**kwargs)
-        logger.info(f"cleanup {tmpdir.name}")
+        logger.info(f"cleanup {tmpdir}")
 
 
 def normal_upload(**kwargs):
@@ -110,6 +110,7 @@ def upload_from_collection(**kwargs):
     output_dir = kwargs.get("output_folder")
     complete = kwargs.get("complete")
     exclude = kwargs.get("exclude", None)
+    include = kwargs.get("include", None)
 
     cb, ca, ub, ua = generate_four_timestamps(**kwargs)
 
@@ -125,6 +126,8 @@ def upload_from_collection(**kwargs):
         logger.info(f"complete: {complete}")
         if exclude:
             logger.info(f"excluding keywords: {str(exclude)}")
+        if include:
+            logger.info(f"excluding keywords: {str(include)}")
         for count, i in enumerate(item):
             dataset_name, image_location = i
             dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
@@ -137,7 +140,7 @@ def upload_from_collection(**kwargs):
             success = download_to_dir(image_location, tmpdir.name)
             if not success:
                 continue
-            title = deal_with_collection(image_location, exclude, cb, ca, ub, ua)
+            title = deal_with_collection(image_location, exclude, include, cb, ca, ub, ua)
             if not title:
                 continue
             if dataset_name == "collection_title":
@@ -178,7 +181,7 @@ def upload_from_collection(**kwargs):
         success = download_to_dir(image_location, tmpdir.name)
         if not success:
             continue
-        title = deal_with_collection(image_location, exclude, cb, ca, ub, ua)
+        title = deal_with_collection(image_location, exclude, include, cb, ca, ub, ua)
         if not title:
             continue
         if dataset_name == "collection_title":

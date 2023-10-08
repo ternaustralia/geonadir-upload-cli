@@ -6,7 +6,7 @@ import pandas as pd
 import requests
 import tqdm as tq
 
-from .stac import get_filelist_from_collection
+from .util import get_filelist_from_collection
 
 logger = logging.getLogger(__name__)
 

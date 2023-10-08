@@ -86,7 +86,7 @@ def download_to_dir(url, directory):
     return True
 
 
-def deal_with_collection(collection_location, exclude, cb, ca, ub, ua):
+def deal_with_collection(collection_location, exclude, include, cb, ca, ub, ua):
     try:
         collection = pystac.Collection.from_file(collection_location)
         dataset_name = collection.title
@@ -102,6 +102,15 @@ def deal_with_collection(collection_location, exclude, cb, ca, ub, ua):
                     logger.warning(f"Dataset {dataset_name} excluded for containing word {word}")
                     break
             if excluded:
+                return False
+        if include:
+            included = False
+            for word in include:
+                if word.lower() in dataset_name.lower():
+                    included = True
+                    break
+            if not included:
+                logger.warning(f"Dataset {dataset_name} excluded for not containing word(s) from {str(include)}")
                 return False
         try:
             summary = collection.summaries

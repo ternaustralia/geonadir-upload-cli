@@ -256,11 +256,18 @@ def collection_upload(**kwargs):
     help="Whether post the uploading complete message to trigger the orthomosaic call.",
 )
 @click.option(
-    "--exclude", "-x",
+    "--exclude", "-x", "-ex",
     type=str,
     required=False,
     multiple=True,
     help="Exclude collections with certain words in the title.",
+)
+@click.option(
+    "--include", "-in",
+    type=str,
+    required=False,
+    multiple=True,
+    help="Include collections with certain words in the title.",
 )
 @click.option(
     "--created-after", "-ca",
