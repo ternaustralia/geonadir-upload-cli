@@ -80,8 +80,7 @@ def cli():
     flag_value=os.getcwd(),
     type=click.Path(exists=True),
     required=False,
-    help="Whether output csv is created. Generate output at the specified path. Default is false. \
-        \nIf flagged without specifing output folder, default is the current path of your terminal.",
+    help="Whether output csv is created. Generate output at the specified path. Default is false. If flagged without specifing output folder, default is the current path of your terminal.",
 )
 @click.option(
     "--item", "-i",
@@ -142,8 +141,7 @@ def local_upload(**kwargs):
     flag_value=os.getcwd(),
     type=click.Path(exists=True),
     required=False,
-    help="Whether output csv is created. Generate output at the specified path. Default is false. \
-        \nIf flagged without specifing output folder, default is the current path of your terminal.",
+    help="Whether output csv is created. Generate output at the specified path. Default is false. If flagged without specifing output folder, default is the current path of your terminal.",
 )
 @click.option(
     "--item", "-i",
@@ -320,14 +318,20 @@ def catalog_upload(**kwargs):
     flag_value=os.getcwd(),
     type=click.Path(exists=True),
     required=False,
-    help="Whether output csv is created. Generate output at the specified path. Default is false. \
-        \nIf flagged without specifing output folder, default is the current path of your terminal.",
+    help="Whether output csv is created. Generate output at the specified path. Default is false. If flagged without specifing output folder, default is the current path of your terminal.",
 )
 @click.argument('search-str')
 def search_dataset(**kwargs):
     base_url = kwargs.get("base_url")
     search = kwargs.get("search_str")
-    print(json.dumps(search_datasets(search, base_url), indent=4))
+    output = kwargs.get("output_folder")
+    result = search_datasets(search, base_url)
+    print(json.dumps(result, indent=4))
+    path = os.path.join(output, "data.json")
+    logger.info(f"result saved as {path}")
+    if output:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(result, f, ensure_ascii=False, indent=4)
 
 
 @cli.command()
@@ -350,13 +354,19 @@ def search_dataset(**kwargs):
     flag_value=os.getcwd(),
     type=click.Path(exists=True),
     required=False,
-    help="Whether output csv is created. Generate output at the specified path. Default is false. \
-        \nIf flagged without specifing output folder, default is the current path of your terminal.",
+    help="Whether output csv is created. Generate output at the specified path. Default is false. If flagged without specifing output folder, default is the current path of your terminal.",
 )
 def range_dataset(**kwargs):
     base_url = kwargs.get("base_url")
     search = kwargs.get("coords")
-    print(json.dumps(search_datasets_coord(search, base_url), indent=4))
+    output = kwargs.get("output_folder")
+    result = search_datasets_coord(search, base_url)
+    print(json.dumps(result, indent=4))
+    path = os.path.join(output, "data.json")
+    logger.info(f"result saved as {path}")
+    if output:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(result, f, ensure_ascii=False, indent=4)
 
 
 @cli.command()
@@ -374,14 +384,20 @@ def range_dataset(**kwargs):
     flag_value=os.getcwd(),
     type=click.Path(exists=True),
     required=False,
-    help="Whether output csv is created. Generate output at the specified path. Default is false. \
-        \nIf flagged without specifing output folder, default is the current path of your terminal.",
+    help="Whether output csv is created. Generate output at the specified path. Default is false. If flagged without specifing output folder, default is the current path of your terminal.",
 )
 @click.argument('project-id')
 def get_dataset_info(**kwargs):
     base_url = kwargs.get("base_url")
     project_id = kwargs.get("project_id")
-    print(json.dumps(dataset_info(project_id, base_url), indent=4))
+    output = kwargs.get("output_folder")
+    result = dataset_info(project_id, base_url)
+    print(json.dumps(result, indent=4))
+    path = os.path.join(output, "data.json")
+    logger.info(f"result saved as {path}")
+    if output:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(result, f, ensure_ascii=False, indent=4)
 
 
 if __name__ == "__main__":
