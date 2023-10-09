@@ -256,3 +256,19 @@ def dataset_info(project_id, base_url):
         timeout=180,
     )
     return response.json()
+
+
+def search_datasets_coord(coord, base_url):
+    l, r = max(min(coord[0], coord[2]), -180), min(max(coord[0], coord[2]), 180)
+    b, t = max(min(coord[1], coord[3]), -90), min(max(coord[1], coord[3]), 90)
+    logger.info(f"Querying dataset within ({l}, {b}, {r}, {t})")
+    payload = {
+        "bbox": f"{coord[0]},{coord[1]},{coord[2]},{coord[3]}"
+    }
+
+    response = requests.get(
+        f"{base_url}/api/dataset_coords",
+        params=payload,
+        timeout=180,
+    )
+    return response.json()

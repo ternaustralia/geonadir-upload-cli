@@ -15,9 +15,9 @@ cd your/repo/directory/geonadir-upload-cli
 pip install -e .
 ```
 
-You can run this cli tool from any location. Call below command for detail.
+You can run this cli tool from any location. Add option `--help` for command detail, e.g.
 ```
-geonadir-upload upload-dataset --help
+geonadir-upload local-upload --help
 ```
 Call below command for showing current version of the package.
 ```

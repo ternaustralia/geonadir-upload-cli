@@ -5,7 +5,7 @@ from importlib.metadata import version
 
 import click
 
-from .dataset import dataset_info, search_datasets
+from .dataset import dataset_info, search_datasets, search_datasets_coord
 from .upload import normal_upload, upload_from_catalog, upload_from_collection
 
 LEGAL_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
@@ -81,7 +81,7 @@ def cli():
     type=click.Path(exists=True),
     required=False,
     help="Whether output csv is created. Generate output at the specified path. Default is false. \
-        If flagged without specifing output folder, default is the current path of your terminal.",
+        \nIf flagged without specifing output folder, default is the current path of your terminal.",
 )
 @click.option(
     "--item", "-i",
@@ -143,7 +143,7 @@ def local_upload(**kwargs):
     type=click.Path(exists=True),
     required=False,
     help="Whether output csv is created. Generate output at the specified path. Default is false. \
-        If flagged without specifing output folder, default is the current path of your terminal.",
+        \nIf flagged without specifing output folder, default is the current path of your terminal.",
 )
 @click.option(
     "--item", "-i",
@@ -151,8 +151,8 @@ def local_upload(**kwargs):
     required=True,
     multiple=True,
     help="The name of the dataset and the remote url of stac collection. \
-        Type 'collection_title' for dataset name when uploading from stac collection if you want to use title in collection.json as dataset title, \
-        e.g. ... --item collection_title ./collection.json ...",
+        \nType 'collection_title' for dataset name when uploading from stac collection if you want to use title in collection.json as dataset title, \
+        \ne.g. ... --item collection_title ./collection.json ...",
 )
 @click.option(
     "--complete", "-c",
@@ -314,6 +314,15 @@ def catalog_upload(**kwargs):
     required=False,
     help="Base url of geonadir api.",
 )
+@click.option(
+    "--output-folder", "-o",
+    is_flag=False,
+    flag_value=os.getcwd(),
+    type=click.Path(exists=True),
+    required=False,
+    help="Whether output csv is created. Generate output at the specified path. Default is false. \
+        \nIf flagged without specifing output folder, default is the current path of your terminal.",
+)
 @click.argument('search-str')
 def search_dataset(**kwargs):
     base_url = kwargs.get("base_url")
@@ -329,6 +338,44 @@ def search_dataset(**kwargs):
     type=str,
     required=False,
     help="Base url of geonadir api.",
+)
+@click.argument(
+    'coords',
+    nargs=4,
+    type=float,
+)
+@click.option(
+    "--output-folder", "-o",
+    is_flag=False,
+    flag_value=os.getcwd(),
+    type=click.Path(exists=True),
+    required=False,
+    help="Whether output csv is created. Generate output at the specified path. Default is false. \
+        \nIf flagged without specifing output folder, default is the current path of your terminal.",
+)
+def range_dataset(**kwargs):
+    base_url = kwargs.get("base_url")
+    search = kwargs.get("coords")
+    print(json.dumps(search_datasets_coord(search, base_url), indent=4))
+
+
+@cli.command()
+@click.option(
+    "--base-url", "-u",
+    default="https://api.geonadir.com",
+    show_default=True,
+    type=str,
+    required=False,
+    help="Base url of geonadir api.",
+)
+@click.option(
+    "--output-folder", "-o",
+    is_flag=False,
+    flag_value=os.getcwd(),
+    type=click.Path(exists=True),
+    required=False,
+    help="Whether output csv is created. Generate output at the specified path. Default is false. \
+        \nIf flagged without specifing output folder, default is the current path of your terminal.",
 )
 @click.argument('project-id')
 def get_dataset_info(**kwargs):
