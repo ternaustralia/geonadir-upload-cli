@@ -143,8 +143,11 @@ def upload_from_collection(**kwargs):
             title = deal_with_collection(image_location, exclude, include, cb, ca, ub, ua)
             if not title:
                 continue
-            if dataset_name == "collection_title":
-                dataset_name = title
+            if not dataset_name:
+                dataset_name = "".join(x for x in title.replace(" ", "_") if x in LEGAL_CHARS)
+                if not dataset_name:
+                    logger.warning(f"No legal character. Dataset named 'untitled_{count}'")
+                    dataset_name = f"untitled_{count}"
             uploads.append(dataset_name)
             logger.info(f"dataset name: {dataset_name}")
             if output_dir:
@@ -171,7 +174,7 @@ def upload_from_collection(**kwargs):
             metadata = json.load(f)
         logger.info(f"metadata: {metadata_json}")
     dataset_details = []
-    for i in item:
+    for count, i in enumerate(item):
         dataset_name, image_location = i
         dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
         remote_collection_json = image_location
@@ -184,8 +187,11 @@ def upload_from_collection(**kwargs):
         title = deal_with_collection(image_location, exclude, include, cb, ca, ub, ua)
         if not title:
             continue
-        if dataset_name == "collection_title":
-            dataset_name = title
+        if not dataset_name:
+            dataset_name = "".join(x for x in title.replace(" ", "_") if x in LEGAL_CHARS)
+            if not dataset_name:
+                logger.warning(f"No legal character. Dataset named 'untitled_{count}'")
+                dataset_name = f"untitled_{count}"
         logger.info(f"Dataset name: {dataset_name}")
         meta = None
         if metadata_json:

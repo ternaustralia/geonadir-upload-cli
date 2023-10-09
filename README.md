@@ -118,8 +118,8 @@ Options:
     - This is a multiple option. User can upload multiple datasets by e.g.  
 `... -i dataset1 url1 -i dataset2 url2 ...`
 
-    - Type 'collection_title' for dataset name when uploading from stac collection if you want to use title in collection.json as dataset title, e.g.
-`... --item collection_title https://url/to/collection.json ...`
+    - Type '=' for dataset name when uploading from stac collection if you want to use title in collection.json as dataset title, e.g.
+`... --item = https://url/to/collection.json ...`
 
     - All path(s) must exist, otherwise error raised.
 
