@@ -25,7 +25,7 @@ def upload_from_catalog(**kwargs):
     with tempfile.TemporaryDirectory() as tmpdir:
         collections_list = []
         for collection_url in really_get_all_collections(catalog_url, tmpdir):
-            collections_list.append(("collection_title", collection_url))
+            collections_list.append(("=", collection_url))
         kwargs["item"] = collections_list
         upload_from_collection(**kwargs)
         logger.info(f"cleanup {tmpdir}")
