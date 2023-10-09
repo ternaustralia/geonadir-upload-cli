@@ -324,12 +324,12 @@ def catalog_upload(**kwargs):
 def search_dataset(**kwargs):
     base_url = kwargs.get("base_url")
     search = kwargs.get("search_str")
-    output = kwargs.get("output_folder")
+    output = kwargs.get("output_folder", None)
     result = search_datasets(search, base_url)
     print(json.dumps(result, indent=4))
-    path = os.path.join(output, "data.json")
-    logger.info(f"result saved as {path}")
     if output:
+        path = os.path.join(output, "data.json")
+        logger.info(f"result saved as {path}")
         with open(path, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=4)
 
@@ -359,12 +359,12 @@ def search_dataset(**kwargs):
 def range_dataset(**kwargs):
     base_url = kwargs.get("base_url")
     search = kwargs.get("coords")
-    output = kwargs.get("output_folder")
+    output = kwargs.get("output_folder", None)
     result = search_datasets_coord(search, base_url)
     print(json.dumps(result, indent=4))
-    path = os.path.join(output, "data.json")
-    logger.info(f"result saved as {path}")
     if output:
+        path = os.path.join(output, "data.json")
+        logger.info(f"result saved as {path}")
         with open(path, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=4)
 
@@ -390,12 +390,12 @@ def range_dataset(**kwargs):
 def get_dataset_info(**kwargs):
     base_url = kwargs.get("base_url")
     project_id = kwargs.get("project_id")
-    output = kwargs.get("output_folder")
+    output = kwargs.get("output_folder", None)
     result = dataset_info(project_id, base_url)
     print(json.dumps(result, indent=4))
-    path = os.path.join(output, "data.json")
-    logger.info(f"result saved as {path}")
     if output:
+        path = os.path.join(output, "data.json")
+        logger.info(f"result saved as {path}")
         with open(path, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=4)
 

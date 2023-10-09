@@ -265,8 +265,8 @@ password <apikey>
 ```
 
 ## other usages
-### searching for dataset
-Usage: `geonadir-upload search-dataset SEARCH_STR`
+### searching for dataset by name
+Usage: `geonadir-upload search-dataset <SEARCH_STR>`
 
 sample usage and output:
 ```
@@ -299,8 +299,46 @@ PS C:\Users\uqtlan> geonadir-upload search-dataset SASMD
 ]
 ```
 
+### searching for dataset by coordinates
+Usage: `geonadir-upload range-dataset <coords>`
+
+Coordinates should be like `lon lat lon lat`.
+
+It needs to be stated with `--` if no extra options is specified when coordinates contain negative (see example below).
+
+sample usage and output:
+```
+PS C:\Users\uqtlan> geonadir-upload range-dataset -- 24 -34 29 -27
+[
+    {
+        "id": 3256,
+        "dataset_name": "SASMDD0006"
+    },
+    {
+        "id": 3198,
+        "dataset_name": "SASMDD0002"
+    },
+    {
+        "id": 3197,
+        "dataset_name": "SASMDD0003"
+    },
+    {
+        "id": 3255,
+        "dataset_name": "SASMDD0005"
+    },
+    {
+        "id": 3199,
+        "dataset_name": "SASMDD0004"
+    },
+    {
+        "id": 2837,
+        "dataset_name": "SASMDD0001"
+    }
+]
+```
+
 ### getting dataset information
-Usage: `geonadir-upload get-dataset-info DATASET_ID`
+Usage: `geonadir-upload get-dataset-info <DATASET_ID>`
 
 sample usage and output:
 ```
