@@ -311,28 +311,39 @@ sample usage and output:
 PS C:\Users\uqtlan> geonadir-upload range-dataset -- 24 -34 29 -27
 [
     {
-        "id": 3256,
-        "dataset_name": "SASMDD0006"
+        "id": 2359,
+        "latitude": -33.47661578,
+        "longitude": 25.34186233
     },
     {
-        "id": 3198,
-        "dataset_name": "SASMDD0002"
+        "id": 2520,
+        "latitude": -33.49132739,
+        "longitude": 26.81348708
     },
     {
-        "id": 3197,
-        "dataset_name": "SASMDD0003"
+        "id": 2876,
+        "latitude": -29.1854623611111,
+        "longitude": 26.1971409444444
     },
     {
-        "id": 3255,
-        "dataset_name": "SASMDD0005"
+        "id": 2877,
+        "latitude": -29.1813107777778,
+        "longitude": 26.1913818888889
     },
     {
-        "id": 3199,
-        "dataset_name": "SASMDD0004"
+        "id": 2883,
+        "latitude": -29.1813107777778,
+        "longitude": 26.1913818888889
     },
     {
-        "id": 2837,
-        "dataset_name": "SASMDD0001"
+        "id": 3003,
+        "latitude": -33.5088568333333,
+        "longitude": 26.8160168883333
+    },
+    {
+        "id": 3009,
+        "latitude": -33.5098297216667,
+        "longitude": 26.815559
     }
 ]
 ```
