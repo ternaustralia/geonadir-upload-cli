@@ -56,7 +56,23 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
         citation = collection.extra_fields.get('sci:citation')
         if citation:
             payload_data["data_credits"] = citation
-        description = collection.description
+        description = ""
+        if hasattr(collection, "description"):
+            description += collection.description
+        else:
+            logger.warning(f"No description in {remote_collection_json}")
+        if hasattr(collection, "license"):
+            description += "\nLicense: "
+            description += collection.license
+        else:
+            logger.warning(f"No license in {remote_collection_json}")
+        try:
+            license_link = collection.get_single_link("license").get_href()
+            if license_link:
+                description += "\nLicense href: "
+                description += license_link
+        except Exception as exc:
+            logger.warning(f"Can't find license href in {remote_collection_json}")
         if description:
             payload_data["description"] = description
 
