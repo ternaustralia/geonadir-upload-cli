@@ -62,14 +62,14 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
         else:
             logger.warning(f"No description in {remote_collection_json}")
         if hasattr(collection, "license"):
-            description += "\nLicense: "
+            description += "\n\nLicense: "
             description += collection.license
         else:
             logger.warning(f"No license in {remote_collection_json}")
         try:
             license_link = collection.get_single_link("license").get_href()
             if license_link:
-                description += "\nLicense href: "
+                description += "\n\nLicense href: "
                 description += license_link
         except Exception as exc:
             logger.warning(f"Can't find license href in {remote_collection_json}")
