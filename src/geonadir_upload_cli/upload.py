@@ -4,9 +4,6 @@ import logging
 import os
 import tempfile
 
-import pystac
-import requests
-
 from .parallel import process_thread
 from .util import really_get_all_collections, generate_four_timestamps, download_to_dir, deal_with_collection
 
