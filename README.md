@@ -15,8 +15,17 @@ cd your/repo/directory/geonadir-upload-cli
 pip install -e .
 ```
 
+Another option is to install from PyPi. Visit [https://pypi.org/project/geonadir-upload-cli/](https://pypi.org/project/geonadir-upload-cli/) for detail:
+```
+# create a virtual env before installing if you prefer
+(virtualenv env)
+(source env/bin/activate)
+pip install geonadir-upload-cli
+```
+
 You can run this cli tool from any location. Add option `--help` for command detail, e.g.
 ```
+geonadir-upload --help
 geonadir-upload local-upload --help
 ```
 Call below command for showing current version of the package.
@@ -72,141 +81,6 @@ Options:
 
     - All path(s) must exist, otherwise error raised.
 
-### upload dataset from single remote STAC collection.json file
-Usage: `geonadir-upload collection-upload [OPTIONS]`
-
-Options:
-
-- `--dry-run`: Show all information of this run without actual running.
-
-- `-u, --base-url`: The base url of geonadir api. 
-
-    - Default is https://api.geonadir.com.
-
-    - Usually leave default.
-
-- `-t, --token`: The user token for authentication. 
-
-    - When not specified in command, there will be a password prompt for it. (recommended for security’s sake)
-
-- `-p, --private / --public`: Whether datasets are private.
-
-    - Default is public.
-
-    - This option is applied to all datasets in a single run. Use metadata if some of the datasets need to be set differently.
-
-- `-m, --metadata`: The path of metadata json file.
-
-    - The path must exist, otherwise error raised.
-
-- `-o, --output-folder`: Whether output csv is created. Generate output at the specified path.
-
-    - Default is false.
-
-    - If flagged without specifying output folder, default is the current path of your terminal.
-
-    - The path must exist, otherwise error raised.
-
-- `-c, --complete`: Whether to trigger the orthomosaic processing once uploading is finished.
-
-    - Default is false.
-
-    - This option is applied to all datasets in a single run.
-
-- `-i, --item`: The name of the dataset and the url of stac collection.
-
-    - This is a multiple option. User can upload multiple datasets by e.g.  
-`... -i dataset1 url1 -i dataset2 url2 ...`
-
-    - Type '=' for dataset name when uploading from stac collection if you want to use title in collection.json as dataset title, e.g.
-`... --item = https://url/to/collection.json ...`
-
-    - All path(s) must exist, otherwise error raised.
-
-- `-cb, --created-before`: Only upload collections created before this timestamp.
-
-    - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
-
-- `-ca, --created-after`: Only upload collections created after this timestamp.
-
-    - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
-
-- `-ub, --updated-before`: Only upload collections updated before this timestamp.
-
-    - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
-
-- `-ua, --updated-after`: Only upload collections updated after this timestamp.
-
-    - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
-
-### upload datasets from all collections of STAC catalog
-Usage: `geonadir-upload catalog-upload [OPTIONS]`
-
-This command uploads all collections in the specified STAC catalog (not necessarily the root catalog) and all its sub-catalogs if any. Each collection will be uploaded as a Geonadir dataset with dataset name being collection title. One catalog each time. Other options are same as single-datasets uploading.
-
-Options:
-
-- `--dry-run`: Show all information of this run without actual running.
-
-- `-u, --base-url`: The base url of geonadir api. 
-
-    - Default is https://api.geonadir.com.
-
-    - Usually leave default.
-
-- `-t, --token`: The user token for authentication. 
-
-    - When not specified in command, there will be a password prompt for it. (recommended for security’s sake)
-
-- `-p, --private / --public`: Whether datasets are private.
-
-    - Default is public.
-
-    - This option is applied to all datasets in a single run. Use metadata if some of the datasets need to be set differently.
-
-- `-m, --metadata`: The path of metadata json file.
-
-    - The path must exist, otherwise error raised.
-
-- `-o, --output-folder`: Whether output csv is created. Generate output at the specified path.
-
-    - Default is false.
-
-    - If flagged without specifying output folder, default is the current path of your terminal.
-
-    - The path must exist, otherwise error raised.
-
-- `-c, --complete`: Whether to trigger the orthomosaic processing once uploading is finished.
-
-    - Default is false.
-
-    - This option is applied to all datasets in a single run.
-
-- `-i, --item`: The remote url of the STAC catalog json file.
-
-- `-x, --exclude`: Exclude collections with keyword in title.
-
-    - This is a multiple option. User can specify multiple keywords by e.g.  
-`... -x keyword1 -x keyword2 ...`
-
-    - Ignore case.
-
-- `-cb, --created-before`: Only upload collections created before this timestamp.
-
-    - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
-
-- `-ca, --created-after`: Only upload collections created after this timestamp.
-
-    - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
-
-- `-ub, --updated-before`: Only upload collections updated before this timestamp.
-
-    - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
-
-- `-ua, --updated-after`: Only upload collections updated after this timestamp.
-
-    - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
-
 ## Running
 An example of privately uploading `./testimage` as dataset **test1** and `C:\tmp\testimage` as **test2** with metadata file in `./sample_metadata.json`, generating the output csv files in the current folder, and trigger the orthomosaic process when uploading is finished:
 ```
@@ -241,28 +115,6 @@ The metadata specified in the json file will override the global settings, e.g. 
 |         test1        |      3174      | DJI_20220519122501_0041.JPG |        201        | 2.770872116088867 |    22500587    |         True         |  (image_url)  |
 |         ...          |      ...       |             ...             |        ...        |        ...        |      ...       |         ...          |      ...      |
 
-
-### .netrc setting for uploading dataset from stac catalog
-before uploading from stac catalog, it is critical to set up `.netrc` file for http requests authentication. Put this file in root folder with content like this or add this to existing `.netrc` file:
-```
-machine <host url>
-login <username>
-password <password>
-```
-#### example: .netrc configuration for TERN data server
-1. Create an API key if you don't have one yet:
-    1. Sign in [TERN Account](https://account.tern.org.au/).
-    2. Click on **Create API key** on the left.
-    3. Type a name for your API key and click on **Request API Key**.
-    4. Memorize the key.
-2. Once you have it, add content below to `<root folder>/.netrc` (or create one if it's not there).
-
-    **Note**: here username is string ***apikey*** and password is the API key generated before or in the previous step.
-```
-machine data.tern.org.au
-login apikey
-password <apikey>
-```
 
 ## other usages
 ### searching for dataset by name
