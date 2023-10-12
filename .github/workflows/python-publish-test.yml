@@ -10,7 +10,7 @@ name: Upload Python Package to TestPyPi
 
 on:
   release:
-    types: [released]
+    types: [published]
 
 permissions:
   contents: write  # IMPORTANT: mandatory for making GitHub Releases
