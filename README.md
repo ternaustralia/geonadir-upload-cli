@@ -15,6 +15,14 @@ cd your/repo/directory/geonadir-upload-cli
 pip install -e .
 ```
 
+Another option is to install from PyPi. Visit (https://pypi.org/project/geonadir-upload-cli/)[https://pypi.org/project/geonadir-upload-cli/] for detail:
+```
+# create a virtual env before installing if you prefer
+(virtualenv env)
+(source env/bin/activate)
+pip install geonadir-upload-cli
+```
+
 You can run this cli tool from any location. Add option `--help` for command detail, e.g.
 ```
 geonadir-upload local-upload --help
