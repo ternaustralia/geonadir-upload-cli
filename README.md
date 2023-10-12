@@ -5,9 +5,10 @@
 This package is for uploading datasets to Geonadir. You can use it to upload multiple datasets at one time with metadata specified for any or all of them. This cli tool has other functions e.g. searching for dataset or getting dataset information.
 
 ## Setup
+
 After cloning this repo, run the commands below to install this package.
 
-```
+```bash
 # create a virtual env before installing if you prefer
 (virtualenv env)
 (source env/bin/activate)
@@ -16,7 +17,8 @@ pip install -e .
 ```
 
 Another option is to install from PyPi. Visit [https://pypi.org/project/geonadir-upload-cli/](https://pypi.org/project/geonadir-upload-cli/) for detail:
-```
+
+```bash
 # create a virtual env before installing if you prefer
 (virtualenv env)
 (source env/bin/activate)
@@ -24,72 +26,82 @@ pip install geonadir-upload-cli
 ```
 
 You can run this cli tool from any location. Add option `--help` for command detail, e.g.
-```
+
+```bash
 geonadir-upload --help
 geonadir-upload local-upload --help
 ```
+
 Call below command for showing current version of the package.
-```
+
+```bash
 geonadir-upload --version
 ```
+
 ## command details
+
 ### upload dataset from local image directory
+
 Usage: `geonadir-upload local-upload [OPTIONS]`
 
 Options:
 
 - `--dry-run`: Show all information of this run without actual running.
 
-- `-u, --base-url`: The base url of geonadir api. 
+- `-u, --base-url`: The base url of geonadir api.
 
-    - Default is https://api.geonadir.com.
+  - Default is <https://api.geonadir.com>.
 
-    - Usually leave default.
+  - Usually leave default.
 
-- `-t, --token`: The user token for authentication. 
+- `-t, --token`: The user token for authentication.
 
-    - When not specified in command, there will be a password prompt for it. (recommended for security’s sake)
+  - When not specified in command, there will be a password prompt for it. (recommended for security’s sake)
 
 - `-p, --private / --public`: Whether datasets are private.
 
-    - Default is public.
+  - Default is public.
 
-    - This option is applied to all datasets in a single run. Use metadata if some of the datasets need to be set differently.
+  - This option is applied to all datasets in a single run. Use metadata if some of the datasets need to be set differently.
 
 - `-m, --metadata`: The path of metadata json file.
 
-    - The path must exist, otherwise error raised.
+  - The path must exist, otherwise error raised.
 
 - `-o, --output-folder`: Whether output csv is created. Generate output at the specified path.
 
-    - Default is false.
+  - Default is false.
 
-    - If flagged without specifying output folder, default is the current path of your terminal.
+  - If flagged without specifying output folder, default is the current path of your terminal.
 
-    - The path must exist, otherwise error raised.
+  - The path must exist, otherwise error raised.
 
 - `-c, --complete`: Whether to trigger the orthomosaic processing once uploading is finished.
 
-    - Default is false.
+  - Default is false.
 
-    - This option is applied to all datasets in a single run.
+  - This option is applied to all datasets in a single run.
 
 - `-i, --item`: The name of the dataset and the directory of images to be uploaded.
 
-    - This is a multiple option. user can upload multiple datasets by e.g.  
+  - This is a multiple option. user can upload multiple datasets by e.g.  
 `... -i dataset1 path1 -i dataset2 path2 ...`
 
-    - All path(s) must exist, otherwise error raised.
+  - All path(s) must exist, otherwise error raised.
 
 ## Running
+
 An example of privately uploading `./testimage` as dataset **test1** and `C:\tmp\testimage` as **test2** with metadata file in `./sample_metadata.json`, generating the output csv files in the current folder, and trigger the orthomosaic process when uploading is finished:
-```
+
+```bash
 geonadir-upload upload-dataset -i test1 testimage -i test2 C:\tmp\testimage -p -m sample_metadata.json -o
 ```
+
 The metadata specified in the json file will override the global settings, e.g. `is_private`.  
 
 ### sample metadata json
-```
+
+```json
 {
     "test1": {
         "tags": ["tag1", "tag2"],
@@ -109,19 +121,23 @@ The metadata specified in the json file will override the global settings, e.g. 
     }
 }
 ```
+
 ### sample output
+
 |   **Dataset Name**   | **Project ID** |        **Image Name**       | **Response Code** |  **Upload Time**  | **Image Size** | **Is Image in API?** | **Image URL** |
 |:--------------------:|:--------------:|:---------------------------:|:-----------------:|:-----------------:|----------------|----------------------|---------------|
 |         test1        |      3174      | DJI_20220519122501_0041.JPG |        201        | 2.770872116088867 |    22500587    |         True         |  (image_url)  |
 |         ...          |      ...       |             ...             |        ...        |        ...        |      ...       |         ...          |      ...      |
 
-
 ## other usages
+
 ### searching for dataset by name
+
 Usage: `geonadir-upload search-dataset <SEARCH_STR>`
 
 sample usage and output:
-```
+
+```bash
 PS C:\Users\uqtlan> geonadir-upload search-dataset SASMD
 [
     {
@@ -152,6 +168,7 @@ PS C:\Users\uqtlan> geonadir-upload search-dataset SASMD
 ```
 
 ### searching for dataset by coordinates
+
 Usage: `geonadir-upload range-dataset <coords>`
 
 Coordinates should be like `lon lat lon lat`.
@@ -159,7 +176,8 @@ Coordinates should be like `lon lat lon lat`.
 It needs to be stated with `--` if no extra options is specified when coordinates contain negative (see example below).
 
 sample usage and output:
-```
+
+```bash
 PS C:\Users\uqtlan> geonadir-upload range-dataset -- 24 -34 29 -27
 [
     {
@@ -201,10 +219,12 @@ PS C:\Users\uqtlan> geonadir-upload range-dataset -- 24 -34 29 -27
 ```
 
 ### getting dataset information
+
 Usage: `geonadir-upload get-dataset-info <DATASET_ID>`
 
 sample usage and output:
-```
+
+```bash
 PS C:\Users\uqtlan> geonadir-upload get-dataset-info 3198
 {
     "id": 2863,
@@ -247,7 +267,6 @@ PS C:\Users\uqtlan> geonadir-upload get-dataset-info 3198
     }
 }
 ```
-
 
 ## Packaging
 
