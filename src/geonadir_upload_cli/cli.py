@@ -84,7 +84,7 @@ def cli():
 )
 @click.option(
     "--item", "-i",
-    type=(str, click.Path()),
+    type=(str, click.Path(exists=True)),
     required=True,
     multiple=True,
     help="The name of the dataset and the directory of images to be uploaded.",
