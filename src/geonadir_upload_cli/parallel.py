@@ -2,11 +2,8 @@ import logging
 import os
 import time
 
-import pystac
-
 from .dataset import (create_dataset, paginate_dataset_image_images,
-                      trigger_ortho_processing, upload_images,
-                      upload_images_from_collection)
+                      trigger_ortho_processing, upload_images)
 
 logger = logging.getLogger(__name__)
 
@@ -51,30 +48,6 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
         "is_private": private,
         "is_published": True
     }
-    if remote_collection_json:
-        collection = pystac.Collection.from_file(img_dir)
-        citation = collection.extra_fields.get('sci:citation')
-        if citation:
-            payload_data["data_credits"] = citation
-        description = ""
-        if hasattr(collection, "description"):
-            description += collection.description
-        else:
-            logger.warning(f"No description in {remote_collection_json}")
-        if hasattr(collection, "license"):
-            description += "\n\nLicense: "
-            description += collection.license
-        else:
-            logger.warning(f"No license in {remote_collection_json}")
-        try:
-            license_link = collection.get_single_link("license").get_href()
-            if license_link:
-                description += "\n\nLicense href: "
-                description += license_link
-        except Exception as exc:
-            logger.warning(f"Can't find license href in {remote_collection_json}")
-        if description:
-            payload_data["description"] = description
 
     if metadata:
         payload_data.update(**metadata)
@@ -93,10 +66,7 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
     url = f"{base_url}/api/uploadfiles/?page=1&project_id={dataset_id}"
 
     try:
-        if os.path.splitext(img_dir)[1] == ".json":
-            result_df = upload_images_from_collection(dataset_name, dataset_id, img_dir, base_url, token, remote_collection_json)
-        else:
-            result_df = upload_images(dataset_name, dataset_id, img_dir, base_url, token)
+        result_df = upload_images(dataset_name, dataset_id, img_dir, base_url, token)
     except Exception as exc:
         logger.error(f"Uploading images failed: {str(exc)}")
         return dataset_name, False, "upload_images"
