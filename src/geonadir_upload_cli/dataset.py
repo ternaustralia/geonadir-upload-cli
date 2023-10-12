@@ -6,6 +6,8 @@ import pandas as pd
 import requests
 import tqdm as tq
 
+from .util import get_filelist_from_collection
+
 logger = logging.getLogger(__name__)
 
 
@@ -85,6 +87,85 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token):
                 )
 
             response_code = response.status_code
+
+            end_time = time.time()
+            upload_time = end_time - start_time
+            df = pd.DataFrame(
+                {
+                    "Project ID": dataset_id,
+                    "Dataset Name": dataset_name,
+                    "Image Name": file_path,
+                    "Response Code": response_code,
+                    "Upload Time": upload_time,
+                    "Image Size": file_size
+                },
+                index=[0]
+            )
+            df_list.append(df)
+
+            count += 1
+            pbar.update(1)
+
+    result_df = pd.concat(df_list, ignore_index=True)
+    return result_df
+
+
+def upload_images_from_collection(dataset_name, dataset_id, collection, base_url, token, remote_collection_json):
+    """
+    Upload images from a directory to a dataset.
+
+    Args:
+        dataset_name (str): Name of the dataset to upload images to.
+        dataset_id (str): ID of the dataset to upload images to.
+        collection (str): Path of local collection.json.
+        base_url (str): Base url of Geonadir api.
+        token (str): User token.
+        remote_collection_json (str): Remote url of collection.json.
+
+    Returns:
+        pd.DataFrame: DataFrame containing upload results for each image.
+    """
+    file_dict = get_filelist_from_collection(collection, remote_collection_json)
+    if not file_dict:
+        raise Exception(f"no applicable asset file in collection {collection}")
+
+    count = 0
+    df_list = []
+
+    with tq.tqdm(total=len(file_dict), position=0) as pbar:
+        for file_path, file_url in file_dict.items():
+            try:
+                r = requests.get(file_url, timeout=60)
+                r.raise_for_status()
+            except Exception as exc:
+                if r.status_code == 401:
+                    logger.error(f"Authentication failed for {dataset_name}. See readme for instruction.")
+                else:
+                    logger.error(f"Error when retrieving files for {dataset_name} from remote.")
+                raise exc
+            with open(file_path, 'wb') as fd:
+                fd.write(r.content)
+            file_size = os.path.getsize(file_path)
+
+            start_time = time.time()
+            headers = {
+                "authorization": token
+            }
+
+            payload = {"project_id": dataset_id}
+
+            with open(file_path, "rb") as file:
+                response = requests.post(
+                    f"{base_url}/api/upload_image/",
+                    headers=headers,
+                    data=payload,
+                    files={"upload_files": file},
+                    timeout=180,
+                )
+
+            response_code = response.status_code
+
+            os.unlink(file_path)
 
             end_time = time.time()
             upload_time = end_time - start_time
