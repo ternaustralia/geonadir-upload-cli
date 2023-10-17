@@ -327,11 +327,7 @@ def search_dataset(**kwargs):
     output = kwargs.get("output_folder", None)
     result = search_datasets(search, base_url)
     print(json.dumps(result, indent=4))
-<<<<<<< HEAD
     print(len(result), "results")
-=======
-    print(len(result), "results.")
->>>>>>> master
     if output:
         path = os.path.join(output, "data.json")
         logger.info(f"result saved as {path}")
@@ -367,11 +363,7 @@ def range_dataset(**kwargs):
     output = kwargs.get("output_folder", None)
     result = search_datasets_coord(search, base_url)
     print(json.dumps(result, indent=4))
-<<<<<<< HEAD
     print(len(result), "results")
-=======
-    print(len(result), "results.")
->>>>>>> master
     if output:
         path = os.path.join(output, "data.json")
         logger.info(f"result saved as {path}")
