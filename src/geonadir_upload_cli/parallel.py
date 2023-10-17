@@ -94,7 +94,8 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
 
     try:
         if os.path.splitext(img_dir)[1] == ".json":
-            result_df = upload_images_from_collection(dataset_name, dataset_id, img_dir, base_url, token, remote_collection_json)
+            result_df = upload_images_from_collection(
+                dataset_name, dataset_id, img_dir, base_url, token, remote_collection_json)
         else:
             result_df = upload_images(dataset_name, dataset_id, img_dir, base_url, token)
     except Exception as exc:
