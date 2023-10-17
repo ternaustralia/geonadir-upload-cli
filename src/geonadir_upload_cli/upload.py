@@ -21,8 +21,12 @@ def upload_from_catalog(**kwargs):
     catalog_url = kwargs.get("item")
     with tempfile.TemporaryDirectory() as tmpdir:
         collections_list = []
-        for collection_url in really_get_all_collections(catalog_url, tmpdir):
-            collections_list.append(("=", collection_url))
+        try:
+            for collection_url in really_get_all_collections(catalog_url, tmpdir):
+                collections_list.append(("=", collection_url))
+        except Exception as exc:
+            logger.error(f"Error when retrieving collections from remote catalog: \n{str(exc)}")
+            return
         kwargs["item"] = collections_list
         upload_from_collection(**kwargs)
         logger.info(f"cleanup {tmpdir}")
