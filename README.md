@@ -66,6 +66,8 @@ Options:
 
 - `-m, --metadata`: The path of metadata json file.
 
+  - This option is not required. Only use it when some metadata fields need to be specified manually on the run.
+
   - The path must exist, otherwise error raised.
 
 - `-o, --output-folder`: Whether output csv is created. Generate output at the specified path.
@@ -89,17 +91,27 @@ Options:
 
   - All path(s) must exist, otherwise error raised.
 
+  - Space in dataset name will be replaced by "_".
+
+  - Illegal characters in dataset name will be removed. The legal chars include Latins, digits, "-" and "_".
+
 ## Running
 
 An example of privately uploading `./testimage` as dataset **test1** and `C:\tmp\testimage` as **test2** with metadata file in `./sample_metadata.json`, generating the output csv files in the current folder, and trigger the orthomosaic process when uploading is finished:
 
 ```bash
-geonadir-upload upload-dataset -i test1 testimage -i test2 C:\tmp\testimage -p -m sample_metadata.json -o
+geonadir-upload local-upload -i test1 testimage -i test2 C:\tmp\testimage -p -m sample_metadata.json -o
 ```
 
 The metadata specified in the json file will override the global settings, e.g. `is_private`.  
 
 ### sample metadata json
+
+Below is an example for specifying some metadata values on the run. In this example, the metadata record will be mapped to uploaded dataset with name being "test1"/"test2", if any.
+
+For uploading from STAC objects (collection or catalog), the key in metadata.json should be equal to the (processed) collection title if dataset name is not manually specified.
+
+Note: The value in designated `metadata.json` will be of highest priority. However, the metadata values from elsewhere (e.g. `collection.json`) won't be overwritten if the relative fields are not specified in `metadata.json`. Therefore, it's ok to only specify some of the fields especially when uploading from collection.
 
 ```json
 {
@@ -114,7 +126,6 @@ The metadata specified in the json file will override the global settings, e.g. 
     },
     "test2": {
         "tags": "tag2",
-        "description": "test descriptu123on",
         "data_captured_by": "lan",
         "data_credits": "credit2",
         "institution_name": "Ndsf"
@@ -165,6 +176,7 @@ PS C:\Users\uqtlan> geonadir-upload search-dataset SASMD
         "dataset_name": "SASMDD0001"
     }
 ]
+7 results.
 ```
 
 ### searching for dataset by coordinates
@@ -216,6 +228,7 @@ PS C:\Users\uqtlan> geonadir-upload range-dataset -- 24 -34 29 -27
         "longitude": 26.815559
     }
 ]
+7 results.
 ```
 
 ### getting dataset information
