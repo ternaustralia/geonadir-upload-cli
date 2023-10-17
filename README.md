@@ -228,17 +228,25 @@ Options:
 
   - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
 
+  - If timezone not specified, e.g. `-cb 2023-09-23`, it will automatically adapt to local timezone.
+
 - `-ca, --created-after`: Only upload collections created after this timestamp.
 
   - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
+
+  - If timezone not specified, e.g. `-ca 2023-09-23`, it will automatically adapt to local timezone.
 
 - `-ub, --updated-before`: Only upload collections updated before this timestamp.
 
   - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
 
+  - If timezone not specified, e.g. `-ub 2023-09-23`, it will automatically adapt to local timezone.
+
 - `-ua, --updated-after`: Only upload collections updated after this timestamp.
 
   - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
+
+  - If timezone not specified, e.g. `-ua 2023-09-23`, it will automatically adapt to local timezone.
 
 ## Running
 
