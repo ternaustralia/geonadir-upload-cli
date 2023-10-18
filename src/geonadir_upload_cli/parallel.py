@@ -106,7 +106,7 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
         else:
             result_df = upload_images(dataset_name, dataset_id, img_dir, base_url, token)
     except Exception as exc:
-        logger.error(f"Uploading images failed: {str(exc)}")
+        logger.error(f"Uploading images failed: \n{str(exc)}")
         return dataset_name, False, "upload_images"
 
     try:
