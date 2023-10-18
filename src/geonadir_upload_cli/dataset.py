@@ -134,17 +134,9 @@ def upload_images_from_collection(dataset_name, dataset_id, collection, base_url
 
     with tq.tqdm(total=len(file_dict), position=0) as pbar:
         for file_path, file_url in file_dict.items():
-            try:
-                r = requests.get(file_url, timeout=60)
-                r.raise_for_status()
-            except Exception as exc:
-                if r.status_code == 401:
-                    logger.error(f"Authentication failed for {dataset_name}. See readme for instruction.")
-                else:
-                    logger.error(f"Error when retrieving files for {dataset_name} from remote.")
-                raise exc
+            content = retrieve_single_image(file_url, dataset_name, 5, 60)
             with open(file_path, 'wb') as fd:
-                fd.write(r.content)
+                fd.write(content)
             file_size = os.path.getsize(file_path)
 
             start_time = time.time()
@@ -272,3 +264,19 @@ def search_datasets_coord(coord, base_url):
         timeout=180,
     )
     return response.json()
+
+
+def retrieve_single_image(url, dataset_name, max_retry=5, retry_interval=60):
+    failed = 0
+    while failed <= max_retry:
+        try:
+            r = requests.get(url, timeout=retry_interval * (failed + 1))
+            r.raise_for_status()
+            return r.content
+        except Exception as exc:
+            if "r" not in locals():
+                raise Exception(f"Url {url} invalid.")
+            if r.status_code == 401:
+                raise Exception(f"Authentication failed for {dataset_name}. See readme for instruction.")
+            logger.warning(f"Error {r.status_code} when retrieving files for {dataset_name} from remote. Retry after {retry_interval} sec.")
+            failed += 1
