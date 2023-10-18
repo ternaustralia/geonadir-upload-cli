@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import time
 
 import pystac
@@ -78,6 +79,12 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
 
     if metadata:
         payload_data.update(**metadata)
+
+    if payload_data.get("description", None):
+        payload_data["description"] = clickable_link(payload_data["description"])
+    if payload_data.get("data_credits", None):
+        payload_data["data_credits"] = clickable_link(payload_data["data_credits"])
+
     logger.info("\n")
     logger.info(f"Metadata for dataset {dataset_name}:")
     logger.info(str(payload_data))
@@ -156,3 +163,20 @@ def first_value(iterable):
         value: non-None value
     """
     return next((item for item in iterable if item is not None), None)
+
+
+def clickable_link(text:str):
+    regexp = r'((?:(?:(?:https?|ftp):\/\/)|www)[\w/\-?=%.]+\.[\w/\-&?=%.]+)([^\w/\-&?=%.]|$)'
+
+    def repl(matchobj:re.Match):
+        rs = matchobj.group(1).rstrip(".")
+        if rs:
+            num = len(matchobj.group(1)) - len(rs)
+            res = f"<{rs}>{matchobj.group(2)}"
+            for _ in range(num):
+                res += "."
+            return res
+        return matchobj.string
+
+    text = re.sub(regexp, repl, text)
+    return text
