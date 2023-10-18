@@ -82,6 +82,8 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
 
     if payload_data.get("description", None):
         payload_data["description"] = clickable_link(payload_data["description"])
+    if payload_data.get("data_credits", None):
+        payload_data["data_credits"] = clickable_link(payload_data["data_credits"])
 
     logger.info("\n")
     logger.info(f"Metadata for dataset {dataset_name}:")
