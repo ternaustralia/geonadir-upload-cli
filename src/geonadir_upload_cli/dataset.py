@@ -58,7 +58,7 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token):
         pd.DataFrame: DataFrame containing upload results for each image.
     """
     file_list = os.listdir(img_dir)
-    file_list = [file for file in file_list if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp'))]
+    file_list = [file for file in file_list if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tif'))]
 
     count = 0
     df_list = []
