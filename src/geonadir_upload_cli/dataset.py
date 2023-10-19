@@ -108,7 +108,16 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token, max_retry,
     return result_df
 
 
-def upload_images_from_collection(dataset_name, dataset_id, collection, base_url, token, remote_collection_json):
+def upload_images_from_collection(
+        dataset_name,
+        dataset_id,
+        collection,
+        base_url,
+        token,
+        remote_collection_json,
+        max_retry,
+        retry_interval
+):
     """
     Upload images from a directory to a dataset.
 
@@ -132,7 +141,7 @@ def upload_images_from_collection(dataset_name, dataset_id, collection, base_url
 
     with tq.tqdm(total=len(file_dict), position=0) as pbar:
         for file_path, file_url in file_dict.items():
-            content = retrieve_single_image(file_url, 5, 60)
+            content = retrieve_single_image(file_url, max_retry, retry_interval)
             with open(file_path, 'wb') as fd:
                 fd.write(content)
             file_size = os.path.getsize(file_path)
@@ -151,7 +160,7 @@ def upload_images_from_collection(dataset_name, dataset_id, collection, base_url
                     "data":payload,
                     "files":{"upload_files": file},
                 }
-                response_code = upload_single_image(param, 5, 60)
+                response_code = upload_single_image(param, max_retry, retry_interval)
 
             os.unlink(file_path)
 

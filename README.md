@@ -181,6 +181,18 @@ Options:
 
   - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
 
+- `-mr, --max-retry`: Max retry attempt for downloading/uploading single image.
+
+    - Must be integer between 0 and 20. Clamping applied.
+
+    - Default is 5.
+
+- `-ri, --retry-interval`: Interval seconds between retries for downloading/uploading single image.
+
+    - Must be floating num between 0 and 3600. Clamping applied.
+
+    - Default is 120.
+
 ### upload datasets from all collections of STAC catalog
 
 Usage: `geonadir-upload catalog-upload [OPTIONS]`
@@ -259,6 +271,18 @@ Options:
   - Must be of [ISO format](https://en.wikipedia.org/wiki/ISO_8601).
 
   - If timezone not specified, e.g. `-ua 2023-09-23`, it will automatically adapt to local timezone.
+
+- `-mr, --max-retry`: Max retry attempt for downloading/uploading single image.
+
+    - Must be integer between 0 and 20. Clamping applied.
+
+    - Default is 5.
+
+- `-ri, --retry-interval`: Interval seconds between retries for downloading/uploading single image.
+
+    - Must be floating num between 0 and 3600. Clamping applied.
+
+    - Default is 120.
 
 ## Running
 

@@ -114,17 +114,25 @@ def process_thread(
     try:
         if os.path.splitext(img_dir)[1] == ".json":
             result_df = upload_images_from_collection(
-                dataset_name, dataset_id, img_dir, base_url, token, remote_collection_json)
+                dataset_name,
+                dataset_id,
+                img_dir,
+                base_url,
+                token,
+                remote_collection_json,
+                max_retry,
+                retry_interval
+            )
         else:
             result_df = upload_images(
-            dataset_name,
-            dataset_id,
-            img_dir,
-            base_url,
-            token,
-            max_retry,
-            retry_interval
-        )
+                dataset_name,
+                dataset_id,
+                img_dir,
+                base_url,
+                token,
+                max_retry,
+                retry_interval
+            )
     except Exception as exc:
         logger.error(f"Uploading images failed:\n{str(exc)}")
         return dataset_name, False, "upload_images"

@@ -209,6 +209,22 @@ def local_upload(**kwargs):
     show_default=True,
     help="Only upload collection updated earlier than specified date. Must be of ISO format.",
 )
+@click.option(
+    "--max-retry", "-mr",
+    default=5,
+    show_default=True,
+    type=click.IntRange(0, 20, clamp=True),
+    required=False,
+    help="Max retry for uploading single image.",
+)
+@click.option(
+    "--retry-interval", "-ri",
+    default=120,
+    show_default=True,
+    type=click.FloatRange(0, 3600, clamp=True),
+    required=False,
+    help="Retry interval second for uploading single image.",
+)
 def collection_upload(**kwargs):
     upload_from_collection(**kwargs)
 
@@ -314,6 +330,22 @@ def collection_upload(**kwargs):
     default="9999-12-31",
     show_default=True,
     help="Only upload collection updated earlier than specified date. Must be of ISO format.",
+)
+@click.option(
+    "--max-retry", "-mr",
+    default=5,
+    show_default=True,
+    type=click.IntRange(0, 20, clamp=True),
+    required=False,
+    help="Max retry for uploading single image.",
+)
+@click.option(
+    "--retry-interval", "-ri",
+    default=120,
+    show_default=True,
+    type=click.FloatRange(0, 3600, clamp=True),
+    required=False,
+    help="Retry interval second for uploading single image.",
 )
 def catalog_upload(**kwargs):
     upload_from_catalog(**kwargs)
