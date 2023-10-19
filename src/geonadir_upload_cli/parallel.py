@@ -65,7 +65,7 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
     try:
         dataset_id = create_dataset(payload_data, base_url, token)
     except Exception as exc:
-        logger.error(f"Create dataset {dataset_name} failed: \n{str(exc)}")
+        logger.error(f"Create dataset {dataset_name} failed:\n{str(exc)}")
         return dataset_name, False, "create_dataset"
     # print(f"Uploading https://staging.geonadir.com/image-collection-details/{dataset_id}")
     # print()
@@ -75,7 +75,7 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
     try:
         result_df = upload_images(dataset_name, dataset_id, img_dir, base_url, token)
     except Exception as exc:
-        logger.error(f"Uploading images failed: {str(exc)}")
+        logger.error(f"Uploading images failed:\n{str(exc)}")
         return dataset_name, False, "upload_images"
 
     try:
@@ -90,14 +90,14 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
             lambda x: first_value(name if original_filename(name) in x else None for name in image_names)
         )
     except Exception as exc:
-        logger.error(f"Retrieving image status for {dataset_name} failed: {str(exc)}")
+        logger.error(f"Retrieving image status for {dataset_name} failed:\n{str(exc)}")
         return dataset_name, result_df, "paginate_dataset_image_images"
 
     if complete:
         try:
             trigger_ortho_processing(dataset_id, base_url, token)
         except Exception as exc:
-            logger.error(f"Triggering ortho processing for {dataset_name} failed: {str(exc)}")
+            logger.error(f"Triggering ortho processing for {dataset_name} failed:\n{str(exc)}")
             return dataset_name, result_df, "trigger_ortho_processing"
 
     return dataset_name, result_df, False
