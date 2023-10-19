@@ -85,7 +85,11 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token, max_retry,
                     "data":payload,
                     "files":{"upload_files": file},
                 }
-                response_code = upload_single_image(param, max_retry, retry_interval, timeout)
+                try:
+                    response_code = upload_single_image(param, max_retry, retry_interval, timeout)
+                except Exception as exc:
+                    logger.error(f"Error when uploading {file_path}")
+                    raise exc
 
             end_time = time.time()
             upload_time = end_time - start_time
@@ -209,10 +213,10 @@ def upload_single_image(param, max_retry=5, retry_interval=20, timeout=60):
             return r.status_code
         except Exception as exc:
             if "r" not in locals():
-                raise Exception(f"Url {param["url"]} invalid.")
-            logger.warning(f"Error {r.status_code} when posting to {param["url"]}: {str(exc)}.")
+                raise Exception(f"Url {param['url']} invalid.")
+            logger.warning(f"Error {r.status_code} when posting to {param['url']}: {str(exc)}.")
             failed += 1
             if failed <= max_retry:
                 logger.warning(f"Retry attempt {failed} after {retry_interval} sec.")
                 time.sleep(retry_interval)
-    raise Exception(f"Max retry exceeded when when posting to {param["url"]}.")
+    raise Exception(f"Max retry exceeded when when posting to {param['url']}.")
