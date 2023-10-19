@@ -95,6 +95,18 @@ Options:
 
   - Illegal characters in dataset name will be removed. The legal chars include Latins, digits, "-" and "_".
 
+- `-mr, --max-retry`: Max retry attempt for uploading single image.
+
+    - Must be integer between 0 and 20. Clamping applied.
+
+    - Default is 5.
+
+- `-ri, --retry-interval`: Interval seconds between retries for uploading single image.
+
+    - Must be floating num between 0 and 3600. Clamping applied.
+
+    - Default is 120.
+
 ## Running
 
 An example of privately uploading `./testimage` as dataset **test1** and `C:\tmp\testimage` as **test2** with metadata file in `./sample_metadata.json`, generating the output csv files in the current folder, and trigger the orthomosaic process when uploading is finished:
