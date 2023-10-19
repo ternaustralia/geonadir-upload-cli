@@ -287,9 +287,11 @@ def retrieve_single_image(url, max_retry=5, retry_interval=60):
                 raise Exception(f"Url {url} invalid.")
             if r.status_code == 401:
                 raise Exception(f"Authentication failed for {url}. See readme for instruction.")
-            logger.warning(f"Error {r.status_code} when retrieving {url} from remote: {str(exc)}. Retry after {retry_interval} sec.")
+            logger.warning(f"Error {r.status_code} when retrieving {url} from remote: {str(exc)}.")
             failed += 1
-            time.sleep(retry_interval)
+            if failed <= max_retry:
+                logger.warning(f"Retry attempt {failed} after {retry_interval} sec.")
+                time.sleep(retry_interval)
     raise Exception(f"Max retry exceeded when retrieving {url} from remote.")
 
 
