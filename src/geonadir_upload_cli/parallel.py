@@ -123,7 +123,8 @@ def process_thread(
                 token,
                 remote_collection_json,
                 max_retry,
-                retry_interval
+                retry_interval,
+                timeout
             )
         else:
             result_df = upload_images(

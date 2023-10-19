@@ -127,6 +127,7 @@ def upload_from_collection(**kwargs):
     include = kwargs.get("include", None)
     max_retry = kwargs.get("max_retry")
     retry_interval = kwargs.get("retry_interval")
+    timeout = kwargs.get("timeout")
 
     cb, ca, ub, ua = generate_four_timestamps(**kwargs)
 
@@ -142,6 +143,7 @@ def upload_from_collection(**kwargs):
         logger.info(f"complete: {complete}")
         logger.info(f"max_retry: {max_retry} times")
         logger.info(f"retry_interval: {retry_interval} sec")
+        logger.info(f"timeout: {timeout} sec")
         if exclude:
             logger.info(f"excluding keywords: {str(exclude)}")
         if include:
@@ -229,6 +231,7 @@ def upload_from_collection(**kwargs):
                 remote_collection_json,
                 max_retry,
                 retry_interval,
+                timeout,
             )
         )
     if complete:

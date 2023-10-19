@@ -119,7 +119,8 @@ def upload_images_from_collection(
         token,
         remote_collection_json,
         max_retry,
-        retry_interval
+        retry_interval,
+        timeout
 ):
     """
     Upload images from a directory to a dataset.
@@ -133,6 +134,7 @@ def upload_images_from_collection(
         remote_collection_json (str): Remote url of collection.json.
         max_retry (int): Max retry for downloading/uploading single image.
         retry_interval (float): Interval between retries.
+        timeout (float): Timeout limit for uploading single images.
 
     Returns:
         pd.DataFrame: DataFrame containing upload results for each image.
@@ -165,7 +167,7 @@ def upload_images_from_collection(
                     "data":payload,
                     "files":{"upload_files": file},
                 }
-                response_code = upload_single_image(param, max_retry, retry_interval)
+                response_code = upload_single_image(param, max_retry, retry_interval, timeout)
 
             os.unlink(file_path)
 
@@ -276,11 +278,11 @@ def search_datasets_coord(coord, base_url):
     return response.json()
 
 
-def retrieve_single_image(url, max_retry=5, retry_interval=60):
+def retrieve_single_image(url, max_retry=5, retry_interval=20, timeout=60):
     failed = 0
     while failed <= max_retry:
         try:
-            r = requests.get(url, timeout=retry_interval)
+            r = requests.get(url, timeout=timeout)
             r.raise_for_status()
             return r.content
         except Exception as exc:
