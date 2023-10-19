@@ -92,7 +92,7 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
     try:
         dataset_id = create_dataset(payload_data, base_url, token)
     except Exception as exc:
-        logger.error(f"Create dataset {dataset_name} failed: {str(exc)}")
+        logger.error(f"Create dataset {dataset_name} failed: \n{str(exc)}")
         return dataset_name, False, "create_dataset"
     # print(f"Uploading https://staging.geonadir.com/image-collection-details/{dataset_id}")
     # print()
