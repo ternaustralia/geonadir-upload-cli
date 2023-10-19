@@ -22,7 +22,8 @@ def process_thread(
         complete,
         remote_collection_json,
         max_retry,
-        retry_interval
+        retry_interval,
+        timeout
 ):
     """
     Process a thread for uploading images to a dataset.
@@ -38,6 +39,7 @@ def process_thread(
         remote_collection_json (str): Remote url of collection.json. Applicable when uploading from collection.
         max_retry (int): Max retry for uploading single image.
         retry_interval (float): Interval between retries.
+        timeout (float): Timeout for uploading single image.
     Returns:
         dataset_name (str): Geonadir dataset name.
         result_df (pd.DataFrame): DataFrame containing upload results for each image, or False if error raised before DF generated.
@@ -131,7 +133,8 @@ def process_thread(
                 base_url,
                 token,
                 max_retry,
-                retry_interval
+                retry_interval,
+                timeout
             )
     except Exception as exc:
         logger.error(f"Uploading images failed:\n{str(exc)}")

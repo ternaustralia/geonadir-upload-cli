@@ -45,7 +45,7 @@ def create_dataset(payload_data, base_url, token):
     return dataset_id
 
 
-def upload_images(dataset_name, dataset_id, img_dir, base_url, token, max_retry, retry_interval):
+def upload_images(dataset_name, dataset_id, img_dir, base_url, token, max_retry, retry_interval, timeout):
     """
     Upload images from a directory to a dataset.
 
@@ -57,6 +57,7 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token, max_retry,
         token (str): User token.
         max_retry (int): Max retry for uploading single image.
         retry_interval (float): Interval between retries.
+        timeout (float): Timeout limit for uploading single images.
 
     Returns:
         pd.DataFrame: DataFrame containing upload results for each image.
@@ -86,7 +87,7 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token, max_retry,
                     "data":payload,
                     "files":{"upload_files": file},
                 }
-                response_code = upload_single_image(param, max_retry, retry_interval)
+                response_code = upload_single_image(param, max_retry, retry_interval, timeout)
 
             end_time = time.time()
             upload_time = end_time - start_time
@@ -295,7 +296,7 @@ def retrieve_single_image(url, max_retry=5, retry_interval=60):
     raise Exception(f"Max retry exceeded when retrieving {url} from remote.")
 
 
-def upload_single_image(param, max_retry=5, retry_interval=60):
+def upload_single_image(param, max_retry=5, retry_interval=20, timeout=60):
     failed = 0
     while failed <= max_retry:
         try:
@@ -304,7 +305,7 @@ def upload_single_image(param, max_retry=5, retry_interval=60):
                 headers=param["headers"],
                 data=param["data"],
                 files=param["files"],
-                timeout=retry_interval,
+                timeout=timeout,
             )
             r.raise_for_status()
             return r.status_code

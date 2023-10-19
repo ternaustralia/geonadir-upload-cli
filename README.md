@@ -105,7 +105,13 @@ Options:
 
     - Must be floating num between 0 and 3600. Clamping applied.
 
-    - Default is 120.
+    - Default is 20.
+
+- `-to, --timeout`: Timeout seconds for uploading single image.
+
+    - Must be floating num between 0 and 3600. Clamping applied.
+
+    - Default is 60.
 
 ### upload dataset from single remote STAC collection.json file
 
