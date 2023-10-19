@@ -194,6 +194,16 @@ def first_value(iterable):
 
 
 def clickable_link(text:str):
+    """Find urls starting with ftp/http/https/www with at least 3 sections,
+    and make them clickable in markdown.
+    e.g. https://a.b will be substituted by <https://a.b>
+
+    Args:
+        text (str): text
+
+    Returns:
+        str: processed text
+    """    
     regexp = r'((?:(?:(?:https?|ftp):\/\/)|www)[\w/\-?=%.]+\.[\w/\-&?=%.]+)([^\w/\-&?=%.]|$)'
 
     def repl(matchobj:re.Match):

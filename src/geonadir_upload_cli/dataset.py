@@ -130,6 +130,8 @@ def upload_images_from_collection(
         base_url (str): Base url of Geonadir api.
         token (str): User token.
         remote_collection_json (str): Remote url of collection.json.
+        max_retry (int): Max retry for downloading/uploading single image.
+        retry_interval (float): Interval between retries.
 
     Returns:
         pd.DataFrame: DataFrame containing upload results for each image.
@@ -310,4 +312,4 @@ def upload_single_image(param, max_retry=5, retry_interval=60):
             logger.warning(f"Error {r.status_code} when posting to {param["url"]}. Retry after {retry_interval} sec.")
             failed += 1
             time.sleep(retry_interval)
-    raise Exception(f"Max retry exceeded when when posting to {param["url"]}.")
+    raise Exception(f"Max retry exceeded when posting to {param["url"]}.")
