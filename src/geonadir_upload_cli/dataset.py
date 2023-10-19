@@ -287,7 +287,7 @@ def retrieve_single_image(url, max_retry=5, retry_interval=60):
                 raise Exception(f"Url {url} invalid.")
             if r.status_code == 401:
                 raise Exception(f"Authentication failed for {url}. See readme for instruction.")
-            logger.warning(f"Error {r.status_code} when retrieving {url} from remote. Retry after {retry_interval} sec.")
+            logger.warning(f"Error {r.status_code} when retrieving {url} from remote: {str(exc)}. Retry after {retry_interval} sec.")
             failed += 1
             time.sleep(retry_interval)
     raise Exception(f"Max retry exceeded when retrieving {url} from remote.")
@@ -309,7 +309,7 @@ def upload_single_image(param, max_retry=5, retry_interval=60):
         except Exception as exc:
             if "r" not in locals():
                 raise Exception(f"Url {param["url"]} invalid.")
-            logger.warning(f"Error {r.status_code} when posting to {param["url"]}. Retry after {retry_interval} sec.")
+            logger.warning(f"Error {r.status_code} when posting to {param["url"]}: {str(exc)}. Retry after {retry_interval} sec.")
             failed += 1
             time.sleep(retry_interval)
     raise Exception(f"Max retry exceeded when posting to {param["url"]}.")
