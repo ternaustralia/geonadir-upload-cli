@@ -76,15 +76,13 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token):
             payload = {"project_id": dataset_id}
 
             with open(os.path.join(img_dir, file_path), "rb") as file:
-                response = requests.post(
-                    f"{base_url}/api/upload_image/",
-                    headers=headers,
-                    data=payload,
-                    files={"upload_files": file},
-                    timeout=180,
-                )
-
-            response_code = response.status_code
+                param = {
+                    "url":f"{base_url}/api/upload_image/",
+                    "headers":headers,
+                    "data":payload,
+                    "files":{"upload_files": file},
+                }
+                response_code = upload_single_image(param, 5, 60)
 
             end_time = time.time()
             upload_time = end_time - start_time
@@ -191,3 +189,25 @@ def search_datasets_coord(coord, base_url):
         timeout=180,
     )
     return response.json()
+
+
+def upload_single_image(param, max_retry=5, retry_interval=60):
+    failed = 0
+    while failed <= max_retry:
+        try:
+            r = requests.post(
+                param["url"],
+                headers=param["headers"],
+                data=param["data"],
+                files=param["files"],
+                timeout=retry_interval,
+            )
+            r.raise_for_status()
+            return r.status_code
+        except Exception as exc:
+            if "r" not in locals():
+                raise Exception(f"Url {param["url"]} invalid.")
+            logger.warning(f"Error {r.status_code} when posting to {param["url"]}. Retry after {retry_interval} sec.")
+            failed += 1
+            time.sleep(retry_interval)
+    raise Exception(f"Max retry exceeded when when posting to {param["url"]}.")
