@@ -223,7 +223,7 @@ def upload_from_collection(**kwargs):
                 private,
                 meta,
                 complete,
-                None,
+                remote_collection_json,
                 max_retry,
                 retry_interval,
             )
