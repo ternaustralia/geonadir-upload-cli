@@ -55,6 +55,8 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token, max_retry,
         img_dir (str): Directory path where the images are located.
         base_url (str): Base url of Geonadir api.
         token (str): User token.
+        max_retry (int): Max retry for uploading single image.
+        retry_interval (float): Interval between retries.
 
     Returns:
         pd.DataFrame: DataFrame containing upload results for each image.
