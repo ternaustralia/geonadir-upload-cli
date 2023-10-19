@@ -209,7 +209,9 @@ def upload_single_image(param, max_retry=5, retry_interval=60):
         except Exception as exc:
             if "r" not in locals():
                 raise Exception(f"Url {param["url"]} invalid.")
-            logger.warning(f"Error {r.status_code} when posting to {param["url"]}. Retry after {retry_interval} sec.")
+            logger.warning(f"Error {r.status_code} when posting to {param["url"]}: {str(exc)}.")
             failed += 1
-            time.sleep(retry_interval)
+            if failed <= max_retry:
+                logger.warning(f"Retry attempt {failed} after {retry_interval} sec.")
+                time.sleep(retry_interval)
     raise Exception(f"Max retry exceeded when when posting to {param["url"]}.")
