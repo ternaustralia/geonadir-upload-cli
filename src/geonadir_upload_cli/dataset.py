@@ -45,7 +45,7 @@ def create_dataset(payload_data, base_url, token):
     return dataset_id
 
 
-def upload_images(dataset_name, dataset_id, img_dir, base_url, token):
+def upload_images(dataset_name, dataset_id, img_dir, base_url, token, max_retry, retry_interval):
     """
     Upload images from a directory to a dataset.
 
@@ -84,7 +84,7 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token):
                     "data":payload,
                     "files":{"upload_files": file},
                 }
-                response_code = upload_single_image(param, 5, 60)
+                response_code = upload_single_image(param, max_retry, retry_interval)
 
             end_time = time.time()
             upload_time = end_time - start_time

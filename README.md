@@ -95,6 +95,18 @@ Options:
 
   - Illegal characters in dataset name will be removed. The legal chars include Latins, digits, "-" and "_".
 
+- `-mr, --max-retry`: Max retry attempt for uploading single image.
+
+    - Must be integer between 0 and 20. Clamping applied.
+
+    - Default is 5.
+
+- `-ri, --retry-interval`: Interval seconds between retries for uploading single image.
+
+    - Must be floating num between 0 and 3600. Clamping applied.
+
+    - Default is 120.
+
 ### upload dataset from single remote STAC collection.json file
 
 Usage: `geonadir-upload collection-upload [OPTIONS]`

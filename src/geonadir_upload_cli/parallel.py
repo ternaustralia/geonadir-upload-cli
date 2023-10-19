@@ -12,7 +12,18 @@ from .dataset import (create_dataset, paginate_dataset_image_images,
 logger = logging.getLogger(__name__)
 
 
-def process_thread(dataset_name, img_dir, base_url, token, private, metadata, complete, remote_collection_json):
+def process_thread(
+        dataset_name,
+        img_dir,
+        base_url,
+        token,
+        private,
+        metadata,
+        complete,
+        remote_collection_json,
+        max_retry,
+        retry_interval
+):
     """
     Process a thread for uploading images to a dataset.
 
@@ -25,7 +36,8 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
         metadata (str): Metadata json file directory.
         complete (str): Whether to trigger orthomosaic processing after finishing uploading.
         remote_collection_json (str): Remote url of collection.json. Applicable when uploading from collection.
-
+        max_retry (int): Max retry for uploading single image.
+        retry_interval (float): Interval between retries.
     Returns:
         dataset_name (str): Geonadir dataset name.
         result_df (pd.DataFrame): DataFrame containing upload results for each image, or False if error raised before DF generated.
@@ -104,7 +116,15 @@ def process_thread(dataset_name, img_dir, base_url, token, private, metadata, co
             result_df = upload_images_from_collection(
                 dataset_name, dataset_id, img_dir, base_url, token, remote_collection_json)
         else:
-            result_df = upload_images(dataset_name, dataset_id, img_dir, base_url, token)
+            result_df = upload_images(
+            dataset_name,
+            dataset_id,
+            img_dir,
+            base_url,
+            token,
+            max_retry,
+            retry_interval
+        )
     except Exception as exc:
         logger.error(f"Uploading images failed:\n{str(exc)}")
         return dataset_name, False, "upload_images"
