@@ -26,6 +26,7 @@ def normal_upload(**kwargs):
     complete = kwargs.get("complete")
     max_retry = kwargs.get("max_retry")
     retry_interval = kwargs.get("retry_interval")
+    timeout = kwargs.get("timeout")
 
     if dry_run:
         logger.info("---------------------dry run---------------------")
@@ -36,6 +37,7 @@ def normal_upload(**kwargs):
         logger.info(f"complete: {complete}")
         logger.info(f"max_retry: {max_retry} times")
         logger.info(f"retry_interval: {retry_interval} sec")
+        logger.info(f"timeout: {timeout} sec")
         for count, i in enumerate(item):
             logger.info(f"--item {count + 1}:")
             dataset_name, image_location = i
@@ -83,6 +85,7 @@ def normal_upload(**kwargs):
                 None,
                 max_retry,
                 retry_interval,
+                timeout,
             )
         )
     if complete:

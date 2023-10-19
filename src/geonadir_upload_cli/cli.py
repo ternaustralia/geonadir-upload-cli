@@ -107,8 +107,16 @@ def cli():
     help="Max retry for uploading single image.",
 )
 @click.option(
+    "--timeout", "-to",
+    default=20,
+    show_default=True,
+    type=click.FloatRange(0, 3600, clamp=True),
+    required=False,
+    help="Timeout second for uploading single image.",
+)
+@click.option(
     "--retry-interval", "-ri",
-    default=120,
+    default=60,
     show_default=True,
     type=click.FloatRange(0, 3600, clamp=True),
     required=False,
