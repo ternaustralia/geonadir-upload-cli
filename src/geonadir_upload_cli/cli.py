@@ -110,9 +110,9 @@ def cli():
     "--retry-interval", "-ri",
     default=120,
     show_default=True,
-    type=click.FloatRange(30, 3600, clamp=True),
+    type=click.FloatRange(0, 3600, clamp=True),
     required=False,
-    help="Timeout and retry interval second for uploading single image.",
+    help="Retry interval second for uploading single image.",
 )
 def local_upload(**kwargs):
     normal_upload(**kwargs)
@@ -221,9 +221,9 @@ def local_upload(**kwargs):
     "--retry-interval", "-ri",
     default=120,
     show_default=True,
-    type=click.FloatRange(30, 3600, clamp=True),
+    type=click.FloatRange(0, 3600, clamp=True),
     required=False,
-    help="Timeout and retry interval second for uploading single image.",
+    help="Retry interval second for uploading single image.",
 )
 def collection_upload(**kwargs):
     upload_from_collection(**kwargs)
@@ -343,9 +343,9 @@ def collection_upload(**kwargs):
     "--retry-interval", "-ri",
     default=120,
     show_default=True,
-    type=click.FloatRange(30, 3600, clamp=True),
+    type=click.FloatRange(0, 3600, clamp=True),
     required=False,
-    help="Timeout and retry interval second for uploading single image.",
+    help="Retry interval second for uploading single image.",
 )
 def catalog_upload(**kwargs):
     upload_from_catalog(**kwargs)
