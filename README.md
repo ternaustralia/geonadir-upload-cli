@@ -97,21 +97,21 @@ Options:
 
 - `-mr, --max-retry`: Max retry attempt for uploading single image.
 
-    - Must be integer between 0 and 20. Clamping applied.
+  - Must be integer between 0 and 20. Clamping applied.
 
-    - Default is 5.
+  - Default is 5.
 
 - `-ri, --retry-interval`: Interval seconds between retries for uploading single image.
 
-    - Must be floating num between 0 and 3600. Clamping applied.
+  - Must be floating num between 0 and 3600. Clamping applied.
 
-    - Default is 20.
+  - Default is 20.
 
 - `-to, --timeout`: Timeout seconds for uploading single image.
 
-    - Must be floating num between 0 and 3600. Clamping applied.
+  - Must be floating num between 0 and 3600. Clamping applied.
 
-    - Default is 60.
+  - Default is 60.
 
 ## Running
 
