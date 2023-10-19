@@ -101,9 +101,9 @@ Options:
 
     - Default is 5.
 
-- `-ri, --retry-interval`: Interval seconds between retries for uploading single image.
+- `-ri, --retry-interval`: Timeout parameter and interval seconds between retries for uploading single image.
 
-    - Must be floating num between 0 and 3600. Clamping applied.
+    - Must be floating num between 30 and 3600. Clamping applied.
 
     - Default is 120.
 
@@ -187,9 +187,9 @@ Options:
 
     - Default is 5.
 
-- `-ri, --retry-interval`: Interval seconds between retries for downloading/uploading single image.
+- `-ri, --retry-interval`: Timeout parameter and interval seconds between retries for uploading single image.
 
-    - Must be floating num between 0 and 3600. Clamping applied.
+    - Must be floating num between 30 and 3600. Clamping applied.
 
     - Default is 120.
 
@@ -278,9 +278,9 @@ Options:
 
     - Default is 5.
 
-- `-ri, --retry-interval`: Interval seconds between retries for downloading/uploading single image.
+- `-ri, --retry-interval`: Timeout parameter and interval seconds between retries for uploading single image.
 
-    - Must be floating num between 0 and 3600. Clamping applied.
+    - Must be floating num between 30 and 3600. Clamping applied.
 
     - Default is 120.
 
