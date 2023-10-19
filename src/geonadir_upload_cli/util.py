@@ -15,8 +15,7 @@ def get_filelist_from_collection(collection_path:str, remote_collection_json:str
     collection = pystac.Collection.from_file(collection_path)
     file_dict = {}
     for name, asset in collection.assets.items():
-        # if name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tif')):
-        if name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp')):
+        if name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tif')):
             file_dict[name] = urllib.parse.urljoin(remote_collection_json, asset.href)
     return file_dict
 
