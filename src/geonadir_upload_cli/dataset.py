@@ -152,7 +152,11 @@ def upload_images_from_collection(
 
     with tq.tqdm(total=len(file_dict), position=0) as pbar:
         for file_path, file_url in file_dict.items():
-            content = retrieve_single_image(file_url, max_retry, retry_interval)
+            try:
+                content = retrieve_single_image(file_url, max_retry, retry_interval)
+            except Exception as exc:
+                logger.error(f"Error when downloading {file_url}")
+                raise exc
             with open(file_path, 'wb') as fd:
                 fd.write(content)
             file_size = os.path.getsize(file_path)
@@ -171,7 +175,11 @@ def upload_images_from_collection(
                     "data":payload,
                     "files":{"upload_files": file},
                 }
-                response_code = upload_single_image(param, max_retry, retry_interval, timeout)
+                try:
+                    response_code = upload_single_image(param, max_retry, retry_interval, timeout)
+                except Exception as exc:
+                    logger.error(f"Error when uploading {file_path}")
+                    raise exc
 
             os.unlink(file_path)
 
