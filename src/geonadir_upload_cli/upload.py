@@ -24,6 +24,8 @@ def normal_upload(**kwargs):
     metadata_json = kwargs.get("metadata")
     output_dir = kwargs.get("output_folder")
     complete = kwargs.get("complete")
+    max_retry = kwargs.get("max_retry")
+    retry_interval = kwargs.get("retry_interval")
 
     if dry_run:
         logger.info("---------------------dry run---------------------")
@@ -32,6 +34,8 @@ def normal_upload(**kwargs):
         logger.info(f"metadata: {metadata_json}")
         logger.info(f"private: {private}")
         logger.info(f"complete: {complete}")
+        logger.info(f"max_retry: {max_retry} times")
+        logger.info(f"retry_interval: {retry_interval} sec")
         for count, i in enumerate(item):
             logger.info(f"--item {count + 1}:")
             dataset_name, image_location = i
@@ -68,7 +72,18 @@ def normal_upload(**kwargs):
                 logger.info(f"Metadata specified for dataset {dataset_name} in {metadata_json}")
 
         dataset_details.append(
-            (dataset_name, image_location, base_url, token, private, meta, complete, None)
+            (
+                dataset_name,
+                image_location,
+                base_url,
+                token,
+                private,
+                meta,
+                complete,
+                None,
+                max_retry,
+                retry_interval,
+            )
         )
     if complete:
         logger.info("Orthomosaic will be triggered after uploading.")

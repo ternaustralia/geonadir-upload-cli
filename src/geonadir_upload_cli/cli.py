@@ -98,6 +98,22 @@ def cli():
     required=False,
     help="Whether post the uploading complete message to trigger the orthomosaic call.",
 )
+@click.option(
+    "--max-retry", "-mr",
+    default=5,
+    show_default=True,
+    type=click.IntRange(0, 20, clamp=True),
+    required=False,
+    help="Max retry for uploading single image.",
+)
+@click.option(
+    "--retry-interval", "-ri",
+    default=120,
+    show_default=True,
+    type=click.FloatRange(0, 3600, clamp=True),
+    required=False,
+    help="Retry interval second for uploading single image.",
+)
 def local_upload(**kwargs):
     normal_upload(**kwargs)
 
