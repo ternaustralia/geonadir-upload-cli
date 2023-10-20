@@ -291,6 +291,7 @@ def retrieve_single_image(url, max_retry=5, retry_interval=10, timeout=60):
         status_forcelist=list(range(400, 600))
     )
     s.mount('http://', HTTPAdapter(max_retries=retries))
+    s.mount('https://', HTTPAdapter(max_retries=retries))
     try:
         r = s.get(url, timeout=timeout)
         r.raise_for_status()
