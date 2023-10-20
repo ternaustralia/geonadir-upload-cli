@@ -111,7 +111,7 @@ def normal_upload(**kwargs):
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
         futures = [executor.submit(process_thread, *params) for params in dataset_details]
         results = [future.result() for future in concurrent.futures.as_completed(futures)]
-        result_processing(results, output_dir, False)
+        result_processing(results, output_dir)
 
 
 def upload_from_collection(**kwargs):
@@ -243,36 +243,27 @@ def upload_from_collection(**kwargs):
         with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
             futures = [executor.submit(process_thread, *params) for params in dataset_details]
             results = [future.result() for future in concurrent.futures.as_completed(futures)]
-            result_processing(results, output_dir, True)
+            result_processing(results, output_dir)
 
     logger.info(f"cleanup {', '.join([i.name for i in tmpdirs])}")
     for i in tmpdirs:
         i.cleanup()
 
 
-def result_processing(results, output_dir, is_collection):
-    if is_collection:
-        for dataset_name, df, error in results:
-            if error:
-                logger.warning(f"{dataset_name} uploading failed when {error}")
-            else:
-                logger.info(f"{dataset_name} uploading success")
-            if output_dir:
-                if df:
-                    df.to_csv(f"{os.path.join(output_dir, dataset_name)}.csv", index=False)
-                    if error:
-                        logger.warning(f"(probably incomplete) output file: {os.path.join(output_dir, dataset_name)}.csv")
-                    else:
-                        logger.info(f"output file: {os.path.join(output_dir, dataset_name)}.csv")
-                else:
-                    logger.warning(f"output file for {dataset_name} not applicable")
-            else:
-                logger.info(f"no output csv file for {dataset_name}")
-    else:
-        if output_dir:
-            for dataset_name, df, _ in results:
-                if df is not None:
-                    df.to_csv(f"{os.path.join(output_dir, dataset_name)}.csv", index=False)
-                    logger.info(f"output file: {os.path.join(output_dir, dataset_name)}.csv")
+def result_processing(results, output_dir):
+    for dataset_name, df, error in results:
+        if error:
+            logger.warning(f"{dataset_name} uploading failed when {error}")
         else:
-            logger.info("no output csv file")
+            logger.info(f"{dataset_name} uploading success")
+        if output_dir:
+            if df is not None:
+                df.to_csv(f"{os.path.join(output_dir, dataset_name)}.csv", index=False)
+                if error:
+                    logger.warning(f"(probably incomplete) output file: {os.path.join(output_dir, dataset_name)}.csv")
+                else:
+                    logger.info(f"output file: {os.path.join(output_dir, dataset_name)}.csv")
+            else:
+                logger.warning(f"output file for {dataset_name} not applicable")
+        else:
+            logger.info(f"no output csv file for {dataset_name}")
