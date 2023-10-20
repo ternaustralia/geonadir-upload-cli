@@ -95,8 +95,9 @@ def normal_upload(**kwargs):
         futures = [executor.submit(process_thread, *params) for params in dataset_details]
         results = [future.result() for future in concurrent.futures.as_completed(futures)]
         if output_dir:
-            for dataset_name, df in results:
-                df.to_csv(f"{os.path.join(output_dir, dataset_name)}.csv", index=False)
-                logger.info(f"output file: {os.path.join(output_dir, dataset_name)}.csv")
+            for dataset_name, df, _ in results:
+                if df is not None:
+                    df.to_csv(f"{os.path.join(output_dir, dataset_name)}.csv", index=False)
+                    logger.info(f"output file: {os.path.join(output_dir, dataset_name)}.csv")
         else:
             logger.info("no output csv file")

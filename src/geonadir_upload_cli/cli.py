@@ -108,7 +108,7 @@ def cli():
 )
 @click.option(
     "--timeout", "-to",
-    default=20,
+    default=60,
     show_default=True,
     type=click.FloatRange(0, 3600, clamp=True),
     required=False,
@@ -116,7 +116,7 @@ def cli():
 )
 @click.option(
     "--retry-interval", "-ri",
-    default=60,
+    default=10,
     show_default=True,
     type=click.FloatRange(0, 3600, clamp=True),
     required=False,

@@ -99,7 +99,7 @@ def process_thread(
         )
     except Exception as exc:
         logger.error(f"Uploading images failed:\n{str(exc)}")
-        return dataset_name, False, "upload_images"
+        return dataset_name, None, "upload_images"
 
     try:
         logger.info("sleep 15s")

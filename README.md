@@ -105,7 +105,9 @@ Options:
 
   - Must be floating num between 0 and 3600. Clamping applied.
 
-  - Default is 20.
+  - Actual interval is `{retry-interval} * (2 ** ({number of total retries} - 1))`
+
+  - Default is 10.
 
 - `-to, --timeout`: Timeout seconds for uploading single image.
 
