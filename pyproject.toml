@@ -37,7 +37,7 @@ dynamic = ["version"]
 homepage = "https://github.com/ternaustralia/geonadir-upload-cli"
 
 [project.scripts]
-geonadir-upload = "geonadir_upload_cli.cli:cli"
+geonadir-cli = "geonadir_upload_cli.cli:cli"
 
 
 [tool.setuptools]
