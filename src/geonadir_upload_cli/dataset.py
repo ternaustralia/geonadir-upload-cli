@@ -159,24 +159,19 @@ def upload_images_from_collection(
             file_size = os.path.getsize(file_path)
 
             start_time = time.time()
-            headers = {
-                "authorization": token
+
+            # with open(os.path.join(img_dir, file_path), "rb") as file:
+            param = {
+                "base_url":base_url,
+                "token":token,
+                "dataset_id":dataset_id,
+                "file_path":file_path,
             }
-
-            payload = {"project_id": dataset_id}
-
-            with open(file_path, "rb") as file:
-                param = {
-                    "url":f"{base_url}/api/upload_image/",
-                    "headers":headers,
-                    "data":payload,
-                    "files":{"upload_files": file},
-                }
-                try:
-                    response_code = upload_single_image(param, max_retry, retry_interval, timeout)
-                except Exception as exc:
-                    logger.error(f"Error when uploading {file_path}")
-                    raise exc
+            try:
+                response_code = upload_single_image(param, max_retry, retry_interval, timeout)
+            except Exception as exc:
+                logger.error(f"Error when uploading {file_path}")
+                raise exc
 
             os.unlink(file_path)
 
