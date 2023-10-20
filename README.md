@@ -28,21 +28,21 @@ pip install geonadir-upload-cli
 You can run this cli tool from any location. Add option `--help` for command detail, e.g.
 
 ```bash
-geonadir-upload --help
-geonadir-upload local-upload --help
+geonadir-cli --help
+geonadir-cli local-upload --help
 ```
 
 Call below command for showing current version of the package.
 
 ```bash
-geonadir-upload --version
+geonadir-cli --version
 ```
 
 ## command details
 
 ### upload dataset from local image directory
 
-Usage: `geonadir-upload local-upload [OPTIONS]`
+Usage: `geonadir-cli local-upload [OPTIONS]`
 
 Options:
 
@@ -120,7 +120,7 @@ Options:
 An example of privately uploading `./testimage` as dataset **test1** and `C:\tmp\testimage` as **test2** with metadata file in `./sample_metadata.json`, generating the output csv files in the current folder, and trigger the orthomosaic process when uploading is finished:
 
 ```bash
-geonadir-upload local-upload -i test1 testimage -i test2 C:\tmp\testimage -p -m sample_metadata.json -o
+geonadir-cli local-upload -i test1 testimage -i test2 C:\tmp\testimage -p -m sample_metadata.json -o
 ```
 
 The metadata specified in the json file will override the global settings, e.g. `is_private`.  
@@ -164,12 +164,12 @@ Note: The value in designated `metadata.json` will be of highest priority. Howev
 
 ### searching for dataset by name
 
-Usage: `geonadir-upload search-dataset <SEARCH_STR>`
+Usage: `geonadir-cli search-dataset <SEARCH_STR>`
 
 sample usage and output:
 
 ```bash
-PS C:\Users\uqtlan> geonadir-upload search-dataset SASMD
+PS C:\Users\uqtlan> geonadir-cli search-dataset SASMD
 [
     {
         "id": 3256,
@@ -201,7 +201,7 @@ PS C:\Users\uqtlan> geonadir-upload search-dataset SASMD
 
 ### searching for dataset by coordinates
 
-Usage: `geonadir-upload range-dataset <coords>`
+Usage: `geonadir-cli range-dataset <coords>`
 
 Coordinates should be like `lon lat lon lat`.
 
@@ -210,7 +210,7 @@ It needs to be stated with `--` if no extra options is specified when coordinate
 sample usage and output:
 
 ```bash
-PS C:\Users\uqtlan> geonadir-upload range-dataset -- 24 -34 29 -27
+PS C:\Users\uqtlan> geonadir-cli range-dataset -- 24 -34 29 -27
 [
     {
         "id": 2359,
@@ -253,12 +253,12 @@ PS C:\Users\uqtlan> geonadir-upload range-dataset -- 24 -34 29 -27
 
 ### getting dataset information
 
-Usage: `geonadir-upload get-dataset-info <DATASET_ID>`
+Usage: `geonadir-cli get-dataset-info <DATASET_ID>`
 
 sample usage and output:
 
 ```bash
-PS C:\Users\uqtlan> geonadir-upload get-dataset-info 3198
+PS C:\Users\uqtlan> geonadir-cli get-dataset-info 3198
 {
     "id": 2863,
     "project_id": {
