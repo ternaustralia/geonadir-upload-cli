@@ -253,6 +253,7 @@ def generate_presigned_url(dataset_id, base_url, token, file_path, max_retry=5, 
         status_forcelist=list(range(400, 600))
     )
     s.mount('http://', HTTPAdapter(max_retries=retries))
+    s.mount('https://', HTTPAdapter(max_retries=retries))
     try:
         r = s.post(
             f'{base_url}/api/generate_presigned_url/',
@@ -291,6 +292,7 @@ def upload_to_amazon(presigned_info, file_path, max_retry=5, retry_interval=10, 
             status_forcelist=list(range(400, 600))
         )
         s.mount('http://', HTTPAdapter(max_retries=retries))
+        s.mount('https://', HTTPAdapter(max_retries=retries))
         try:
             r = s.post(
                 'https://geonadir-prod.s3.amazonaws.com/',
@@ -325,7 +327,7 @@ def create_post_image(presigned_info, dataset_id, base_url, token, max_retry=5, 
         status_forcelist=list(range(400, 600))
     )
     s.mount('http://', HTTPAdapter(max_retries=retries))
-
+    s.mount('https://', HTTPAdapter(max_retries=retries))
     try:
         r = s.post(
             f'{base_url}/api/create_post_image/',
