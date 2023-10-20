@@ -288,23 +288,22 @@ def search_datasets_coord(coord, base_url):
 
 
 def retrieve_single_image(url, max_retry=5, retry_interval=10, timeout=60):
-    failed = 0
-    while failed <= max_retry:
-        try:
-            r = requests.get(url, timeout=timeout)
-            r.raise_for_status()
-            return r.content
-        except Exception as exc:
-            if "r" not in locals():
-                raise Exception(f"Url {url} invalid.")
-            if r.status_code == 401:
-                raise Exception(f"Authentication failed for {url}. See readme for instruction.")
-            logger.warning(f"Error {r.status_code} when retrieving {url} from remote: {str(exc)}.")
-            failed += 1
-            if failed <= max_retry:
-                logger.warning(f"Retry attempt {failed} after {retry_interval} sec.")
-                time.sleep(retry_interval)
-    raise Exception(f"Max retry exceeded when retrieving {url} from remote.")
+    s = requests.Session()
+    retries = Retry(
+        total=max_retry,
+        backoff_factor=retry_interval,
+        raise_on_status=False,
+        status_forcelist=list(range(400, 600))
+    )
+    s.mount('http://', HTTPAdapter(max_retries=retries))
+    try:
+        r = s.get(url, timeout=timeout)
+        r.raise_for_status()
+        return r.content
+    except Exception as exc:
+        if "r" not in locals():
+            raise Exception(f"Url invalid: {url}.")
+        raise Exception(str(exc))
 
 
 def upload_single_image(param, max_retry=5, retry_interval=10, timeout=60):
