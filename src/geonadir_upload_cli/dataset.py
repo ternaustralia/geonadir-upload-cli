@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import time
@@ -7,6 +8,7 @@ import requests
 import tqdm as tq
 
 from .util import get_filelist_from_collection
+from requests.adapters import HTTPAdapter, Retry
 
 logger = logging.getLogger(__name__)
 
@@ -74,24 +76,19 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token, max_retry,
             file_size = os.path.getsize(os.path.join(img_dir, file_path))
 
             start_time = time.time()
-            headers = {
-                "authorization": token
+
+            # with open(os.path.join(img_dir, file_path), "rb") as file:
+            param = {
+                "base_url":base_url,
+                "token":token,
+                "dataset_id":dataset_id,
+                "file_path":os.path.join(img_dir, file_path),
             }
-
-            payload = {"project_id": dataset_id}
-
-            with open(os.path.join(img_dir, file_path), "rb") as file:
-                param = {
-                    "url":f"{base_url}/api/upload_image/",
-                    "headers":headers,
-                    "data":payload,
-                    "files":{"upload_files": file},
-                }
-                try:
-                    response_code = upload_single_image(param, max_retry, retry_interval, timeout)
-                except Exception as exc:
-                    logger.error(f"Error when uploading {file_path}")
-                    raise exc
+            try:
+                response_code = upload_single_image(param, max_retry, retry_interval, timeout)
+            except Exception as exc:
+                logger.error(f"Error when uploading {file_path}")
+                raise exc
 
             end_time = time.time()
             upload_time = end_time - start_time
@@ -290,7 +287,7 @@ def search_datasets_coord(coord, base_url):
     return response.json()
 
 
-def retrieve_single_image(url, max_retry=5, retry_interval=20, timeout=60):
+def retrieve_single_image(url, max_retry=5, retry_interval=10, timeout=60):
     failed = 0
     while failed <= max_retry:
         try:
@@ -310,25 +307,147 @@ def retrieve_single_image(url, max_retry=5, retry_interval=20, timeout=60):
     raise Exception(f"Max retry exceeded when retrieving {url} from remote.")
 
 
-def upload_single_image(param, max_retry=5, retry_interval=20, timeout=60):
-    failed = 0
-    while failed <= max_retry:
+def upload_single_image(param, max_retry=5, retry_interval=10, timeout=60):
+    base_url = param["base_url"]
+    token = param["token"]
+    dataset_id = param["dataset_id"]
+    file_path = param["file_path"]
+
+    try:
+        response_code, response_json = generate_presigned_url(dataset_id, base_url, token, file_path, max_retry, retry_interval, timeout)
+        response_code = upload_to_amazon(response_json, file_path, max_retry, retry_interval, timeout)
+        response_code = create_post_image(response_json, dataset_id, base_url, token, max_retry, retry_interval, timeout)
+        return response_code
+    except Exception as exc:
+        raise exc
+
+
+def generate_presigned_url(dataset_id, base_url, token, file_path, max_retry=5, retry_interval=10, timeout=60):
+    """Step 1 for uploading single image
+    sample return:
+    {
+        "fields": [
+            {
+                "key": "privateuploads/images/2717-3173fe88-844a-46bd-9348-f7caceb012f7/100.jpeg",
+                "policy": "eyJleHBpcmF0aW9uIjogIjIwMjMtMDctMjFUMDc6MTA6NTFaIiwgImNvbmRpdGlvbnMiOiBbeyJidWNrZXQiOiAiZ2VvbmFkaXItZGV2In0sIHsia2V5IjogInByaXZhdGV1cGxvYWRzL2ltYWdlcy8yNzE3LTMxNzNmZTg4LTg0NGEtNDZiZC05MzQ4LWY3Y2FjZWIwMTJmNy8xMDAuanBlZyJ9XX0=",
+                "signature": "LjhBcHmvPuSKK77O79GxWiCtzRc="
+            }
+        ],
+        "url": "https://geonadir-dev.s3.amazonaws.com/",
+        "AWSAccessKeyId": "AKIA22MUSOLJIKAI3KK5"
+    }
+
+    Args:
+        dataset_id (str): dataset_id
+        base_url (str): base_url
+        token (str): token
+        file_path (str): file_path
+
+    Returns:
+        dict: response.json()
+    """
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': token,
+    }
+
+    json_data = {
+        'dataset_id': str(dataset_id),
+        'images': [
+            os.path.basename(file_path),
+        ],
+    }
+    s = requests.Session()
+    retries = Retry(
+        total=max_retry,
+        backoff_factor=retry_interval,
+        raise_on_status=False,
+        status_forcelist=list(range(400, 600))
+    )
+    s.mount('http://', HTTPAdapter(max_retries=retries))
+    try:
+        r = s.post(
+            f'{base_url}/api/generate_presigned_url/',
+            headers=headers,
+            json=json_data,
+            timeout=timeout,
+        )
+        r.raise_for_status()
+        return r.status_code, r.json()
+    except Exception as exc:
+        if "r" not in locals():
+            raise Exception(f"generate_presigned_url invalid: {json.dumps(json_data, indent=4)}.")
+        raise Exception(str(exc))
+
+
+def upload_to_amazon(presigned_info, file_path, max_retry=5, retry_interval=10, timeout=60):
+    key = presigned_info["fields"][0]["key"]
+    policy = presigned_info["fields"][0]["policy"]
+    signature = presigned_info["fields"][0]["signature"]
+    AWSAccessKeyId = presigned_info["AWSAccessKeyId"]
+    
+    with open(file_path, 'rb') as file:
+        files = {
+            'key': (None, key),
+            'AWSAccessKeyId': (None, AWSAccessKeyId),
+            'policy': (None, policy),
+            'signature': (None, signature),
+            'file': file,
+        }
+
+        s = requests.Session()
+        retries = Retry(
+            total=max_retry,
+            backoff_factor=retry_interval,
+            raise_on_status=False,
+            status_forcelist=list(range(400, 600))
+        )
+        s.mount('http://', HTTPAdapter(max_retries=retries))
         try:
-            r = requests.post(
-                param["url"],
-                headers=param["headers"],
-                data=param["data"],
-                files=param["files"],
+            r = s.post(
+                'https://geonadir-prod.s3.amazonaws.com/',
+                files=files,
                 timeout=timeout,
             )
             r.raise_for_status()
             return r.status_code
         except Exception as exc:
             if "r" not in locals():
-                raise Exception(f"Url {param['url']} invalid.")
-            logger.warning(f"Error {r.status_code} when posting to {param['url']}: {str(exc)}.")
-            failed += 1
-            if failed <= max_retry:
-                logger.warning(f"Retry attempt {failed} after {retry_interval} sec.")
-                time.sleep(retry_interval)
-    raise Exception(f"Max retry exceeded when when posting to {param['url']}.")
+                raise Exception(f"https://geonadir-dev.s3.amazonaws.com/ posting invalid: {key}.")
+            raise Exception(str(exc))
+
+
+def create_post_image(presigned_info, dataset_id, base_url, token, max_retry=5, retry_interval=10, timeout=60):
+    key = presigned_info["fields"][0]["key"].removeprefix("privateuploads/")
+
+    headers = {
+        'Authorization': token,
+    }
+
+    files = {
+        'dataset_id': (None, str(dataset_id)),
+        'image': (None, key),
+    }
+
+    s = requests.Session()
+    retries = Retry(
+        total=max_retry,
+        backoff_factor=retry_interval,
+        raise_on_status=False,
+        status_forcelist=list(range(400, 600))
+    )
+    s.mount('http://', HTTPAdapter(max_retries=retries))
+
+    try:
+        r = s.post(
+            f'{base_url}/api/create_post_image/',
+            headers=headers,
+            files=files,
+            timeout=timeout,
+        )
+        r.raise_for_status()
+        return r.status_code
+    except Exception as exc:
+        if "r" not in locals():
+            raise Exception(f"Url {f'{base_url}/api/create_post_image/'} invalid.")
+        raise Exception(str(exc))

@@ -270,8 +270,9 @@ def result_processing(results, output_dir, is_collection):
                 logger.info(f"no output csv file for {dataset_name}")
     else:
         if output_dir:
-            for dataset_name, df in results:
-                df.to_csv(f"{os.path.join(output_dir, dataset_name)}.csv", index=False)
-                logger.info(f"output file: {os.path.join(output_dir, dataset_name)}.csv")
+            for dataset_name, df, _ in results:
+                if df is not None:
+                    df.to_csv(f"{os.path.join(output_dir, dataset_name)}.csv", index=False)
+                    logger.info(f"output file: {os.path.join(output_dir, dataset_name)}.csv")
         else:
             logger.info("no output csv file")
