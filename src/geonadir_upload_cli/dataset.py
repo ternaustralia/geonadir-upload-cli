@@ -382,6 +382,17 @@ def search_datasets_coord(coord, base_url):
 
 
 def retrieve_single_image(url, max_retry=5, retry_interval=10, timeout=60):
+    """download single image from STAC collection assets
+
+    Args:
+        url (str): asset href for retrieving image from
+        max_retry (int, optional): max_retry. Defaults to 5.
+        retry_interval (int, optional): retry_interval. Defaults to 10.
+        timeout (int, optional): timeout. Defaults to 60.
+
+    Returns:
+        requests.content: image content from http request
+    """    
     s = requests.Session()
     retries = Retry(
         total=max_retry,

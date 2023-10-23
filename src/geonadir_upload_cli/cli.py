@@ -248,6 +248,8 @@ def local_upload(**kwargs):
     help="Retry interval second for uploading single image.",
 )
 def collection_upload(**kwargs):
+    """upload dataset from valid STAC collection object
+    """    
     upload_from_collection(**kwargs)
 
 
@@ -378,6 +380,8 @@ def collection_upload(**kwargs):
     help="Retry interval second for uploading single image.",
 )
 def catalog_upload(**kwargs):
+    """upload dataset from valid STAC catalog object
+    """    
     upload_from_catalog(**kwargs)
 
 
