@@ -158,6 +158,14 @@ def first_value(iterable):
 
 
 def clickable_link(text:str):
+    """make web urls markdown-clickable in text.
+
+    Args:
+        text (str): description/acknowledgement text.
+
+    Returns:
+        str: processed text
+    """    
     regexp = r'((?:(?:(?:https?|ftp):\/\/)|www)[\w/\-?=%.]+\.[\w/\-&?=%.]+)([^\w/\-&?=%.]|$)'
 
     def repl(matchobj:re.Match):

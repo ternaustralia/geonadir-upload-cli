@@ -19,6 +19,8 @@ logging.basicConfig(level=log_level)
 
 
 def print_version(ctx, param, value):
+    """callback for printing cli tool version
+    """    
     # print(ctx.__dict__)
     # print(param.__dict__)
     # print(value)
@@ -38,6 +40,8 @@ def print_version(ctx, param, value):
     help="Package version.",
 )
 def cli():
+    """main cli call
+    """    
     pass
 
 
@@ -123,6 +127,8 @@ def cli():
     help="Retry interval second for uploading single image.",
 )
 def local_upload(**kwargs):
+    """upload local images
+    """    
     normal_upload(**kwargs)
 
 
@@ -145,6 +151,8 @@ def local_upload(**kwargs):
 )
 @click.argument('search-str')
 def search_dataset(**kwargs):
+    """search dataset by keyword
+    """    
     base_url = kwargs.get("base_url")
     search = kwargs.get("search_str")
     output = kwargs.get("output_folder", None)
@@ -181,6 +189,8 @@ def search_dataset(**kwargs):
     help="Whether output csv is created. Generate output at the specified path. Default is false. If flagged without specifing output folder, default is the current path of your terminal.",
 )
 def range_dataset(**kwargs):
+    """search dataset by latlon area
+    """    
     base_url = kwargs.get("base_url")
     search = kwargs.get("coords")
     output = kwargs.get("output_folder", None)
@@ -213,6 +223,8 @@ def range_dataset(**kwargs):
 )
 @click.argument('project-id')
 def get_dataset_info(**kwargs):
+    """get metadata of dataset given dataset id
+    """    
     base_url = kwargs.get("base_url")
     project_id = kwargs.get("project_id")
     output = kwargs.get("output_folder", None)
