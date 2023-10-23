@@ -70,10 +70,10 @@ def generate_four_timestamps(**kwargs):
 
 
 def download_to_dir(url, directory):
+    image_location = os.path.join(directory, "collection.json")
     r = requests.get(url, timeout=60)
     try:
         r.raise_for_status()
-        image_location = os.path.join(directory, "collection.json")
         with open(image_location, 'wb') as fd:
             fd.write(r.content)
     except Exception as exc:
