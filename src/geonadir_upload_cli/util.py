@@ -12,6 +12,15 @@ LEGAL_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
 
 def get_filelist_from_collection(collection_path:str, remote_collection_json:str):
+    """get list of all assets from STAC collection file
+
+    Args:
+        collection_path (str): local path of downloaded collection.json
+        remote_collection_json (str): original url location of valid collection
+
+    Returns:
+        dict: asset names and urls
+    """    
     collection = pystac.Collection.from_file(collection_path)
     file_dict = {}
     for name, asset in collection.assets.items():
@@ -21,6 +30,15 @@ def get_filelist_from_collection(collection_path:str, remote_collection_json:str
 
 
 def really_get_all_collections(catalog_url:str, local_folder:str):
+    """recursively get list of all sub-collections
+
+    Args:
+        catalog_url (str): original url location of valid catalog
+        local_folder (str): local folder of downloaded catalog.json
+
+    Yields:
+        str: url of valid collection
+    """    
     # catalog_url = "https://data-test.tern.org.au/uas_raw/catalog.json"
     logger.info(f"getting child collection urls from {catalog_url}")
     r = requests.get(catalog_url, timeout=60)
@@ -41,6 +59,11 @@ def really_get_all_collections(catalog_url:str, local_folder:str):
 
 
 def generate_four_timestamps(**kwargs):
+    """generate datetimes from input isoformat datetime strings
+
+    Returns:
+        datetime, datetime, datetime, datetime: created before/after/updated before/after
+    """    
     try:
         created_before = kwargs.get("created_before", "9999-12-31")
         cb = datetime.fromisoformat(created_before)
@@ -70,6 +93,15 @@ def generate_four_timestamps(**kwargs):
 
 
 def download_to_dir(url, directory):
+    """download collection.json
+
+    Args:
+        url (str): url of collection
+        directory (str): dest folder of downloaded collection.json
+
+    Returns:
+        bool: whether successfully downloaded
+    """    
     image_location = os.path.join(directory, "collection.json")
     r = requests.get(url, timeout=60)
     try:
@@ -86,6 +118,20 @@ def download_to_dir(url, directory):
 
 
 def deal_with_collection(collection_location, exclude, include, cb, ca, ub, ua):
+    """filter collections based on name and datetime
+
+    Args:
+        collection_location (str): local collection.json file
+        exclude (str): exclude collection with name containing certain string
+        include (str): include collection with name containing certain string
+        cb (datetime): exclude collection not created before given datetime
+        ca (datetime): exclude collection not created after given datetime
+        ub (datetime): exclude collection not updated before given datetime
+        ua (datetime): exclude collection not updated after given datetime
+
+    Returns:
+        str | bool: dataset name retrieved from collection.json. return False if collection is filtered out.
+    """    
     try:
         collection = pystac.Collection.from_file(collection_location)
         dataset_name = collection.title
