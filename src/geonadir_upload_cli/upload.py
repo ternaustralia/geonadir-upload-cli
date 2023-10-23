@@ -33,6 +33,8 @@ def upload_from_catalog(**kwargs):
 
 
 def normal_upload(**kwargs):
+    """upload local images
+    """    
     base_url = kwargs.get("base_url")
     token = kwargs.get("token")
     item = kwargs.get("item")

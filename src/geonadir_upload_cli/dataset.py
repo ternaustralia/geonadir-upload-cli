@@ -198,6 +198,13 @@ def upload_images_from_collection(
 
 
 def trigger_ortho_processing(dataset_id, base_url, token):
+    """trigger orthomosaic processing in GN after uploading completed
+
+    Args:
+        dataset_id (str | int): GN dataset id.
+        base_url (_type_): Base url of Geonadir api.
+        token (str): User token.
+    """    
     headers = {
         "authorization": token
     }
@@ -241,6 +248,26 @@ def paginate_dataset_image_images(url, image_names):
 
 
 def search_datasets(search_str, base_url):
+    """search GN dataset by name
+    sample output:
+    [
+        {
+            "id": 3256,
+            "dataset_name": "SASMDD0006"
+        },
+        {
+            "id": 3198,
+            "dataset_name": "SASMDD0002"
+        }
+    ]
+
+    Args:
+        search_str (str): keyword searched for in GN dataset name.
+        base_url (_type_): Base url of Geonadir api.
+
+    Returns:
+        list: list of dataset ids and names.
+    """    
     payload = {
         "search": search_str
     }
@@ -254,6 +281,56 @@ def search_datasets(search_str, base_url):
 
 
 def dataset_info(project_id, base_url):
+    """show dataset info of given id
+    sample output:
+    {
+        "id": 2863,
+        "project_id": {
+            "id": 3198,
+            "user": "TERN Australia",
+            "user_id": 4865,
+            "user_image": null,
+            "project_institution_name": "",
+            "project_name": "SASMDD0002",
+            "tags": "",
+            "category": [
+                "Shrubland"
+            ],
+            "description": "TERN Landscapes, TERN Surveillance Monitoring, Stenson, M., Sparrow, B. & Lucieer, A. (2022): Drone RGB and Multispectral Imagery from TERN plots across Australia. Version 1. Terrestrial Ecosystem Research Network. (Dataset). https://portal.tern.org.au/metadata/TERN/39de90f5-49e3-4567-917c-cf3e3bc93086 Creative Commons Attribution 4.0 International Licence http://creativecommons.org/licenses/by/4.0",
+            "data_captured_by": "",
+            "latitude": -34.0123308611111,
+            "longitude": 140.591931111111,
+            "created_at": "2023-08-28T03:30:41.907924Z",
+            "captured_date": "2022-05-19T12:24:21Z",
+            "location": "Renmark West, Australia",
+            "image_count": 693,
+            "data_credits": "",
+            "is_private": false,
+            "has_ortho": true,
+            "has_dsm": true,
+            "has_dtm": true,
+            "ic_bbox": [
+                -34.01593698,
+                140.58760077,
+                -34.00872474,
+                140.59626145
+            ],
+            "ortho_size": 5071.88,
+            "raw_images_size": 15171.659
+        },
+        "uuid": "b257c851-6ecb-428e-882e-f685b663f9a9",
+        "metadata":{
+            ...
+        }
+    }
+
+    Args:
+        project_id (str): GN dataset id.
+        base_url (str): Base url of Geonadir api.
+
+    Returns:
+        dict: dataset metadata.
+    """    
     payload = {
         "project_id": project_id
     }
@@ -267,6 +344,28 @@ def dataset_info(project_id, base_url):
 
 
 def search_datasets_coord(coord, base_url):
+    """find GN datasets in given area
+    sample output:
+    [
+        {
+            "id": 2359,
+            "latitude": -33.47661578,
+            "longitude": 25.34186233
+        },
+        {
+            "id": 2520,
+            "latitude": -33.49132739,
+            "longitude": 26.81348708
+        }
+    ]
+
+    Args:
+        coord (tuple): bbox in latlon.
+        base_url (str): Base url of Geonadir api.
+
+    Returns:
+        list: list of dataset ids and latlons.
+    """    
     l, r = max(min(coord[0], coord[2]), -180), min(max(coord[0], coord[2]), 180)
     b, t = max(min(coord[1], coord[3]), -90), min(max(coord[1], coord[3]), 90)
     logger.info(f"Querying dataset within ({l}, {b}, {r}, {t})")
@@ -303,6 +402,23 @@ def retrieve_single_image(url, max_retry=5, retry_interval=10, timeout=60):
 
 
 def upload_single_image(param, max_retry=5, retry_interval=10, timeout=60):
+    """upload single image to GN in 3 steps:
+    1. generate presigned url for GN Amazon S3 storage.
+    2. upload image to url generated before.
+    3. create image uploaded to storage.
+
+    Args:
+        param (dict): all params required for uploading, including base_url, token, dataset id and local file path.
+        max_retry (int, optional): max retry. Defaults to 5.
+        retry_interval (int, optional): retry interval in second. Defaults to 10.
+        timeout (int, optional): timeout for single http request in second. Defaults to 60.
+
+    Raises:
+        exc: Exception
+
+    Returns:
+        int: http response code for creating image in GN.
+    """    
     base_url = param["base_url"]
     token = param["token"]
     dataset_id = param["dataset_id"]
@@ -318,18 +434,18 @@ def upload_single_image(param, max_retry=5, retry_interval=10, timeout=60):
 
 
 def generate_presigned_url(dataset_id, base_url, token, file_path, max_retry=5, retry_interval=10, timeout=60):
-    """Step 1 for uploading single image
+    """Step 1: generate presigned url for GN Amazon S3 storage.
     sample return:
     {
         "fields": [
             {
                 "key": "privateuploads/images/2717-3173fe88-844a-46bd-9348-f7caceb012f7/100.jpeg",
-                "policy": "eyJleHBpcmF0aW9uIjogIjIwMjMtMDctMjFUMDc6MTA6NTFaIiwgImNvbmRpdGlvbnMiOiBbeyJidWNrZXQiOiAiZ2VvbmFkaXItZGV2In0sIHsia2V5IjogInByaXZhdGV1cGxvYWRzL2ltYWdlcy8yNzE3LTMxNzNmZTg4LTg0NGEtNDZiZC05MzQ4LWY3Y2FjZWIwMTJmNy8xMDAuanBlZyJ9XX0=",
-                "signature": "LjhBcHmvPuSKK77O79GxWiCtzRc="
+                "policy": "<omitted>",
+                "signature": "<omitted>"
             }
         ],
         "url": "https://geonadir-dev.s3.amazonaws.com/",
-        "AWSAccessKeyId": "AKIA22MUSOLJIKAI3KK5"
+        "AWSAccessKeyId": "<omitted>"
     }
 
     Args:
@@ -339,7 +455,7 @@ def generate_presigned_url(dataset_id, base_url, token, file_path, max_retry=5, 
         file_path (str): file_path
 
     Returns:
-        dict: response.json()
+        (int, dict): (status_code, response.json())
     """
     headers = {
         'Content-Type': 'application/json',
@@ -377,6 +493,18 @@ def generate_presigned_url(dataset_id, base_url, token, file_path, max_retry=5, 
 
 
 def upload_to_amazon(presigned_info, file_path, max_retry=5, retry_interval=10, timeout=60):
+    """Step 2: upload image to url generated before.
+
+    Args:
+        presigned_info (dict): key, policy, signature and AWSAccessKeyId for uploading to Amazon.
+        file_path (str): local file path.
+        max_retry (int, optional): max retry. Defaults to 5.
+        retry_interval (int, optional): retry interval. Defaults to 10.
+        timeout (int, optional): timeout. Defaults to 60.
+
+    Returns:
+        int: http request status code.
+    """    
     key = presigned_info["fields"][0]["key"]
     policy = presigned_info["fields"][0]["policy"]
     signature = presigned_info["fields"][0]["signature"]
@@ -415,6 +543,20 @@ def upload_to_amazon(presigned_info, file_path, max_retry=5, retry_interval=10, 
 
 
 def create_post_image(presigned_info, dataset_id, base_url, token, max_retry=5, retry_interval=10, timeout=60):
+    """Step 3: create image uploaded to storage.
+
+    Args:
+        presigned_info (dict): key, policy, signature and AWSAccessKeyId for uploading to Amazon.
+        dataset_id (int | str): GN dataset_id.
+        base_url (str): GN api base_url.
+        token (str): GN user token.
+        max_retry (int, optional): max_retry. Defaults to 5.
+        retry_interval (int, optional): retry_interval. Defaults to 10.
+        timeout (int, optional): timeout. Defaults to 60.
+
+    Returns:
+        int: http request status code.
+    """    
     key = presigned_info["fields"][0]["key"].removeprefix("privateuploads/")
 
     headers = {
