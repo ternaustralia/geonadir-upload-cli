@@ -408,7 +408,7 @@ def retrieve_single_image(url, max_retry=5, retry_interval=10, timeout=60):
         return r.content
     except Exception as exc:
         if "r" not in locals():
-            raise Exception(f"Url invalid: {url}.")
+            raise Exception(f"Failed to access url: {url}.")
         raise Exception(str(exc))
 
 
@@ -499,7 +499,7 @@ def generate_presigned_url(dataset_id, base_url, token, file_path, max_retry=5, 
         return r.status_code, r.json()
     except Exception as exc:
         if "r" not in locals():
-            raise Exception(f"generate_presigned_url invalid: {json.dumps(json_data, indent=4)}.")
+            raise Exception(f"failed to generate presigned url: {json.dumps(json_data, indent=4)}.")
         raise Exception(str(exc))
 
 
@@ -549,7 +549,7 @@ def upload_to_amazon(presigned_info, file_path, max_retry=5, retry_interval=10, 
             return r.status_code
         except Exception as exc:
             if "r" not in locals():
-                raise Exception(f"https://geonadir-dev.s3.amazonaws.com/ posting invalid: {key}.")
+                raise Exception(f"https://geonadir-dev.s3.amazonaws.com/ posting failed: {key}.")
             raise Exception(str(exc))
 
 
@@ -599,5 +599,5 @@ def create_post_image(presigned_info, dataset_id, base_url, token, max_retry=5, 
         return r.status_code
     except Exception as exc:
         if "r" not in locals():
-            raise Exception(f"Url {f'{base_url}/api/create_post_image/'} invalid.")
+            raise Exception(f"Failed to access url {f'{base_url}/api/create_post_image/'}.")
         raise Exception(str(exc))
