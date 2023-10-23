@@ -174,6 +174,8 @@ def original_filename(url):
         ?AWSAccessKeyId=<key_id>&Signature=<sig>&Expires=1692857952',
     the original file name is DJI_20220519122445_0024.JPG
 
+    23/10/2023 update: filename in url changed due to uploading mechanism update.
+
     Args:
         url (str): image url
 
@@ -181,8 +183,9 @@ def original_filename(url):
         name: the name of the original image
     """
     url_name = url.split("?")[0].split("/")[-1]  # DJI_20220519122445_0024_766891.JPG
-    basename, ext = os.path.splitext(url_name)
-    return "_".join(basename.split("_")[:-1]) + ext  # DJI_20220519122445_0024.JPG
+    # basename, ext = os.path.splitext(url_name)
+    # return "_".join(basename.split("_")[:-1]) + ext  # DJI_20220519122445_0024.JPG
+    return url_name
 
 
 def first_value(iterable):
