@@ -64,49 +64,48 @@ def process_thread(
     #     "is_private": False
     # }
 
-    payload_data = {
-        "dataset_name": dataset_name,
-        "is_private": private,
-        "is_published": True
-    }
-    if remote_collection_json:
-        collection = pystac.Collection.from_file(img_dir)
-        citation = collection.extra_fields.get('sci:citation')
-        if citation:
-            payload_data["data_credits"] = citation
-        description = ""
-        if hasattr(collection, "description"):
-            description += collection.description
-        else:
-            logger.warning(f"No description in {remote_collection_json}")
-        if hasattr(collection, "license"):
-            description += "\n\nLicense: "
-            description += collection.license
-        else:
-            logger.warning(f"No license in {remote_collection_json}")
-        try:
-            license_link = collection.get_single_link("license").get_href()
-            if license_link:
-                description += "\n\nLicense href: "
-                description += license_link
-        except Exception as exc:
-            logger.warning(f"Can't find license href in {remote_collection_json}")
-        if description:
-            payload_data["description"] = description
-
-    if metadata:
-        payload_data.update(**metadata)
-
-    if payload_data.get("description", None):
-        payload_data["description"] = clickable_link(payload_data["description"])
-    if payload_data.get("data_credits", None):
-        payload_data["data_credits"] = clickable_link(payload_data["data_credits"])
-
-    logger.info("\n")
-    logger.info(f"Metadata for dataset {dataset_name}:")
-    logger.info(str(payload_data))
-
     if not dataset_id:
+        payload_data = {
+            "dataset_name": dataset_name,
+            "is_private": private,
+            "is_published": True
+        }
+        if remote_collection_json:
+            collection = pystac.Collection.from_file(img_dir)
+            citation = collection.extra_fields.get('sci:citation')
+            if citation:
+                payload_data["data_credits"] = citation
+            description = ""
+            if hasattr(collection, "description"):
+                description += collection.description
+            else:
+                logger.warning(f"No description in {remote_collection_json}")
+            if hasattr(collection, "license"):
+                description += "\n\nLicense: "
+                description += collection.license
+            else:
+                logger.warning(f"No license in {remote_collection_json}")
+            try:
+                license_link = collection.get_single_link("license").get_href()
+                if license_link:
+                    description += "\n\nLicense href: "
+                    description += license_link
+            except Exception as exc:
+                logger.warning(f"Can't find license href in {remote_collection_json}")
+            if description:
+                payload_data["description"] = description
+
+        if metadata:
+            payload_data.update(**metadata)
+
+        if payload_data.get("description", None):
+            payload_data["description"] = clickable_link(payload_data["description"])
+        if payload_data.get("data_credits", None):
+            payload_data["data_credits"] = clickable_link(payload_data["data_credits"])
+
+        logger.info("\n")
+        logger.info(f"Metadata for dataset {dataset_name}:")
+        logger.info(str(payload_data))
         try:
             dataset_id = create_dataset(payload_data, base_url, token)
         except Exception as exc:

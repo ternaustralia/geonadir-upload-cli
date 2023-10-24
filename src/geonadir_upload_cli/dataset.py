@@ -283,7 +283,7 @@ def search_datasets(search_str, base_url):
 
 
 def dataset_info(project_id, base_url):
-    """show dataset info of given id
+    """show dataset info of given id. return 'Metadata not found' if not found.
     sample output:
     {
         "id": 2863,

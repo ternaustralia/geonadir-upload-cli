@@ -6,6 +6,7 @@ import logging
 import os
 import tempfile
 
+from .dataset import dataset_info
 from .parallel import process_thread
 from .util import (deal_with_collection, download_to_dir,
                    generate_four_timestamps, really_get_all_collections)
@@ -52,6 +53,19 @@ def normal_upload(**kwargs):
     retry_interval = kwargs.get("retry_interval")
     timeout = kwargs.get("timeout")
     dataset_id = kwargs.get("dataset_id")
+    existing_dataset_name = ""
+    if dataset_id:
+        result = dataset_info(dataset_id, base_url)
+        if result == "Metadata not found":
+            logger.warning(f"Dataset id {dataset_id} not found. Upload to new dataset instead.")
+            dataset_id = 0
+        else:
+            logger.info(f"Upload to existing dataset id: {dataset_id}")
+            try:
+                existing_dataset_name = result.get("project_id", {}).get("project_name", "")
+                logger.info(f"Dataset name: {existing_dataset_name}")
+            except Exception as exc:
+                existing_dataset_name = f"<dataset id: {dataset_id}"
 
     if dry_run:
         logger.info("---------------------dry run---------------------")
@@ -63,16 +77,15 @@ def normal_upload(**kwargs):
         logger.info(f"max_retry: {max_retry} times")
         logger.info(f"retry_interval: {retry_interval} sec")
         logger.info(f"timeout: {timeout} sec")
-        if dataset_id:
-            logger.info(f"Upload to existing dataset id: {dataset_id}")
         for count, i in enumerate(item):
             logger.info(f"--item {count + 1}:")
             dataset_name, image_location = i
-            dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
-            if not dataset_name:
-                logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
-                dataset_name = "untitled"
-            logger.info(f"dataset name: {dataset_name}")
+            if not dataset_id:
+                dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
+                if not dataset_name:
+                    logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
+                    dataset_name = "untitled"
+                logger.info(f"dataset name: {dataset_name}")
             logger.info(f"image location: {image_location}")
         if output_dir:
             logger.info(f"output file: {os.path.join(output_dir, f'{dataset_name}.csv')}")
@@ -80,8 +93,6 @@ def normal_upload(**kwargs):
             logger.info("no output csv file")
 
     logger.info(base_url)
-    if dataset_id:
-        logger.info(f"Upload to existing dataset id: {dataset_id}")
     token = "Token " + token
     if metadata_json:
         with open(metadata_json) as f:
@@ -90,18 +101,21 @@ def normal_upload(**kwargs):
     dataset_details = []
     for i in item:
         dataset_name, image_location = i
-        dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
-        if not dataset_name:
-            logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
-            dataset_name = "untitled"
-        logger.info(f"Dataset name: {dataset_name}")
-        logger.info(f"Images location: {image_location}")
         meta = None
-        if metadata_json:
-            meta = metadata.get(dataset_name, None)
-            if meta:
-                logger.info(f"Metadata specified for dataset {dataset_name} in {metadata_json}")
+        if not dataset_id:
+            dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
+            if not dataset_name:
+                logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
+                dataset_name = "untitled"
+            logger.info(f"Dataset name: {dataset_name}")
+            if metadata_json:
+                meta = metadata.get(dataset_name, None)
+                if meta:
+                    logger.info(f"Metadata specified for dataset {dataset_name} in {metadata_json}")
+        logger.info(f"Images location: {image_location}")
 
+        if existing_dataset_name:
+            dataset_name = existing_dataset_name
         dataset_details.append(
             (
                 dataset_id,
@@ -143,6 +157,20 @@ def upload_from_collection(**kwargs):
     max_retry = kwargs.get("max_retry")
     retry_interval = kwargs.get("retry_interval")
     timeout = kwargs.get("timeout")
+    dataset_id = kwargs.get("dataset_id")
+    existing_dataset_name = ""
+    if dataset_id:
+        result = dataset_info(dataset_id, base_url)
+        if result == "Metadata not found":
+            logger.warning(f"Dataset id {dataset_id} not found. Upload to new dataset instead.")
+            dataset_id = 0
+        else:
+            logger.info(f"Upload to existing dataset id: {dataset_id}")
+            try:
+                existing_dataset_name = result.get("project_id", {}).get("project_name", "")
+                logger.info(f"Dataset name: {existing_dataset_name}")
+            except Exception as exc:
+                existing_dataset_name = f"<dataset id: {dataset_id}"
 
     cb, ca, ub, ua = generate_four_timestamps(**kwargs)
 
@@ -165,7 +193,6 @@ def upload_from_collection(**kwargs):
             logger.info(f"excluding keywords: {str(include)}")
         for count, i in enumerate(item):
             dataset_name, image_location = i
-            dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
             remote_collection_json = image_location
             logger.info("")
             logger.info(f"--item {count + 1}:")
@@ -178,13 +205,18 @@ def upload_from_collection(**kwargs):
             title = deal_with_collection(image_location, exclude, include, cb, ca, ub, ua)
             if not title:
                 continue
-            if not dataset_name:
-                dataset_name = "".join(x for x in title.replace(" ", "_") if x in LEGAL_CHARS)
+            if not dataset_id:
+                dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
                 if not dataset_name:
-                    logger.warning(f"No legal character. Dataset named 'untitled_{count}'")
-                    dataset_name = f"untitled_{count}"
-            uploads.append(dataset_name)
-            logger.info(f"dataset name: {dataset_name}")
+                    dataset_name = "".join(x for x in title.replace(" ", "_") if x in LEGAL_CHARS)
+                    if not dataset_name:
+                        logger.warning(f"No legal character. Dataset named 'untitled_{count}'")
+                        dataset_name = f"untitled_{count}"
+                logger.info(f"dataset name: {dataset_name}")
+                uploads.append(dataset_name)
+            else:
+                uploads.append(f"<dataset id: {dataset_id}>")
+                logger.info(f"Upload to existing dataset id: {dataset_id}")
             if output_dir:
                 logger.info(f"output file: {os.path.join(output_dir, f'{dataset_name}.csv')}")
             else:
@@ -204,14 +236,15 @@ def upload_from_collection(**kwargs):
 
     logger.info(base_url)
     token = "Token " + token
-    if metadata_json:
-        with open(metadata_json) as f:
-            metadata = json.load(f)
-        logger.info(f"metadata: {metadata_json}")
+    if not dataset_id:
+        if metadata_json:
+            with open(metadata_json) as f:
+                metadata = json.load(f)
+            logger.info(f"metadata: {metadata_json}")
     dataset_details = []
     for count, i in enumerate(item):
         dataset_name, image_location = i
-        dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
+        meta = None
         remote_collection_json = image_location
         logger.info(f"retreiving collection.json from {remote_collection_json}")
         tmpdir = tempfile.TemporaryDirectory()
@@ -222,20 +255,26 @@ def upload_from_collection(**kwargs):
         title = deal_with_collection(image_location, exclude, include, cb, ca, ub, ua)
         if not title:
             continue
-        if not dataset_name:
-            dataset_name = "".join(x for x in title.replace(" ", "_") if x in LEGAL_CHARS)
+        if not dataset_id:
+            dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
             if not dataset_name:
-                logger.warning(f"No legal character. Dataset named 'untitled_{count}'")
-                dataset_name = f"untitled_{count}"
-        logger.info(f"Dataset name: {dataset_name}")
-        meta = None
-        if metadata_json:
-            meta = metadata.get(dataset_name, None)
-            if meta:
-                logger.info(f"Metadata specified for dataset {dataset_name} in {metadata_json}")
+                dataset_name = "".join(x for x in title.replace(" ", "_") if x in LEGAL_CHARS)
+                if not dataset_name:
+                    logger.warning(f"No legal character. Dataset named 'untitled_{count}'")
+                    dataset_name = f"untitled_{count}"
+            logger.info(f"Dataset name: {dataset_name}")
+            if metadata_json:
+                meta = metadata.get(dataset_name, None)
+                if meta:
+                    logger.info(f"Metadata specified for dataset {dataset_name} in {metadata_json}")
+        else:
+            logger.info(f"Upload to existing dataset id: {dataset_id}")
 
+        if existing_dataset_name:
+            dataset_name = existing_dataset_name
         dataset_details.append(
             (
+                dataset_id,
                 dataset_name,
                 image_location,
                 base_url,
