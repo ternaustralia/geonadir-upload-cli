@@ -1,3 +1,5 @@
+"""dataset handling functions
+"""
 import json
 import logging
 import os
@@ -6,9 +8,9 @@ import time
 import pandas as pd
 import requests
 import tqdm as tq
+from requests.adapters import HTTPAdapter, Retry
 
 from .util import get_filelist_from_collection
-from requests.adapters import HTTPAdapter, Retry
 
 logger = logging.getLogger(__name__)
 
@@ -79,10 +81,10 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token, max_retry,
 
             # with open(os.path.join(img_dir, file_path), "rb") as file:
             param = {
-                "base_url":base_url,
-                "token":token,
-                "dataset_id":dataset_id,
-                "file_path":os.path.join(img_dir, file_path),
+                "base_url": base_url,
+                "token": token,
+                "dataset_id": dataset_id,
+                "file_path": os.path.join(img_dir, file_path),
             }
             try:
                 response_code = upload_single_image(param, max_retry, retry_interval, timeout)
@@ -162,10 +164,10 @@ def upload_images_from_collection(
 
             # with open(os.path.join(img_dir, file_path), "rb") as file:
             param = {
-                "base_url":base_url,
-                "token":token,
-                "dataset_id":dataset_id,
-                "file_path":file_path,
+                "base_url": base_url,
+                "token": token,
+                "dataset_id": dataset_id,
+                "file_path": file_path,
             }
             try:
                 response_code = upload_single_image(param, max_retry, retry_interval, timeout)
@@ -204,7 +206,7 @@ def trigger_ortho_processing(dataset_id, base_url, token):
         dataset_id (str | int): GN dataset id.
         base_url (_type_): Base url of Geonadir api.
         token (str): User token.
-    """    
+    """
     headers = {
         "authorization": token
     }
@@ -267,7 +269,7 @@ def search_datasets(search_str, base_url):
 
     Returns:
         list: list of dataset ids and names.
-    """    
+    """
     payload = {
         "search": search_str
     }
@@ -330,7 +332,7 @@ def dataset_info(project_id, base_url):
 
     Returns:
         dict: dataset metadata.
-    """    
+    """
     payload = {
         "project_id": project_id
     }
@@ -365,7 +367,7 @@ def search_datasets_coord(coord, base_url):
 
     Returns:
         list: list of dataset ids and latlons.
-    """    
+    """
     l, r = max(min(coord[0], coord[2]), -180), min(max(coord[0], coord[2]), 180)
     b, t = max(min(coord[1], coord[3]), -90), min(max(coord[1], coord[3]), 90)
     logger.info(f"Querying dataset within ({l}, {b}, {r}, {t})")
@@ -392,7 +394,7 @@ def retrieve_single_image(url, max_retry=5, retry_interval=10, timeout=60):
 
     Returns:
         requests.content: image content from http request
-    """    
+    """
     s = requests.Session()
     retries = Retry(
         total=max_retry,
@@ -429,22 +431,32 @@ def upload_single_image(param, max_retry=5, retry_interval=10, timeout=60):
 
     Returns:
         int: http response code for creating image in GN.
-    """    
+    """
     base_url = param["base_url"]
     token = param["token"]
     dataset_id = param["dataset_id"]
     file_path = param["file_path"]
 
     try:
-        response_code, response_json = generate_presigned_url(dataset_id, base_url, token, file_path, max_retry, retry_interval, timeout)
+        response_code, response_json = generate_presigned_url(
+            dataset_id, base_url, token, file_path, max_retry, retry_interval, timeout)
         response_code = upload_to_amazon(response_json, file_path, max_retry, retry_interval, timeout)
-        response_code = create_post_image(response_json, dataset_id, base_url, token, max_retry, retry_interval, timeout)
+        response_code = create_post_image(response_json, dataset_id, base_url,
+                                          token, max_retry, retry_interval, timeout)
         return response_code
     except Exception as exc:
         raise exc
 
 
-def generate_presigned_url(dataset_id, base_url, token, file_path, max_retry=5, retry_interval=10, timeout=60):
+def generate_presigned_url(
+    dataset_id,
+    base_url,
+    token,
+    file_path,
+    max_retry=5,
+    retry_interval=10,
+    timeout=60
+):
     """Step 1: generate presigned url for GN Amazon S3 storage.
     sample return:
     {
@@ -515,12 +527,12 @@ def upload_to_amazon(presigned_info, file_path, max_retry=5, retry_interval=10, 
 
     Returns:
         int: http request status code.
-    """    
+    """
     key = presigned_info["fields"][0]["key"]
     policy = presigned_info["fields"][0]["policy"]
     signature = presigned_info["fields"][0]["signature"]
     AWSAccessKeyId = presigned_info["AWSAccessKeyId"]
-    
+
     with open(file_path, 'rb') as file:
         files = {
             'key': (None, key),
@@ -567,7 +579,7 @@ def create_post_image(presigned_info, dataset_id, base_url, token, max_retry=5, 
 
     Returns:
         int: http request status code.
-    """    
+    """
     key = presigned_info["fields"][0]["key"].removeprefix("privateuploads/")
 
     headers = {

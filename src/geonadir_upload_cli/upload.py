@@ -1,3 +1,5 @@
+"""main uploading function handling cli request
+"""
 import concurrent.futures
 import json
 import logging
@@ -5,16 +7,17 @@ import os
 import tempfile
 
 from .parallel import process_thread
-from .util import really_get_all_collections, generate_four_timestamps, download_to_dir, deal_with_collection
+from .util import (deal_with_collection, download_to_dir,
+                   generate_four_timestamps, really_get_all_collections)
 
 LEGAL_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
 logger = logging.getLogger(__name__)
 env = os.environ.get("DEPLOYMENT_ENV", "prod")
-log_level = logging.INFO
+LOG_LEVEL = logging.INFO
 if env != "prod":
-    log_level = logging.DEBUG
-logging.basicConfig(level=log_level)
+    LOG_LEVEL = logging.DEBUG
+logging.basicConfig(level=LOG_LEVEL)
 
 
 def upload_from_catalog(**kwargs):
@@ -48,6 +51,7 @@ def normal_upload(**kwargs):
     max_retry = kwargs.get("max_retry")
     retry_interval = kwargs.get("retry_interval")
     timeout = kwargs.get("timeout")
+    dataset_id = kwargs.get("dataset_id")
 
     if dry_run:
         logger.info("---------------------dry run---------------------")
@@ -59,6 +63,8 @@ def normal_upload(**kwargs):
         logger.info(f"max_retry: {max_retry} times")
         logger.info(f"retry_interval: {retry_interval} sec")
         logger.info(f"timeout: {timeout} sec")
+        if dataset_id:
+            logger.info(f"Upload to existing dataset id: {dataset_id}")
         for count, i in enumerate(item):
             logger.info(f"--item {count + 1}:")
             dataset_name, image_location = i
@@ -74,6 +80,8 @@ def normal_upload(**kwargs):
             logger.info("no output csv file")
 
     logger.info(base_url)
+    if dataset_id:
+        logger.info(f"Upload to existing dataset id: {dataset_id}")
     token = "Token " + token
     if metadata_json:
         with open(metadata_json) as f:
@@ -96,6 +104,7 @@ def normal_upload(**kwargs):
 
         dataset_details.append(
             (
+                dataset_id,
                 dataset_name,
                 image_location,
                 base_url,

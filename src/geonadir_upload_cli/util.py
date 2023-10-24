@@ -1,3 +1,5 @@
+"""util functions for STAC objects
+"""
 import logging
 import os
 import urllib

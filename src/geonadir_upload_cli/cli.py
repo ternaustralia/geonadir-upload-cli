@@ -128,6 +128,15 @@ If flagged without specifing output folder, default is the current path of your 
     required=False,
     help="Retry interval second for uploading single image.",
 )
+@click.option(
+    "--dataset-id", "-d",
+    type=click.IntRange(0, 999999999, clamp=True),
+    required=False,
+    default=0,
+    show_default=True,
+    help="Existing Geonadir dataset id to be uploaded to. Only works when dataset id is valid. \
+Leave default or set 0 to skip dataset existence check and upload to new dataset insetad."
+)
 def local_upload(**kwargs):
     """upload local images
     """

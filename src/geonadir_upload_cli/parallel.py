@@ -1,3 +1,5 @@
+"""parallel processing function
+"""
 import logging
 import os
 import re
@@ -13,17 +15,18 @@ logger = logging.getLogger(__name__)
 
 
 def process_thread(
-        dataset_name,
-        img_dir,
-        base_url,
-        token,
-        private,
-        metadata,
-        complete,
-        remote_collection_json,
-        max_retry,
-        retry_interval,
-        timeout
+    dataset_id,
+    dataset_name,
+    img_dir,
+    base_url,
+    token,
+    private,
+    metadata,
+    complete,
+    remote_collection_json,
+    max_retry,
+    retry_interval,
+    timeout
 ):
     """
     Process a thread for uploading images to a dataset.
@@ -103,11 +106,12 @@ def process_thread(
     logger.info(f"Metadata for dataset {dataset_name}:")
     logger.info(str(payload_data))
 
-    try:
-        dataset_id = create_dataset(payload_data, base_url, token)
-    except Exception as exc:
-        logger.error(f"Create dataset {dataset_name} failed:\n{str(exc)}")
-        return dataset_name, False, "create_dataset"
+    if not dataset_id:
+        try:
+            dataset_id = create_dataset(payload_data, base_url, token)
+        except Exception as exc:
+            logger.error(f"Create dataset {dataset_name} failed:\n{str(exc)}")
+            return dataset_name, False, "create_dataset"
     # print(f"Uploading https://staging.geonadir.com/image-collection-details/{dataset_id}")
     # print()
     logger.info(f"Dataset name: {dataset_name}, dataset ID: {dataset_id}")
