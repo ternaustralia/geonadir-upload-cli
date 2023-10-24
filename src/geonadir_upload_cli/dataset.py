@@ -10,7 +10,7 @@ import requests
 import tqdm as tq
 from requests.adapters import HTTPAdapter, Retry
 
-from .util import get_filelist_from_collection
+from .util import get_filelist_from_collection, original_filename
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +67,16 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token, max_retry,
         pd.DataFrame: DataFrame containing upload results for each image.
     """
     file_list = os.listdir(img_dir)
-    file_list = [file for file in file_list if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tif'))]
+    file_list = [
+        file for file in file_list if file.lower().endswith(
+            ('.jpg','.jpeg','.png','.gif','.bmp','.tif')
+        )
+    ]
+
+    url = f"{base_url}/api/uploadfiles/?page=1&project_id={dataset_id}"
+    existing_image_list = [original_filename(name) for name in paginate_dataset_images(url, [])]
+    existing_images = set(existing_image_list)
+    file_list = [file for file in file_list if file not in existing_images]
 
     count = 0
     df_list = []
@@ -146,11 +155,18 @@ def upload_images_from_collection(
     if not file_dict:
         raise Exception(f"no applicable asset file in collection {collection}")
 
-    count = 0
+    url = f"{base_url}/api/uploadfiles/?page=1&project_id={dataset_id}"
+    existing_image_list = [original_filename(name) for name in paginate_dataset_images(url, [])]
+    existing_images = set(existing_image_list)
+
     df_list = []
 
     with tq.tqdm(total=len(file_dict), position=0) as pbar:
         for file_path, file_url in file_dict.items():
+            if os.path.basename(file_path) in existing_images:
+                logger.warning(f"{file_path} already uploaded. skipped")
+                pbar.update(1)
+                continue
             try:
                 content = retrieve_single_image(file_url, max_retry, retry_interval)
             except Exception as exc:
@@ -191,8 +207,6 @@ def upload_images_from_collection(
                 index=[0]
             )
             df_list.append(df)
-
-            count += 1
             pbar.update(1)
 
     result_df = pd.concat(df_list, ignore_index=True)
@@ -225,7 +239,7 @@ def trigger_ortho_processing(dataset_id, base_url, token):
     response.raise_for_status()
 
 
-def paginate_dataset_image_images(url, image_names):
+def paginate_dataset_images(url, image_names:list):
     """
     Paginate through the dataset images API response to retrieve all image names.
 
@@ -236,17 +250,24 @@ def paginate_dataset_image_images(url, image_names):
     Returns:
         list: List of image names.
     """
-    response = requests.get(url, timeout=60)
-    data = response.json()
-    results = data["results"]
-    for result in results:
-        image_name = result["upload_files"]
-        # image_name = re.search(r'([^/]+?)(?:_\d+)?\.JPG', image_url).group(1) + ".JPG"
-        image_names.append(image_name)
-    next_page = data["next"]
-    if next_page:
-        paginate_dataset_image_images(next_page, image_names)
-    return image_names
+    try:
+        response = requests.get(url, timeout=60)
+        data = response.json()
+        results = data["results"]
+        for result in results:
+            image_name = result["upload_files"]
+            # image_name = re.search(r'([^/]+?)(?:_\d+)?\.JPG', image_url).group(1) + ".JPG"
+            image_names.append(image_name)
+        next_page = data["next"]
+        if next_page:
+            paginate_dataset_images(next_page, image_names)
+        return image_names
+    except Exception as exc:
+        if "data" in locals():
+            logger.warning(f"dataset for {url} doesn't exist")
+        else:
+            logger.error(f"Failed to get dataset images from {url}: {str(exc)}")
+        return []
 
 
 def search_datasets(search_str, base_url):

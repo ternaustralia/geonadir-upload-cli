@@ -2,6 +2,7 @@
 """
 import logging
 import os
+import re
 import urllib
 from datetime import datetime
 
@@ -177,3 +178,64 @@ def deal_with_collection(collection_location, exclude, include, cb, ca, ub, ua):
         logger.error(f"{collection_location} illegal: {str(exc)}")
         return False
     return dataset_name
+
+
+def original_filename(url):
+    """
+    Extract the original file name from Geonadir image url.
+    for url = 'https://geonadir-prod.s3.amazonaws.com/privateuploads/images/ \
+        3151-fce3304f-a253-4e91-acd9-3c2aaf876cd3/DJI_20220519122445_0024_766891.JPG \
+        ?AWSAccessKeyId=<key_id>&Signature=<sig>&Expires=1692857952',
+    the original file name is DJI_20220519122445_0024.JPG
+
+    23/10/2023 update: filename in url changed due to uploading mechanism update.
+
+    Args:
+        url (str): image url
+
+    Returns:
+        name: the name of the original image
+    """
+    url_name = url.split("?")[0].split("/")[-1]  # DJI_20220519122445_0024_766891.JPG
+    # basename, ext = os.path.splitext(url_name)
+    # return "_".join(basename.split("_")[:-1]) + ext  # DJI_20220519122445_0024.JPG
+    return url_name
+
+
+def first_value(iterable):
+    """Extract the first non-None value
+
+    Args:
+        iterable (iterable): iterable object
+
+    Returns:
+        value: non-None value
+    """
+    return next((item for item in iterable if item is not None), None)
+
+
+def clickable_link(text:str):
+    """Find urls starting with ftp/http/https/www with at least 3 sections,
+    and make them clickable in markdown.
+    e.g. https://a.b will be substituted by <https://a.b>
+
+    Args:
+        text (str): text
+
+    Returns:
+        str: processed text
+    """    
+    regexp = r'((?:(?:(?:https?|ftp):\/\/)|www)[\w/\-?=%.]+\.[\w/\-&?=%.]+)([^\w/\-&?=%.]|$)'
+
+    def repl(matchobj:re.Match):
+        rs = matchobj.group(1).rstrip(".")
+        if rs:
+            num = len(matchobj.group(1)) - len(rs)
+            res = f"<{rs}>{matchobj.group(2)}"
+            for _ in range(num):
+                res += "."
+            return res
+        return matchobj.string
+
+    text = re.sub(regexp, repl, text)
+    return text
