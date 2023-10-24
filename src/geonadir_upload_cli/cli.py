@@ -1,3 +1,5 @@
+"""main cli commands
+"""
 import json
 import logging
 import os
@@ -12,15 +14,15 @@ LEGAL_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
 logger = logging.getLogger(__name__)
 env = os.environ.get("DEPLOYMENT_ENV", "prod")
-log_level = logging.INFO
+LOG_LEVEL = logging.INFO
 if env != "prod":
-    log_level = logging.DEBUG
-logging.basicConfig(level=log_level)
+    LOG_LEVEL = logging.DEBUG
+logging.basicConfig(level=LOG_LEVEL)
 
 
-def print_version(ctx, param, value):
+def print_version(ctx, _, value):
     """callback for printing cli tool version
-    """    
+    """
     # print(ctx.__dict__)
     # print(param.__dict__)
     # print(value)
@@ -41,8 +43,7 @@ def print_version(ctx, param, value):
 )
 def cli():
     """main cli call
-    """    
-    pass
+    """
 
 
 @cli.command()
@@ -84,7 +85,8 @@ def cli():
     flag_value=os.getcwd(),
     type=click.Path(exists=True),
     required=False,
-    help="Whether output csv is created. Generate output at the specified path. Default is false. If flagged without specifing output folder, default is the current path of your terminal.",
+    help="Whether output csv is created. Generate output at the specified path. Default is false. \
+If flagged without specifing output folder, default is the current path of your terminal.",
 )
 @click.option(
     "--item", "-i",
@@ -128,7 +130,7 @@ def cli():
 )
 def local_upload(**kwargs):
     """upload local images
-    """    
+    """
     normal_upload(**kwargs)
 
 
@@ -171,7 +173,8 @@ def local_upload(**kwargs):
     flag_value=os.getcwd(),
     type=click.Path(exists=True),
     required=False,
-    help="Whether output csv is created. Generate output at the specified path. Default is false. If flagged without specifing output folder, default is the current path of your terminal.",
+    help="Whether output csv is created. Generate output at the specified path. Default is false. \
+If flagged without specifing output folder, default is the current path of your terminal.",
 )
 @click.option(
     "--item", "-i",
@@ -179,8 +182,9 @@ def local_upload(**kwargs):
     required=True,
     multiple=True,
     help="The name of the dataset and the remote url of stac collection. \
-        \nType 'collection_title' for dataset name when uploading from stac collection if you want to use title in collection.json as dataset title, \
-        \ne.g. ... --item collection_title ./collection.json ...",
+Type 'collection_title' for dataset name when uploading from stac \
+collection if you want to use title in collection.json as dataset title, \
+e.g. ... --item collection_title ./collection.json ...",
 )
 @click.option(
     "--complete", "-c",
@@ -249,7 +253,7 @@ def local_upload(**kwargs):
 )
 def collection_upload(**kwargs):
     """upload dataset from valid STAC collection object
-    """    
+    """
     upload_from_collection(**kwargs)
 
 
@@ -292,7 +296,8 @@ def collection_upload(**kwargs):
     flag_value=os.getcwd(),
     type=click.Path(exists=True),
     required=False,
-    help="Whether output csv is created. Generate output at the specified path. Default is false. If flagged without specifing output folder, default is the current path of your terminal.",
+    help="Whether output csv is created. Generate output at the specified path. Default is false. \
+If flagged without specifing output folder, default is the current path of your terminal.",
 )
 @click.option(
     "--item", "-i",
@@ -381,7 +386,7 @@ def collection_upload(**kwargs):
 )
 def catalog_upload(**kwargs):
     """upload dataset from valid STAC catalog object
-    """    
+    """
     upload_from_catalog(**kwargs)
 
 
@@ -400,12 +405,13 @@ def catalog_upload(**kwargs):
     flag_value=os.getcwd(),
     type=click.Path(exists=True),
     required=False,
-    help="Whether output csv is created. Generate output at the specified path. Default is false. If flagged without specifing output folder, default is the current path of your terminal.",
+    help="Whether output csv is created. Generate output at the specified path. Default is false. \
+If flagged without specifing output folder, default is the current path of your terminal.",
 )
 @click.argument('search-str')
 def search_dataset(**kwargs):
     """search dataset by keyword
-    """    
+    """
     base_url = kwargs.get("base_url")
     search = kwargs.get("search_str")
     output = kwargs.get("output_folder", None)
@@ -439,11 +445,12 @@ def search_dataset(**kwargs):
     flag_value=os.getcwd(),
     type=click.Path(exists=True),
     required=False,
-    help="Whether output csv is created. Generate output at the specified path. Default is false. If flagged without specifing output folder, default is the current path of your terminal.",
+    help="Whether output csv is created. Generate output at the specified path. Default is false. \
+If flagged without specifing output folder, default is the current path of your terminal.",
 )
 def range_dataset(**kwargs):
     """search dataset by latlon area
-    """    
+    """
     base_url = kwargs.get("base_url")
     search = kwargs.get("coords")
     output = kwargs.get("output_folder", None)
@@ -472,12 +479,13 @@ def range_dataset(**kwargs):
     flag_value=os.getcwd(),
     type=click.Path(exists=True),
     required=False,
-    help="Whether output csv is created. Generate output at the specified path. Default is false. If flagged without specifing output folder, default is the current path of your terminal.",
+    help="Whether output csv is created. Generate output at the specified path. Default is false. \
+If flagged without specifing output folder, default is the current path of your terminal.",
 )
 @click.argument('project-id')
 def get_dataset_info(**kwargs):
     """get metadata of dataset given dataset id
-    """    
+    """
     base_url = kwargs.get("base_url")
     project_id = kwargs.get("project_id")
     output = kwargs.get("output_folder", None)
