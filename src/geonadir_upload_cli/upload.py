@@ -57,15 +57,13 @@ def normal_upload(**kwargs):
     if dataset_id:
         result = dataset_info(dataset_id, base_url)
         if result == "Metadata not found":
-            logger.warning(f"Dataset id {dataset_id} not found. Upload to new dataset instead.")
-            dataset_id = 0
-        else:
-            logger.info(f"Upload to existing dataset id: {dataset_id}")
-            try:
-                existing_dataset_name = result.get("project_id", {}).get("project_name", "")
-                logger.info(f"Dataset name: {existing_dataset_name}")
-            except Exception as exc:
-                existing_dataset_name = f"<dataset id: {dataset_id}"
+            raise Exception(f"Dataset id {dataset_id} invalid.")
+        logger.info(f"Upload to existing dataset id: {dataset_id}")
+        try:
+            existing_dataset_name = result.get("project_id", {}).get("project_name", "")
+            logger.info(f"Dataset name: {existing_dataset_name}")
+        except Exception as exc:
+            existing_dataset_name = f"<dataset id: {dataset_id}"
 
     if dry_run:
         logger.info("---------------------dry run---------------------")
@@ -162,15 +160,13 @@ def upload_from_collection(**kwargs):
     if dataset_id:
         result = dataset_info(dataset_id, base_url)
         if result == "Metadata not found":
-            logger.warning(f"Dataset id {dataset_id} not found. Upload to new dataset instead.")
-            dataset_id = 0
-        else:
-            logger.info(f"Upload to existing dataset id: {dataset_id}")
-            try:
-                existing_dataset_name = result.get("project_id", {}).get("project_name", "")
-                logger.info(f"Dataset name: {existing_dataset_name}")
-            except Exception as exc:
-                existing_dataset_name = f"<dataset id: {dataset_id}"
+            raise Exception(f"Dataset id {dataset_id} invalid.")
+        logger.info(f"Upload to existing dataset id: {dataset_id}")
+        try:
+            existing_dataset_name = result.get("project_id", {}).get("project_name", "")
+            logger.info(f"Dataset name: {existing_dataset_name}")
+        except Exception as exc:
+            existing_dataset_name = f"<dataset id: {dataset_id}"
 
     cb, ca, ub, ua = generate_four_timestamps(**kwargs)
 
