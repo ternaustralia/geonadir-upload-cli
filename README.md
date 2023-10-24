@@ -193,7 +193,7 @@ Options:
 
   - Must be integer between 0 and 20. Clamping applied.
 
-  - Default is 5.
+  - Default is 10.
 
 - `-ri, --retry-interval`: Interval seconds between retries for uploading single image.
 
@@ -201,13 +201,13 @@ Options:
 
   - Actual interval is `{retry-interval} * (2 ** ({number of total retries} - 1))`
 
-  - Default is 10.
+  - Default is 30.
 
 - `-to, --timeout`: Timeout seconds for uploading single image.
 
   - Must be floating num between 0 and 3600. Clamping applied.
 
-  - Default is 60.
+  - Default is 120.
 
 ### upload datasets from all collections of STAC catalog
 
@@ -292,7 +292,7 @@ Options:
 
   - Must be integer between 0 and 20. Clamping applied.
 
-  - Default is 5.
+  - Default is 10.
 
 - `-ri, --retry-interval`: Interval seconds between retries for uploading single image.
 
@@ -300,13 +300,13 @@ Options:
 
   - Actual interval is `{retry-interval} * (2 ** ({number of total retries} - 1))`
 
-  - Default is 10.
+  - Default is 30.
 
 - `-to, --timeout`: Timeout seconds for uploading single image.
 
   - Must be floating num between 0 and 3600. Clamping applied.
 
-  - Default is 60.
+  - Default is 120.
 
 ## Running
 

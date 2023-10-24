@@ -225,7 +225,7 @@ def local_upload(**kwargs):
 )
 @click.option(
     "--max-retry", "-mr",
-    default=5,
+    default=10,
     show_default=True,
     type=click.IntRange(0, 20, clamp=True),
     required=False,
@@ -233,7 +233,7 @@ def local_upload(**kwargs):
 )
 @click.option(
     "--timeout", "-to",
-    default=60,
+    default=120,
     show_default=True,
     type=click.FloatRange(0, 3600, clamp=True),
     required=False,
@@ -241,7 +241,7 @@ def local_upload(**kwargs):
 )
 @click.option(
     "--retry-interval", "-ri",
-    default=10,
+    default=30,
     show_default=True,
     type=click.FloatRange(0, 3600, clamp=True),
     required=False,
@@ -357,7 +357,7 @@ def collection_upload(**kwargs):
 )
 @click.option(
     "--max-retry", "-mr",
-    default=5,
+    default=10,
     show_default=True,
     type=click.IntRange(0, 20, clamp=True),
     required=False,
@@ -365,7 +365,7 @@ def collection_upload(**kwargs):
 )
 @click.option(
     "--timeout", "-to",
-    default=60,
+    default=120,
     show_default=True,
     type=click.FloatRange(0, 3600, clamp=True),
     required=False,
@@ -373,7 +373,7 @@ def collection_upload(**kwargs):
 )
 @click.option(
     "--retry-interval", "-ri",
-    default=10,
+    default=30,
     show_default=True,
     type=click.FloatRange(0, 3600, clamp=True),
     required=False,
