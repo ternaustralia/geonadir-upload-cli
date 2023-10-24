@@ -117,6 +117,8 @@ Options:
 
 ### upload dataset from single remote STAC collection.json file
 
+This is for uploading all image assets as a GN dataset from single collection. STAC items are not yet supported.
+
 Usage: `geonadir-upload collection-upload [OPTIONS]`
 
 Options:
