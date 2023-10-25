@@ -10,7 +10,8 @@ import requests
 import tqdm as tq
 from requests.adapters import HTTPAdapter, Retry
 
-from .util import get_filelist_from_collection, original_filename
+from .util import (geonadir_filename_trans, get_filelist_from_collection,
+                   original_filename)
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +77,7 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token, max_retry,
     url = f"{base_url}/api/uploadfiles/?page=1&project_id={dataset_id}"
     existing_image_list = [original_filename(name) for name in paginate_dataset_images(url, [])]
     existing_images = set(existing_image_list)
-    file_list = [file for file in file_list if file not in existing_images]
+    file_list = [file for file in file_list if geonadir_filename_trans(file) not in existing_images]
 
     count = 0
     df_list = []
@@ -163,7 +164,7 @@ def upload_images_from_collection(
 
     with tq.tqdm(total=len(file_dict), position=0) as pbar:
         for file_path, file_url in file_dict.items():
-            if os.path.basename(file_path) in existing_images:
+            if geonadir_filename_trans(os.path.basename(file_path)) in existing_images:
                 logger.warning(f"{file_path} already uploaded. skipped")
                 pbar.update(1)
                 continue

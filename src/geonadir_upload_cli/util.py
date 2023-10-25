@@ -11,8 +11,6 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-LEGAL_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
-
 
 def get_filelist_from_collection(collection_path:str, remote_collection_json:str):
     """get list of all assets from STAC collection file
@@ -137,8 +135,7 @@ def deal_with_collection(collection_location, exclude, include, cb, ca, ub, ua):
     """
     try:
         collection = pystac.Collection.from_file(collection_location)
-        dataset_name = collection.title
-        dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
+        dataset_name = re.sub(r"[^a-zA-Z0-9-_]+", "", collection.title.replace(" ", "_")).strip("_")
         if not dataset_name:
             logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
             dataset_name = "untitled"
@@ -180,7 +177,7 @@ def deal_with_collection(collection_location, exclude, include, cb, ca, ub, ua):
     return dataset_name
 
 
-def original_filename(url):
+def original_filename(url:str):
     """
     Extract the original file name from Geonadir image url.
     for url = 'https://geonadir-prod.s3.amazonaws.com/privateuploads/images/ \
@@ -200,6 +197,24 @@ def original_filename(url):
     # basename, ext = os.path.splitext(url_name)
     # return "_".join(basename.split("_")[:-1]) + ext  # DJI_20220519122445_0024.JPG
     return url_name
+
+
+def geonadir_filename_trans(filename:str):
+    """get transformed filename in GN.
+
+    Step 1: Replace %xx escapes by their single-character equivalent using urllib.parse.unquote
+    Step 2: replace all characters with _, except for latin and digit
+    Step 3: strip trailing underscores on the right or left
+
+    Args:
+        filename (str): original filename
+
+    Returns:
+        str: transformed filename
+    """
+    name, ext = os.path.splitext(filename)
+    trans_name = re.sub(r"[^a-zA-Z0-9_]+", "_", urllib.parse.unquote(name)).strip("_")
+    return trans_name + ext
 
 
 def first_value(iterable):
