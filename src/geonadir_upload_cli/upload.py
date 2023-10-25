@@ -23,7 +23,7 @@ logging.basicConfig(level=LOG_LEVEL)
 
 def upload_from_catalog(**kwargs):
     """recursively retrieve all collections and upload dataset from each
-    """    
+    """
     catalog_url = kwargs.get("item")
     with tempfile.TemporaryDirectory() as tmpdir:
         collections_list = []
@@ -40,7 +40,7 @@ def upload_from_catalog(**kwargs):
 
 def normal_upload(**kwargs):
     """upload local images
-    """    
+    """
     base_url = kwargs.get("base_url")
     token = kwargs.get("token")
     item = kwargs.get("item")
@@ -141,7 +141,7 @@ def normal_upload(**kwargs):
 
 def upload_from_collection(**kwargs):
     """upload from valid STAC collection object
-    """    
+    """
     base_url = kwargs.get("base_url")
     token = kwargs.get("token")
     item = kwargs.get("item")
@@ -306,7 +306,7 @@ def result_processing(results, output_dir):
     Args:
         results (list): uploading results
         output_dir (str): directory of output csv files
-    """    
+    """
     for dataset_name, df, error in results:
         if error:
             logger.warning(f"{dataset_name} uploading failed when {error}")

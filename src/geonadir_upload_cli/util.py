@@ -41,7 +41,7 @@ def really_get_all_collections(catalog_url:str, local_folder:str):
 
     Yields:
         str: url of valid collection
-    """    
+    """
     # catalog_url = "https://data-test.tern.org.au/uas_raw/catalog.json"
     logger.info(f"getting child collection urls from {catalog_url}")
     r = requests.get(catalog_url, timeout=60)
@@ -66,7 +66,7 @@ def generate_four_timestamps(**kwargs):
 
     Returns:
         datetime, datetime, datetime, datetime: created before/after/updated before/after
-    """    
+    """
     try:
         created_before = kwargs.get("created_before", "9999-12-31")
         cb = datetime.fromisoformat(created_before)
@@ -104,7 +104,7 @@ def download_to_dir(url, directory):
 
     Returns:
         bool: whether successfully downloaded
-    """    
+    """
     image_location = os.path.join(directory, "collection.json")
     r = requests.get(url, timeout=60)
     try:
@@ -134,7 +134,7 @@ def deal_with_collection(collection_location, exclude, include, cb, ca, ub, ua):
 
     Returns:
         str | bool: dataset name retrieved from collection.json. return False if collection is filtered out.
-    """    
+    """
     try:
         collection = pystac.Collection.from_file(collection_location)
         dataset_name = collection.title
@@ -224,7 +224,7 @@ def clickable_link(text:str):
 
     Returns:
         str: processed text
-    """    
+    """
     regexp = r'((?:(?:(?:https?|ftp):\/\/)|www)[\w/\-?=%.]+\.[\w/\-&?=%.]+)([^\w/\-&?=%.]|$)'
 
     def repl(matchobj:re.Match):
