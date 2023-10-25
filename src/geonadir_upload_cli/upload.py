@@ -4,14 +4,13 @@ import concurrent.futures
 import json
 import logging
 import os
+import re
 import tempfile
 
 from .dataset import dataset_info
 from .parallel import process_thread
 from .util import (deal_with_collection, download_to_dir,
                    generate_four_timestamps, really_get_all_collections)
-
-LEGAL_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
 logger = logging.getLogger(__name__)
 env = os.environ.get("DEPLOYMENT_ENV", "prod")
@@ -79,7 +78,7 @@ def normal_upload(**kwargs):
             logger.info(f"--item {count + 1}:")
             dataset_name, image_location = i
             if not dataset_id:
-                dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
+                dataset_name = re.sub(r"[^a-zA-Z0-9-_]+", "", dataset_name.replace(" ", "_")).strip("_")
                 if not dataset_name:
                     logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
                     dataset_name = "untitled"
@@ -101,7 +100,7 @@ def normal_upload(**kwargs):
         dataset_name, image_location = i
         meta = None
         if not dataset_id:
-            dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
+            dataset_name = re.sub(r"[^a-zA-Z0-9-_]+", "", dataset_name.replace(" ", "_")).strip("_")
             if not dataset_name:
                 logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
                 dataset_name = "untitled"
@@ -202,9 +201,9 @@ def upload_from_collection(**kwargs):
             if not title:
                 continue
             if not dataset_id:
-                dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
+                dataset_name = re.sub(r"[^a-zA-Z0-9-_]+", "", dataset_name.replace(" ", "_")).strip("_")
                 if not dataset_name:
-                    dataset_name = "".join(x for x in title.replace(" ", "_") if x in LEGAL_CHARS)
+                    dataset_name = re.sub(r"[^a-zA-Z0-9-_]+", "", title.replace(" ", "_")).strip("_")
                     if not dataset_name:
                         logger.warning(f"No legal character. Dataset named 'untitled_{count}'")
                         dataset_name = f"untitled_{count}"
@@ -252,9 +251,9 @@ def upload_from_collection(**kwargs):
         if not title:
             continue
         if not dataset_id:
-            dataset_name = "".join(x for x in dataset_name.replace(" ", "_") if x in LEGAL_CHARS)
+            dataset_name = re.sub(r"[^a-zA-Z0-9-_]+", "", dataset_name.replace(" ", "_")).strip("_")
             if not dataset_name:
-                dataset_name = "".join(x for x in title.replace(" ", "_") if x in LEGAL_CHARS)
+                dataset_name = re.sub(r"[^a-zA-Z0-9-_]+", "", title.replace(" ", "_")).strip("_")
                 if not dataset_name:
                     logger.warning(f"No legal character. Dataset named 'untitled_{count}'")
                     dataset_name = f"untitled_{count}"

@@ -91,19 +91,23 @@ Options:
 
   - All path(s) must exist, otherwise error raised.
 
-  - Space in dataset name will be replaced by "_".
+  - Dataset name is processed as follows:
 
-  - Illegal characters in dataset name will be removed. The legal chars include Latins, digits, "-" and "_".
+    1. Space in dataset name replaced by "_".
+
+    2. Characters in dataset name removed except for Latins, digits, "-" and "_".
+
+    3. Trailing "_"s removed from both sides
 
 - `-mr, --max-retry`: Max retry attempt for uploading single image.
 
-  - Must be integer between 0 and 20. Clamping applied.
+  - Must be non-negative integer.
 
   - Default is 5.
 
 - `-ri, --retry-interval`: Interval seconds between retries for uploading single image.
 
-  - Must be floating num between 0 and 3600. Clamping applied.
+  - Must be non-negative float.
 
   - Actual interval is `{retry-interval} * (2 ** ({number of total retries} - 1))`
 
@@ -111,9 +115,19 @@ Options:
 
 - `-to, --timeout`: Timeout seconds for uploading single image.
 
-  - Must be floating num between 0 and 3600. Clamping applied.
+  - Must be non-negative float.
 
   - Default is 60.
+
+- `-d, --dataset-id`: Optional for uploading to existing GN dataset.
+
+  - Must be non-negative integer.
+
+  - Leave it default or set 0 to upload to new dataset.
+
+  - Error raised if dataset-id is illegal.
+
+  - If id specified, several option will be disabled, e.g., dataset name, metadata, etc.
 
 ### upload dataset from single remote STAC collection.json file
 
@@ -171,9 +185,13 @@ Options:
 
   - All path(s) must exist, otherwise error raised.
 
-  - Space in dataset name will be replaced by "_".
+  - Dataset name is processed as follows:
 
-  - Illegal characters in dataset name will be removed. The legal chars include Latins, digits, "-" and "_".
+    1. Space in dataset name replaced by "_".
+
+    2. Characters in dataset name removed except for Latins, digits, "-" and "_".
+
+    3. Trailing "_"s removed from both sides
 
 - `-cb, --created-before`: Only upload collections created before this timestamp.
 
@@ -193,13 +211,13 @@ Options:
 
 - `-mr, --max-retry`: Max retry attempt for uploading single image.
 
-  - Must be integer between 0 and 20. Clamping applied.
+  - Must be non-negative integer.
 
   - Default is 10.
 
 - `-ri, --retry-interval`: Interval seconds between retries for uploading single image.
 
-  - Must be floating num between 0 and 3600. Clamping applied.
+  - Must be non-negative integer.
 
   - Actual interval is `{retry-interval} * (2 ** ({number of total retries} - 1))`
 
@@ -207,9 +225,19 @@ Options:
 
 - `-to, --timeout`: Timeout seconds for uploading single image.
 
-  - Must be floating num between 0 and 3600. Clamping applied.
+  - Must be non-negative float.
 
   - Default is 120.
+
+- `-d, --dataset-id`: Optional for uploading to existing GN dataset.
+
+  - Must be non-negative integer.
+
+  - Leave it default or set 0 to upload to new dataset.
+
+  - Error raised if dataset-id is illegal.
+
+  - If id specified, several option will be disabled, e.g., dataset name, metadata, etc.
 
 ### upload datasets from all collections of STAC catalog
 
@@ -292,13 +320,13 @@ Options:
 
 - `-mr, --max-retry`: Max retry attempt for uploading single image.
 
-  - Must be integer between 0 and 20. Clamping applied.
+  - Must be non-negative integer.
 
   - Default is 10.
 
 - `-ri, --retry-interval`: Interval seconds between retries for uploading single image.
 
-  - Must be floating num between 0 and 3600. Clamping applied.
+  - Must be non-negative integer.
 
   - Actual interval is `{retry-interval} * (2 ** ({number of total retries} - 1))`
 
@@ -306,7 +334,7 @@ Options:
 
 - `-to, --timeout`: Timeout seconds for uploading single image.
 
-  - Must be floating num between 0 and 3600. Clamping applied.
+  - Must be non-negative float.
 
   - Default is 120.
 

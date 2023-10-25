@@ -10,8 +10,6 @@ import click
 from .dataset import dataset_info, search_datasets, search_datasets_coord
 from .upload import normal_upload, upload_from_catalog, upload_from_collection
 
-LEGAL_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
-
 logger = logging.getLogger(__name__)
 env = os.environ.get("DEPLOYMENT_ENV", "prod")
 LOG_LEVEL = logging.INFO
@@ -108,7 +106,7 @@ If flagged without specifing output folder, default is the current path of your 
     "--max-retry", "-mr",
     default=5,
     show_default=True,
-    type=click.IntRange(0, 20, clamp=True),
+    type=click.IntRange(0, max_open=True),
     required=False,
     help="Max retry for uploading single image.",
 )
@@ -116,7 +114,7 @@ If flagged without specifing output folder, default is the current path of your 
     "--timeout", "-to",
     default=60,
     show_default=True,
-    type=click.FloatRange(0, 3600, clamp=True),
+    type=click.FloatRange(0, max_open=True),
     required=False,
     help="Timeout second for uploading single image.",
 )
@@ -124,13 +122,13 @@ If flagged without specifing output folder, default is the current path of your 
     "--retry-interval", "-ri",
     default=10,
     show_default=True,
-    type=click.FloatRange(0, 3600, clamp=True),
+    type=click.FloatRange(0, max_open=True),
     required=False,
     help="Retry interval second for uploading single image.",
 )
 @click.option(
     "--dataset-id", "-d",
-    type=click.IntRange(0, 999999999, clamp=True),
+    type=click.IntRange(0, max_open=True),
     required=False,
     default=0,
     show_default=True,
@@ -240,7 +238,7 @@ e.g. ... --item collection_title ./collection.json ...",
     "--max-retry", "-mr",
     default=10,
     show_default=True,
-    type=click.IntRange(0, 20, clamp=True),
+    type=click.IntRange(0, max_open=True),
     required=False,
     help="Max retry for uploading single image.",
 )
@@ -248,7 +246,7 @@ e.g. ... --item collection_title ./collection.json ...",
     "--timeout", "-to",
     default=120,
     show_default=True,
-    type=click.FloatRange(0, 3600, clamp=True),
+    type=click.FloatRange(0, max_open=True),
     required=False,
     help="Timeout second for uploading single image.",
 )
@@ -256,13 +254,13 @@ e.g. ... --item collection_title ./collection.json ...",
     "--retry-interval", "-ri",
     default=30,
     show_default=True,
-    type=click.FloatRange(0, 3600, clamp=True),
+    type=click.FloatRange(0, max_open=True),
     required=False,
     help="Retry interval second for uploading single image.",
 )
 @click.option(
     "--dataset-id", "-d",
-    type=click.IntRange(0, 999999999, clamp=True),
+    type=click.IntRange(0, max_open=True),
     required=False,
     default=0,
     show_default=True,
@@ -382,7 +380,7 @@ If flagged without specifing output folder, default is the current path of your 
     "--max-retry", "-mr",
     default=10,
     show_default=True,
-    type=click.IntRange(0, 20, clamp=True),
+    type=click.IntRange(0, max_open=True),
     required=False,
     help="Max retry for uploading single image.",
 )
@@ -390,7 +388,7 @@ If flagged without specifing output folder, default is the current path of your 
     "--timeout", "-to",
     default=120,
     show_default=True,
-    type=click.FloatRange(0, 3600, clamp=True),
+    type=click.FloatRange(0, max_open=True),
     required=False,
     help="Timeout second for uploading single image.",
 )
@@ -398,7 +396,7 @@ If flagged without specifing output folder, default is the current path of your 
     "--retry-interval", "-ri",
     default=30,
     show_default=True,
-    type=click.FloatRange(0, 3600, clamp=True),
+    type=click.FloatRange(0, max_open=True),
     required=False,
     help="Retry interval second for uploading single image.",
 )

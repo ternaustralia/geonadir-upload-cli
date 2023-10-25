@@ -204,7 +204,7 @@ def geonadir_filename_trans(filename:str):
 
     Step 1: Replace %xx escapes by their single-character equivalent using urllib.parse.unquote
     Step 2: replace all characters with _, except for latin and digit
-    Step 3: strip trailing underscores on the right or left
+    Step 3: strip trailing underscores from both sides
 
     Args:
         filename (str): original filename
