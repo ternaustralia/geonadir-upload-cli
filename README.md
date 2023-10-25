@@ -120,6 +120,7 @@ Options:
   - Default is 60.
 
 - `-d, --dataset-id`: Optional for uploading to existing GN dataset.
+Unless you know what you are doing, don't enable this when you are uploading multiple datasets in parallel.
 
   - Must be non-negative integer.
 
@@ -230,6 +231,7 @@ Options:
   - Default is 120.
 
 - `-d, --dataset-id`: Optional for uploading to existing GN dataset.
+Unless you know what you are doing, don't enable this when you are uploading multiple datasets in parallel.
 
   - Must be non-negative integer.
 
