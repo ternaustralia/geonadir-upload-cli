@@ -265,7 +265,7 @@ def paginate_dataset_images(url, image_names:list):
         return image_names
     except Exception as exc:
         if "data" in locals():
-            logger.warning(f"dataset for {url} doesn't exist")
+            logger.warning(f"No image found in {url}")
         else:
             logger.error(f"Failed to get dataset images from {url}: {str(exc)}")
         return []

@@ -64,22 +64,31 @@ def process_thread(
     #     "is_private": False
     # }
 
+    # create new dataset if dataset_id not specified
     if not dataset_id:
         payload_data = {
             "dataset_name": dataset_name,
             "is_private": private,
             "is_published": True
         }
+
+        # retrieve metadata from STAC collection if applicable
         if remote_collection_json:
             collection = pystac.Collection.from_file(img_dir)
+
+            # get citation
             citation = collection.extra_fields.get('sci:citation')
             if citation:
                 payload_data["data_credits"] = citation
+
+            # get description
             description = ""
             if hasattr(collection, "description"):
                 description += collection.description
             else:
                 logger.warning(f"No description in {remote_collection_json}")
+
+            # add license to description
             if hasattr(collection, "license"):
                 description += "\n\nLicense: "
                 description += collection.license
@@ -95,9 +104,11 @@ def process_thread(
             if description:
                 payload_data["description"] = description
 
+        # update metadata if json file specified in command
         if metadata:
             payload_data.update(**metadata)
 
+        # use <> to make url markdown-clickable
         if payload_data.get("description", None):
             payload_data["description"] = clickable_link(payload_data["description"])
         if payload_data.get("data_credits", None):
@@ -111,13 +122,12 @@ def process_thread(
         except Exception as exc:
             logger.error(f"Create dataset {dataset_name} failed:\n{str(exc)}")
             return dataset_name, False, "create_dataset"
-    # print(f"Uploading https://staging.geonadir.com/image-collection-details/{dataset_id}")
-    # print()
+
     logger.info(f"Dataset name: {dataset_name}, dataset ID: {dataset_id}")
     url = f"{base_url}/api/uploadfiles/?page=1&project_id={dataset_id}"
 
     try:
-        if os.path.splitext(img_dir)[1] == ".json":
+        if os.path.splitext(img_dir)[1] == ".json":  # upload from STAC collection
             result_df = upload_images_from_collection(
                 dataset_name,
                 dataset_id,
@@ -129,7 +139,7 @@ def process_thread(
                 retry_interval,
                 timeout
             )
-        else:
+        else:  # upload local images in img_dir
             result_df = upload_images(
                 dataset_name,
                 dataset_id,
@@ -144,13 +154,14 @@ def process_thread(
         logger.error(f"Uploading images failed:\n{str(exc)}")
         return dataset_name, None, "upload_images"
 
+    # get all images uploaded in GN dataset
     try:
         logger.info("sleep 15s")
         time.sleep(15)
         image_names = paginate_dataset_images(url, [])
         logger.debug(image_names)
         result_df["Is Image in API?"] = result_df["Image Name"].apply(
-            lambda x: any(original_filename(name) in x for name in image_names)
+            lambda x: any(original_filename(name) in x for name in image_names)  # get original filename from GN image url
         )
         result_df["Image URL"] = result_df["Image Name"].apply(
             lambda x: first_value(name if original_filename(name) in x else None for name in image_names)
@@ -159,6 +170,7 @@ def process_thread(
         logger.error(f"Retrieving image status for {dataset_name} failed:\n{str(exc)}")
         return dataset_name, result_df, "paginate_dataset_image_images"
 
+    # trigger orthomosaic processing in GN
     if complete:
         try:
             trigger_ortho_processing(dataset_id, base_url, token)

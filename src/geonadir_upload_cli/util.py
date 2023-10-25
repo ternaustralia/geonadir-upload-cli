@@ -21,7 +21,7 @@ def get_filelist_from_collection(collection_path:str, remote_collection_json:str
 
     Returns:
         dict: asset names and urls
-    """    
+    """
     collection = pystac.Collection.from_file(collection_path)
     file_dict = {}
     for name, asset in collection.assets.items():
