@@ -222,6 +222,7 @@ def trigger_ortho_processing(dataset_id, base_url, token):
         base_url (_type_): Base url of Geonadir api.
         token (str): User token.
     """
+    logger.info(f"triggering orthomosaic process for dataset {str(dataset_id)}")
     headers = {
         "authorization": token
     }
