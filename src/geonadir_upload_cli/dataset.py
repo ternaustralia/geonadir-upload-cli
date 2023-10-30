@@ -14,6 +14,11 @@ from .util import (geonadir_filename_trans, get_filelist_from_collection,
                    original_filename)
 
 logger = logging.getLogger(__name__)
+env = os.environ.get("GEONADIR_CLI_ENV", "prod")
+LOG_LEVEL = logging.INFO
+if env != "prod":
+    LOG_LEVEL = logging.DEBUG
+logging.basicConfig(level=LOG_LEVEL)
 
 
 def create_dataset(payload_data, base_url, token):

@@ -12,6 +12,11 @@ from .dataset import (create_dataset, paginate_dataset_images,
 from .util import clickable_link, first_value, original_filename
 
 logger = logging.getLogger(__name__)
+env = os.environ.get("GEONADIR_CLI_ENV", "prod")
+LOG_LEVEL = logging.INFO
+if env != "prod":
+    LOG_LEVEL = logging.DEBUG
+logging.basicConfig(level=LOG_LEVEL)
 
 
 def process_thread(

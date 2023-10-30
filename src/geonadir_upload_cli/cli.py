@@ -11,7 +11,7 @@ from .dataset import dataset_info, search_datasets, search_datasets_coord
 from .upload import normal_upload, upload_from_catalog, upload_from_collection
 
 logger = logging.getLogger(__name__)
-env = os.environ.get("DEPLOYMENT_ENV", "prod")
+env = os.environ.get("GEONADIR_CLI_ENV", "prod")
 LOG_LEVEL = logging.INFO
 if env != "prod":
     LOG_LEVEL = logging.DEBUG

@@ -10,6 +10,11 @@ import pystac
 import requests
 
 logger = logging.getLogger(__name__)
+env = os.environ.get("GEONADIR_CLI_ENV", "prod")
+LOG_LEVEL = logging.INFO
+if env != "prod":
+    LOG_LEVEL = logging.DEBUG
+logging.basicConfig(level=LOG_LEVEL)
 
 
 def get_filelist_from_collection(collection_path:str, remote_collection_json:str):

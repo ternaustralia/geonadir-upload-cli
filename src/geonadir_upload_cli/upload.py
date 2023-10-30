@@ -13,7 +13,7 @@ from .util import (deal_with_collection, download_to_dir,
                    generate_four_timestamps, really_get_all_collections)
 
 logger = logging.getLogger(__name__)
-env = os.environ.get("DEPLOYMENT_ENV", "prod")
+env = os.environ.get("GEONADIR_CLI_ENV", "prod")
 LOG_LEVEL = logging.INFO
 if env != "prod":
     LOG_LEVEL = logging.DEBUG
