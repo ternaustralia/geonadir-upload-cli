@@ -88,6 +88,7 @@ def normal_upload(**kwargs):
             logger.info(f"output file: {os.path.join(output_dir, f'{dataset_name}.csv')}")
         else:
             logger.info("no output csv file")
+        return
 
     logger.info(base_url)
     token = "Token " + token
