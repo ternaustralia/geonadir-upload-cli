@@ -48,8 +48,15 @@ def create_dataset(payload_data, base_url, token):
         payload += f"--kljmyvW1ndjXaOEAg4vPm6RBUqO6MC5A\r\nContent-Disposition: form-data; name=\"{key}\"\r\n\r\n{value}\r\n"
     payload += "--kljmyvW1ndjXaOEAg4vPm6RBUqO6MC5A--\r\n"
 
+    logger.debug("\n")
+    logger.debug("creating dataset:")
+    logger.debug(f"url: {reqUrl}")
+    logger.debug(f"data: {payload}")
+    logger.debug(f"headers: {headers}")
     response = requests.post(reqUrl, data=payload, headers=headers, timeout=120)
     response.raise_for_status()
+    logger.debug("response content:")
+    logger.debug(f"{response.text}")
 
     dataset_id = response.json()["id"]
     return dataset_id
@@ -125,6 +132,7 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token, max_retry,
             count += 1
             pbar.update(1)
 
+    logger.debug(f"generating result dataframe")
     result_df = pd.concat(df_list, ignore_index=True)
     return result_df
 
@@ -178,6 +186,7 @@ def upload_images_from_collection(
             except Exception as exc:
                 logger.error(f"Error when downloading {file_url}")
                 raise exc
+            logger.debug(f"writting content from {file_url} to {file_path}")
             with open(file_path, 'wb') as fd:
                 fd.write(content)
             file_size = os.path.getsize(file_path)
@@ -197,6 +206,7 @@ def upload_images_from_collection(
                 logger.error(f"Error when uploading {file_path}")
                 raise exc
 
+            logger.debug(f"deleting {file_path} after uploading")
             os.unlink(file_path)
 
             end_time = time.time()
@@ -215,6 +225,7 @@ def upload_images_from_collection(
             df_list.append(df)
             pbar.update(1)
 
+    logger.debug(f"generating result dataframe")
     result_df = pd.concat(df_list, ignore_index=True)
     return result_df
 
@@ -237,6 +248,10 @@ def trigger_ortho_processing(dataset_id, base_url, token):
         'flag': (None, 'upload_completed'),
     }
 
+    logger.debug(f"url: {base_url}/api/utility/dataset-actions/")
+    logger.debug(f"headers: {headers}")
+    logger.debug(f"files: {payload}")
+
     response = requests.post(
         f"{base_url}/api/utility/dataset-actions/",
         headers=headers,
@@ -258,6 +273,7 @@ def paginate_dataset_images(url, image_names:list):
         list: List of image names.
     """
     try:
+        logger.debug(f"get dataset images from {url}")
         response = requests.get(url, timeout=60)
         data = response.json()
         results = data["results"]
@@ -302,6 +318,9 @@ def search_datasets(search_str, base_url):
         "search": search_str
     }
 
+    logger.info(f"search for GN dataset: {search_str}")
+    logger.debug(f"url: {base_url}/api/search_datasets")
+    logger.debug(f"params: {payload}")
     response = requests.get(
         f"{base_url}/api/search_datasets",
         params=payload,
@@ -361,6 +380,9 @@ def dataset_info(project_id, base_url):
     Returns:
         dict: dataset metadata.
     """
+    logger.info(f"getting GN dataset info for {project_id}")
+    logger.debug(f"url: {base_url}/api/metadata/")
+    logger.debug(f"params: {payload}")
     payload = {
         "project_id": project_id
     }
@@ -403,6 +425,8 @@ def search_datasets_coord(coord, base_url):
         "bbox": f"{coord[0]},{coord[1]},{coord[2]},{coord[3]}"
     }
 
+    logger.debug(f"url: {base_url}/api/dataset_coords")
+    logger.debug(f"params: {payload}")
     response = requests.get(
         f"{base_url}/api/dataset_coords",
         params=payload,
@@ -433,8 +457,11 @@ def retrieve_single_image(url, max_retry=5, retry_interval=10, timeout=60):
     s.mount('http://', HTTPAdapter(max_retries=retries))
     s.mount('https://', HTTPAdapter(max_retries=retries))
     try:
+        logger.debug("retrieve single image from collection:")
+        logger.debug(f"url: {url}")
         r = s.get(url, timeout=timeout)
         r.raise_for_status()
+        logger.debug(r.text)
         return r.content
     except Exception as exc:
         if "r" not in locals():
@@ -529,13 +556,18 @@ def generate_presigned_url(
     s.mount('http://', HTTPAdapter(max_retries=retries))
     s.mount('https://', HTTPAdapter(max_retries=retries))
     try:
+        logger.debug("generate presigned url:")
+        logger.debug(f"url: {base_url}/api/generate_presigned_url/")
+        logger.debug(f"headers: {headers}")
+        logger.debug(f"json: {json_data}")
         r = s.post(
-            f'{base_url}/api/generate_presigned_url/',
+            f"{base_url}/api/generate_presigned_url/",
             headers=headers,
             json=json_data,
             timeout=timeout,
         )
         r.raise_for_status()
+        logger.debug(r.text)
         return r.status_code, r.json()
     except Exception as exc:
         if "r" not in locals():
@@ -580,12 +612,16 @@ def upload_to_amazon(presigned_info, file_path, max_retry=5, retry_interval=10, 
         s.mount('http://', HTTPAdapter(max_retries=retries))
         s.mount('https://', HTTPAdapter(max_retries=retries))
         try:
+            logger.debug("upload to GN Amazon S3 storage:")
+            logger.debug("url: https://geonadir-prod.s3.amazonaws.com/")
+            logger.debug(f"files: {files}")
             r = s.post(
-                'https://geonadir-prod.s3.amazonaws.com/',
+                "https://geonadir-prod.s3.amazonaws.com/",
                 files=files,
                 timeout=timeout,
             )
             r.raise_for_status()
+            logger.debug(r.text)
             return r.status_code
         except Exception as exc:
             if "r" not in locals():
@@ -629,13 +665,18 @@ def create_post_image(presigned_info, dataset_id, base_url, token, max_retry=5, 
     s.mount('http://', HTTPAdapter(max_retries=retries))
     s.mount('https://', HTTPAdapter(max_retries=retries))
     try:
+        logger.debug("create post image:")
+        logger.debug(f"url: {base_url}/api/create_post_image/")
+        logger.debug(f"headers: {headers}")
+        logger.debug(f"files: {files}")
         r = s.post(
-            f'{base_url}/api/create_post_image/',
+            f"{base_url}/api/create_post_image/",
             headers=headers,
             files=files,
             timeout=timeout,
         )
         r.raise_for_status()
+        logger.debug(r.text)
         return r.status_code
     except Exception as exc:
         if "r" not in locals():

@@ -79,6 +79,7 @@ def process_thread(
 
         # retrieve metadata from STAC collection if applicable
         if remote_collection_json:
+            logger.debug(f"loading STAC collection from {img_dir}")
             collection = pystac.Collection.from_file(img_dir)
 
             # get citation

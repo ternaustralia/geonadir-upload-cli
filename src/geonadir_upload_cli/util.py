@@ -27,6 +27,7 @@ def get_filelist_from_collection(collection_path:str, remote_collection_json:str
     Returns:
         dict: asset names and urls
     """
+    logger.debug(f"loading STAC collection from {collection_path}")
     collection = pystac.Collection.from_file(collection_path)
     file_dict = {}
     for name, asset in collection.assets.items():
@@ -49,17 +50,25 @@ def really_get_all_collections(catalog_url:str, local_folder:str):
     logger.info(f"getting child collection urls from {catalog_url}")
     r = requests.get(catalog_url, timeout=60)
     r.raise_for_status()
+    logger.debug(r.text)
+
     catalog_location = os.path.join(local_folder, "catalog.json")
     with open(catalog_location, 'wb') as fd:
+        logger.debug(f"writing catalog from {catalog_url} to {catalog_location}")
         fd.write(r.content)
+
+    logger.debug(f"loading STAC catalog from {catalog_location}")
     catalog = pystac.Catalog.from_file(catalog_location)
     for child_link in catalog.get_child_links():
         href = child_link.href
         if href.endswith("collection.json"):
+            logger.debug(f"collection found: {href}")
             yield urllib.parse.urljoin(catalog_url, href)
         if href.endswith("catalog.json"):
+            logger.debug(f"sub-catalog found: {href}")
             subcat_href = urllib.parse.urljoin(catalog_url, href)
             local_subfolder = urllib.parse.urljoin(catalog_location, href).removesuffix("/catalog.json")
+            logger.debug(f"creating local directory: {local_subfolder}")
             os.makedirs(local_subfolder, exist_ok=True)
             yield from really_get_all_collections(subcat_href, local_subfolder)
 
@@ -109,8 +118,9 @@ def download_to_dir(url, directory):
         bool: whether successfully downloaded
     """
     image_location = os.path.join(directory, "collection.json")
-    r = requests.get(url, timeout=60)
     try:
+        logger.debug(f"downloading {url} to {image_location}")
+        r = requests.get(url, timeout=60)
         r.raise_for_status()
         with open(image_location, 'wb') as fd:
             fd.write(r.content)
@@ -139,7 +149,9 @@ def deal_with_collection(collection_location, exclude, include, cb, ca, ub, ua):
         str | bool: dataset name retrieved from collection.json. return False if collection is filtered out.
     """
     try:
+        logger.debug(f"loading STAC collection from {collection_location}")
         collection = pystac.Collection.from_file(collection_location)
+        logger.debug(f"processing original title: {collection.title}")
         dataset_name = re.sub(r"[^a-zA-Z0-9-_]+", "", collection.title.replace(" ", "_")).strip("_")
         if not dataset_name:
             logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
@@ -164,6 +176,7 @@ def deal_with_collection(collection_location, exclude, include, cb, ca, ub, ua):
                 return False
         try:
             summary = collection.summaries
+            logger.debug(f"collection summary: {summary}")
             other = summary.other
             created = datetime.fromisoformat(other.get("created"))
             updated = datetime.fromisoformat(other.get("updated"))
@@ -250,6 +263,7 @@ def clickable_link(text:str):
     def repl(matchobj:re.Match):
         rs = matchobj.group(1).rstrip(".")
         if rs:
+            logger.debug(f"url found: {rs}")
             num = len(matchobj.group(1)) - len(rs)
             res = f"<{rs}>{matchobj.group(2)}"
             for _ in range(num):

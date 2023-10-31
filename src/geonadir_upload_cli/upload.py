@@ -24,6 +24,7 @@ def upload_from_catalog(**kwargs):
     """recursively retrieve all collections and upload dataset from each
     """
     catalog_url = kwargs.get("item")
+    logger.debug(f"catalog url: {catalog_url}")
     with tempfile.TemporaryDirectory() as tmpdir:
         collections_list = []
         try:
@@ -32,6 +33,7 @@ def upload_from_catalog(**kwargs):
         except Exception as exc:
             logger.error(f"Error when retrieving collections from remote catalog: \n{str(exc)}")
             return
+        logger.debug(f"collections_list: {collections_list}")
         kwargs["item"] = collections_list
         upload_from_collection(**kwargs)
         logger.info(f"cleanup {tmpdir}")
@@ -54,6 +56,7 @@ def normal_upload(**kwargs):
     dataset_id = kwargs.get("dataset_id")
     existing_dataset_name = ""
     if dataset_id:
+        logger.debug(f"searching for metadata of dataset {dataset_id}")
         result = dataset_info(dataset_id, base_url)
         if result == "Metadata not found":
             raise Exception(f"Dataset id {dataset_id} invalid.")
@@ -62,7 +65,7 @@ def normal_upload(**kwargs):
             existing_dataset_name = result.get("project_id", {}).get("project_name", "")
             logger.info(f"Dataset name: {existing_dataset_name}")
         except Exception as exc:
-            existing_dataset_name = f"<dataset id: {dataset_id}"
+            existing_dataset_name = f"<dataset id: {dataset_id}>"
 
     if dry_run:
         logger.info("---------------------dry run---------------------")
@@ -78,11 +81,15 @@ def normal_upload(**kwargs):
             logger.info(f"--item {count + 1}:")
             dataset_name, image_location = i
             if not dataset_id:
+                logger.debug(f"processing original dataset name: {dataset_name}")
                 dataset_name = re.sub(r"[^a-zA-Z0-9-_]+", "", dataset_name.replace(" ", "_")).strip("_")
                 if not dataset_name:
                     logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
                     dataset_name = "untitled"
                 logger.info(f"dataset name: {dataset_name}")
+            else:
+                dataset_name = existing_dataset_name
+                logger.info(f"existing dataset name: {dataset_name}")
             logger.info(f"image location: {image_location}")
         if output_dir:
             logger.info(f"output file: {os.path.join(output_dir, f'{dataset_name}.csv')}")
@@ -92,6 +99,7 @@ def normal_upload(**kwargs):
 
     logger.info(base_url)
     token = "Token " + token
+    logger.debug(f"token: {token}")
     if metadata_json:
         with open(metadata_json) as f:
             metadata = json.load(f)
@@ -101,6 +109,7 @@ def normal_upload(**kwargs):
         dataset_name, image_location = i
         meta = None
         if not dataset_id:
+            logger.debug(f"processing original dataset name: {dataset_name}")
             dataset_name = re.sub(r"[^a-zA-Z0-9-_]+", "", dataset_name.replace(" ", "_")).strip("_")
             if not dataset_name:
                 logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
@@ -114,6 +123,7 @@ def normal_upload(**kwargs):
 
         if existing_dataset_name:
             dataset_name = existing_dataset_name
+            logger.info(f"existing dataset name: {dataset_name}")
         dataset_details.append(
             (
                 dataset_id,
@@ -133,6 +143,7 @@ def normal_upload(**kwargs):
     if complete:
         logger.info("Orthomosaic will be triggered after uploading.")
     num_threads = len(dataset_details) if len(dataset_details) <= 5 else 5
+    logger.debug(f"nubmer of threads: {num_threads}")
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
         futures = [executor.submit(process_thread, *params) for params in dataset_details]
         results = [future.result() for future in concurrent.futures.as_completed(futures)]
@@ -158,6 +169,7 @@ def upload_from_collection(**kwargs):
     dataset_id = kwargs.get("dataset_id")
     existing_dataset_name = ""
     if dataset_id:
+        logger.debug(f"searching for metadata of dataset {dataset_id}")
         result = dataset_info(dataset_id, base_url)
         if result == "Metadata not found":
             raise Exception(f"Dataset id {dataset_id} invalid.")
@@ -202,8 +214,11 @@ def upload_from_collection(**kwargs):
             if not title:
                 continue
             if not dataset_id:
+                logger.debug(f"processing original dataset name: {dataset_name}")
                 dataset_name = re.sub(r"[^a-zA-Z0-9-_]+", "", dataset_name.replace(" ", "_")).strip("_")
                 if not dataset_name:
+                    logger.debug(f"No legal character in original dataset name.")
+                    logger.debug(f"processing collection title: {title}")
                     dataset_name = re.sub(r"[^a-zA-Z0-9-_]+", "", title.replace(" ", "_")).strip("_")
                     if not dataset_name:
                         logger.warning(f"No legal character. Dataset named 'untitled_{count}'")
@@ -213,6 +228,8 @@ def upload_from_collection(**kwargs):
             else:
                 uploads.append(f"<dataset id: {dataset_id}>")
                 logger.info(f"Upload to existing dataset id: {dataset_id}")
+                dataset_name = existing_dataset_name
+                logger.info(f"existing dataset name: {dataset_name}")
             if output_dir:
                 logger.info(f"output file: {os.path.join(output_dir, f'{dataset_name}.csv')}")
             else:
@@ -252,8 +269,11 @@ def upload_from_collection(**kwargs):
         if not title:
             continue
         if not dataset_id:
+            logger.debug(f"processing original dataset name: {dataset_name}")
             dataset_name = re.sub(r"[^a-zA-Z0-9-_]+", "", dataset_name.replace(" ", "_")).strip("_")
             if not dataset_name:
+                logger.debug(f"No legal character in original dataset name.")
+                logger.debug(f"processing collection title: {title}")
                 dataset_name = re.sub(r"[^a-zA-Z0-9-_]+", "", title.replace(" ", "_")).strip("_")
                 if not dataset_name:
                     logger.warning(f"No legal character. Dataset named 'untitled_{count}'")
@@ -268,6 +288,7 @@ def upload_from_collection(**kwargs):
 
         if existing_dataset_name:
             dataset_name = existing_dataset_name
+            logger.info(f"existing dataset name: {dataset_name}")
         dataset_details.append(
             (
                 dataset_id,
@@ -290,12 +311,13 @@ def upload_from_collection(**kwargs):
     if not num_threads:
         logger.error("No dataset to upload.")
     else:
+        logger.debug(f"nubmer of threads: {num_threads}")
         with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
             futures = [executor.submit(process_thread, *params) for params in dataset_details]
             results = [future.result() for future in concurrent.futures.as_completed(futures)]
             result_processing(results, output_dir)
 
-    logger.info(f"cleanup {', '.join([i.name for i in tmpdirs])}")
+    logger.debug(f"cleanup {', '.join([i.name for i in tmpdirs])}")
     for i in tmpdirs:
         i.cleanup()
 
