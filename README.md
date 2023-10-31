@@ -132,7 +132,7 @@ Unless you know what you are doing, don't enable this when you are uploading mul
 
 ### upload dataset from single remote STAC collection.json file
 
-This is for uploading all image assets as a GN dataset from single collection. STAC items are not yet supported.
+This is for uploading all image assets as a GN dataset from single collection. STAC items are not yet supported. An example can be found here: <https://radiantearth.github.io/stac-browser/#/external/data.tern.org.au/uas_raw/landscapes/tas/cockatoo_hills/20211012/rgb/collection.json>.
 
 Usage: `geonadir-upload collection-upload [OPTIONS]`
 
@@ -245,7 +245,7 @@ Unless you know what you are doing, don't enable this when you are uploading mul
 
 Usage: `geonadir-upload catalog-upload [OPTIONS]`
 
-This command uploads all collections in the specified STAC catalog (not necessarily the root catalog) and all its sub-catalogs if any. Each collection will be uploaded as a Geonadir dataset with dataset name being collection title. One catalog each time. Other options are same as single-datasets uploading.
+This command uploads all collections in the specified STAC catalog (not necessarily the root catalog) and all its sub-catalogs if any. Each collection will be uploaded as a Geonadir dataset with dataset name being collection title. One catalog each time. Other options are same as single-datasets uploading. An example can be found here: <https://radiantearth.github.io/stac-browser/#/external/data.tern.org.au/uas_raw/catalog.json>.
 
 Options:
 
@@ -513,7 +513,7 @@ sample usage and output:
 PS C:\Users\uqtlan> geonadir-cli get-dataset-info 3198
 {
     "id": 2863,
-    "project_id": {
+    "project_id":{
         "id": 3198,
         "user": "TERN Australia",
         "user_id": 4865,
@@ -552,6 +552,12 @@ PS C:\Users\uqtlan> geonadir-cli get-dataset-info 3198
     }
 }
 ```
+
+## Debug info
+
+Default logging level is `INFO`. To set logging info to be `DEBUG`, Set environmental variable `GEONADIR_CLI_ENV=test`. Set `GEONADIR_CLI_ENV=prod` or unset this variable to reset logging info to `INFO`.
+
+For Windows user, see <https://phoenixnap.com/kb/windows-set-environment-variable> for setting/unsetting env variable. For Linux user, see <https://phoenixnap.com/kb/linux-set-environment-variable>.
 
 ## Packaging
 
