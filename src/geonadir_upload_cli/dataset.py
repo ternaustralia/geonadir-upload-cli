@@ -461,7 +461,7 @@ def retrieve_single_image(url, max_retry=5, retry_interval=10, timeout=60):
         logger.debug(f"url: {url}")
         r = s.get(url, timeout=timeout)
         r.raise_for_status()
-        logger.debug(r.text)
+        logger.debug(r.status_code)
         return r.content
     except Exception as exc:
         if "r" not in locals():

@@ -515,4 +515,5 @@ def get_dataset_info(**kwargs):
 
 
 if __name__ == "__main__":
+    logger.info(f"log level: {LOG_LEVEL}")
     cli()
