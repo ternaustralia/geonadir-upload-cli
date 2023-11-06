@@ -326,6 +326,10 @@ def search_datasets(search_str, base_url):
         params=payload,
         timeout=180,
     )
+    try:
+        response.raise_for_status()
+    except Exception as exc:
+        raise Exception(f"response code {response.status_code}: {response.text}")
     return response.json()
 
 
@@ -392,6 +396,10 @@ def dataset_info(project_id, base_url):
         params=payload,
         timeout=180,
     )
+    try:
+        response.raise_for_status()
+    except Exception as exc:
+        raise Exception(f"response code {response.status_code}: {response.text}")
     return response.json()
 
 
@@ -432,6 +440,10 @@ def search_datasets_coord(coord, base_url):
         params=payload,
         timeout=180,
     )
+    try:
+        response.raise_for_status()
+    except Exception as exc:
+        raise Exception(f"response code {response.status_code}: {response.text}")
     return response.json()
 
 
