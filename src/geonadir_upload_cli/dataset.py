@@ -53,7 +53,8 @@ def create_dataset(payload_data, base_url, token):
     logger.debug(f"url: {reqUrl}")
     logger.debug(f"data: {payload}")
     logger.debug(f"headers: {headers}")
-    response = requests.post(reqUrl, data=payload, headers=headers, timeout=120)
+    response = requests.post(reqUrl, data=payload,
+                             headers=headers, timeout=120)
     response.raise_for_status()
     logger.debug("response content:")
     logger.debug(f"{response.text}")
@@ -82,14 +83,16 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token, max_retry,
     file_list = os.listdir(img_dir)
     file_list = [
         file for file in file_list if file.lower().endswith(
-            ('.jpg','.jpeg','.png','.gif','.bmp','.tif')
+            ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tif')
         )
     ]
 
     url = f"{base_url}/api/uploadfiles/?page=1&project_id={dataset_id}"
-    existing_image_list = [original_filename(name) for name in paginate_dataset_images(url, [])]
+    existing_image_list = [original_filename(
+        name) for name in paginate_dataset_images(url, [])]
     existing_images = set(existing_image_list)
-    file_list = [file for file in file_list if geonadir_filename_trans(file) not in existing_images]
+    file_list = [file for file in file_list if geonadir_filename_trans(
+        file) not in existing_images]
 
     count = 0
     df_list = []
@@ -109,7 +112,8 @@ def upload_images(dataset_name, dataset_id, img_dir, base_url, token, max_retry,
                 "file_path": os.path.join(img_dir, file_path),
             }
             try:
-                response_code = upload_single_image(param, max_retry, retry_interval, timeout)
+                response_code = upload_single_image(
+                    param, max_retry, retry_interval, timeout)
             except Exception as exc:
                 logger.error(f"Error when uploading {file_path}")
                 raise exc
@@ -165,12 +169,14 @@ def upload_images_from_collection(
     Returns:
         pd.DataFrame: DataFrame containing upload results for each image.
     """
-    file_dict = get_filelist_from_collection(collection, remote_collection_json)
+    file_dict = get_filelist_from_collection(
+        collection, remote_collection_json)
     if not file_dict:
         raise Exception(f"no applicable asset file in collection {collection}")
 
     url = f"{base_url}/api/uploadfiles/?page=1&project_id={dataset_id}"
-    existing_image_list = [original_filename(name) for name in paginate_dataset_images(url, [])]
+    existing_image_list = [original_filename(
+        name) for name in paginate_dataset_images(url, [])]
     existing_images = set(existing_image_list)
 
     df_list = []
@@ -182,7 +188,8 @@ def upload_images_from_collection(
                 pbar.update(1)
                 continue
             try:
-                content = retrieve_single_image(file_url, max_retry, retry_interval)
+                content = retrieve_single_image(
+                    file_url, max_retry, retry_interval)
             except Exception as exc:
                 logger.error(f"Error when downloading {file_url}")
                 raise exc
@@ -201,7 +208,8 @@ def upload_images_from_collection(
                 "file_path": file_path,
             }
             try:
-                response_code = upload_single_image(param, max_retry, retry_interval, timeout)
+                response_code = upload_single_image(
+                    param, max_retry, retry_interval, timeout)
             except Exception as exc:
                 logger.error(f"Error when uploading {file_path}")
                 raise exc
@@ -238,7 +246,8 @@ def trigger_ortho_processing(dataset_id, base_url, token):
         base_url (_type_): Base url of Geonadir api.
         token (str): User token.
     """
-    logger.info(f"triggering orthomosaic process for dataset {str(dataset_id)}")
+    logger.info(
+        f"triggering orthomosaic process for dataset {str(dataset_id)}")
     headers = {
         "authorization": token
     }
@@ -261,7 +270,7 @@ def trigger_ortho_processing(dataset_id, base_url, token):
     response.raise_for_status()
 
 
-def paginate_dataset_images(url, image_names:list):
+def paginate_dataset_images(url, image_names: list):
     """
     Paginate through the dataset images API response to retrieve all image names.
 
@@ -289,7 +298,8 @@ def paginate_dataset_images(url, image_names:list):
         if "data" in locals():
             logger.warning(f"No image found in {url}")
         else:
-            logger.error(f"Failed to get dataset images from {url}: {str(exc)}")
+            logger.error(
+                f"Failed to get dataset images from {url}: {str(exc)}")
         return []
 
 
@@ -329,7 +339,8 @@ def search_datasets(search_str, base_url):
     try:
         response.raise_for_status()
     except Exception as exc:
-        raise Exception(f"response code {response.status_code}: {response.text}")
+        raise Exception(
+            f"response code {response.status_code}: {response.text}")
     return response.json()
 
 
@@ -386,10 +397,10 @@ def dataset_info(project_id, base_url):
     """
     logger.info(f"getting GN dataset info for {project_id}")
     logger.debug(f"url: {base_url}/api/metadata/")
-    logger.debug(f"params: {payload}")
     payload = {
         "project_id": project_id
     }
+    logger.debug(f"params: {payload}")
 
     response = requests.get(
         f"{base_url}/api/metadata/",
@@ -399,7 +410,8 @@ def dataset_info(project_id, base_url):
     try:
         response.raise_for_status()
     except Exception as exc:
-        raise Exception(f"response code {response.status_code}: {response.text}")
+        raise Exception(
+            f"response code {response.status_code}: {response.text}")
     return response.json()
 
 
@@ -426,7 +438,8 @@ def search_datasets_coord(coord, base_url):
     Returns:
         list: list of dataset ids and latlons.
     """
-    l, r = max(min(coord[0], coord[2]), -180), min(max(coord[0], coord[2]), 180)
+    l, r = max(min(coord[0], coord[2]), -
+               180), min(max(coord[0], coord[2]), 180)
     b, t = max(min(coord[1], coord[3]), -90), min(max(coord[1], coord[3]), 90)
     logger.info(f"Querying dataset within ({l}, {b}, {r}, {t})")
     payload = {
@@ -443,7 +456,8 @@ def search_datasets_coord(coord, base_url):
     try:
         response.raise_for_status()
     except Exception as exc:
-        raise Exception(f"response code {response.status_code}: {response.text}")
+        raise Exception(
+            f"response code {response.status_code}: {response.text}")
     return response.json()
 
 
@@ -507,7 +521,8 @@ def upload_single_image(param, max_retry=5, retry_interval=10, timeout=60):
     try:
         response_code, response_json = generate_presigned_url(
             dataset_id, base_url, token, file_path, max_retry, retry_interval, timeout)
-        response_code = upload_to_amazon(response_json, file_path, max_retry, retry_interval, timeout)
+        response_code = upload_to_amazon(
+            response_json, file_path, max_retry, retry_interval, timeout)
         response_code = create_post_image(response_json, dataset_id, base_url,
                                           token, max_retry, retry_interval, timeout)
         return response_code
@@ -583,7 +598,8 @@ def generate_presigned_url(
         return r.status_code, r.json()
     except Exception as exc:
         if "r" not in locals():
-            raise Exception(f"failed to generate presigned url: {json.dumps(json_data, indent=4)}.")
+            raise Exception(
+                f"failed to generate presigned url: {json.dumps(json_data, indent=4)}.")
         raise Exception(str(exc))
 
 
@@ -637,7 +653,8 @@ def upload_to_amazon(presigned_info, file_path, max_retry=5, retry_interval=10, 
             return r.status_code
         except Exception as exc:
             if "r" not in locals():
-                raise Exception(f"https://geonadir-dev.s3.amazonaws.com/ posting failed: {key}.")
+                raise Exception(
+                    f"https://geonadir-dev.s3.amazonaws.com/ posting failed: {key}.")
             raise Exception(str(exc))
 
 
@@ -692,5 +709,6 @@ def create_post_image(presigned_info, dataset_id, base_url, token, max_retry=5, 
         return r.status_code
     except Exception as exc:
         if "r" not in locals():
-            raise Exception(f"Failed to access url {f'{base_url}/api/create_post_image/'}.")
+            raise Exception(
+                f"Failed to access url {f'{base_url}/api/create_post_image/'}.")
         raise Exception(str(exc))

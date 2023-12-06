@@ -106,7 +106,8 @@ def process_thread(
                     description += "\n\nLicense href: "
                     description += license_link
             except Exception as exc:
-                logger.warning(f"Can't find license href in {remote_collection_json}")
+                logger.warning(
+                    f"Can't find license href in {remote_collection_json}")
             if description:
                 payload_data["description"] = description
 
@@ -116,9 +117,11 @@ def process_thread(
 
         # use <> to make url markdown-clickable
         if payload_data.get("description", None):
-            payload_data["description"] = clickable_link(payload_data["description"])
+            payload_data["description"] = clickable_link(
+                payload_data["description"])
         if payload_data.get("data_credits", None):
-            payload_data["data_credits"] = clickable_link(payload_data["data_credits"])
+            payload_data["data_credits"] = clickable_link(
+                payload_data["data_credits"])
 
         logger.info("\n")
         logger.info(f"Metadata for dataset {dataset_name}:")
@@ -133,7 +136,8 @@ def process_thread(
     url = f"{base_url}/api/uploadfiles/?page=1&project_id={dataset_id}"
 
     try:
-        if os.path.splitext(img_dir)[1] == ".json":  # upload from STAC collection
+        # upload from STAC collection
+        if os.path.splitext(img_dir)[1] == ".json":
             result_df = upload_images_from_collection(
                 dataset_name,
                 dataset_id,
@@ -167,13 +171,16 @@ def process_thread(
         image_names = paginate_dataset_images(url, [])
         logger.debug(image_names)
         result_df["Is Image in API?"] = result_df["Image Name"].apply(
-            lambda x: any(original_filename(name) in x for name in image_names)  # get original filename from GN image url
+            # get original filename from GN image url
+            lambda x: any(original_filename(name) in x for name in image_names)
         )
         result_df["Image URL"] = result_df["Image Name"].apply(
-            lambda x: first_value(name if original_filename(name) in x else None for name in image_names)
+            lambda x: first_value(name if original_filename(
+                name) in x else None for name in image_names)
         )
     except Exception as exc:
-        logger.error(f"Retrieving image status for {dataset_name} failed:\n{str(exc)}")
+        logger.error(
+            f"Retrieving image status for {dataset_name} failed:\n{str(exc)}")
         return dataset_name, result_df, "paginate_dataset_image_images"
 
     # trigger orthomosaic processing in GN
@@ -181,7 +188,8 @@ def process_thread(
         try:
             trigger_ortho_processing(dataset_id, base_url, token)
         except Exception as exc:
-            logger.error(f"Triggering ortho processing for {dataset_name} failed:\n{str(exc)}")
+            logger.error(
+                f"Triggering ortho processing for {dataset_name} failed:\n{str(exc)}")
             return dataset_name, result_df, "trigger_ortho_processing"
 
     return dataset_name, result_df, False

@@ -17,7 +17,7 @@ if env != "prod":
 logging.basicConfig(level=LOG_LEVEL)
 
 
-def get_filelist_from_collection(collection_path:str, remote_collection_json:str):
+def get_filelist_from_collection(collection_path: str, remote_collection_json: str):
     """get list of all assets from STAC collection file
 
     Args:
@@ -32,11 +32,12 @@ def get_filelist_from_collection(collection_path:str, remote_collection_json:str
     file_dict = {}
     for name, asset in collection.assets.items():
         if name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tif')):
-            file_dict[name] = urllib.parse.urljoin(remote_collection_json, asset.href)
+            file_dict[name] = urllib.parse.urljoin(
+                remote_collection_json, asset.href)
     return file_dict
 
 
-def really_get_all_collections(catalog_url:str, local_folder:str):
+def really_get_all_collections(catalog_url: str, local_folder: str):
     """recursively get list of all sub-collections
 
     Args:
@@ -54,7 +55,8 @@ def really_get_all_collections(catalog_url:str, local_folder:str):
 
     catalog_location = os.path.join(local_folder, "catalog.json")
     with open(catalog_location, 'wb') as fd:
-        logger.debug(f"writing catalog from {catalog_url} to {catalog_location}")
+        logger.debug(
+            f"writing catalog from {catalog_url} to {catalog_location}")
         fd.write(r.content)
 
     logger.debug(f"loading STAC catalog from {catalog_location}")
@@ -67,7 +69,8 @@ def really_get_all_collections(catalog_url:str, local_folder:str):
         if href.endswith("catalog.json"):
             logger.debug(f"sub-catalog found: {href}")
             subcat_href = urllib.parse.urljoin(catalog_url, href)
-            local_subfolder = urllib.parse.urljoin(catalog_location, href).removesuffix("/catalog.json")
+            local_subfolder = urllib.parse.urljoin(
+                catalog_location, href).removesuffix("/catalog.json")
             logger.debug(f"creating local directory: {local_subfolder}")
             os.makedirs(local_subfolder, exist_ok=True)
             yield from really_get_all_collections(subcat_href, local_subfolder)
@@ -83,25 +86,29 @@ def generate_four_timestamps(**kwargs):
         created_before = kwargs.get("created_before", "9999-12-31")
         cb = datetime.fromisoformat(created_before)
     except Exception as exc:
-        logger.warning(f"create_before = {created_before} is not a legal iso format timestamp.")
+        logger.warning(
+            f"create_before = {created_before} is not a legal iso format timestamp.")
         cb = datetime(9999, 12, 31, 0, 0)
     try:
         created_after = kwargs.get("created_after", "0001-01-01")
         ca = datetime.fromisoformat(created_after)
     except Exception as exc:
-        logger.warning(f"created_after = {created_after} is not a legal iso format timestamp.")
+        logger.warning(
+            f"created_after = {created_after} is not a legal iso format timestamp.")
         ca = datetime(1, 1, 1, 0, 0)
     try:
         updated_before = kwargs.get("updated_before", "9999-12-31")
         ub = datetime.fromisoformat(updated_before)
     except Exception as exc:
-        logger.warning(f"create_before = {updated_before} is not a legal iso format timestamp.")
+        logger.warning(
+            f"create_before = {updated_before} is not a legal iso format timestamp.")
         ub = datetime(9999, 12, 31, 0, 0)
     try:
         updated_after = kwargs.get("updated_after", "0001-01-01")
         ua = datetime.fromisoformat(updated_after)
     except Exception as exc:
-        logger.warning(f"created_after = {updated_after} is not a legal iso format timestamp.")
+        logger.warning(
+            f"created_after = {updated_after} is not a legal iso format timestamp.")
         ua = datetime(1, 1, 1, 0, 0)
 
     return cb, ca, ub, ua
@@ -126,9 +133,11 @@ def download_to_dir(url, directory):
             fd.write(r.content)
     except Exception as exc:
         if r.status_code == 401:
-            logger.error(f"Authentication failed for downloading {image_location}. See readme for instruction.")
+            logger.error(
+                f"Authentication failed for downloading {image_location}. See readme for instruction.")
         else:
-            logger.error(f"{image_location} doesn't exist or is undownloadable: {str(exc)}")
+            logger.error(
+                f"{image_location} doesn't exist or is undownloadable: {str(exc)}")
         return False
     return True
 
@@ -152,16 +161,19 @@ def deal_with_collection(collection_location, exclude, include, cb, ca, ub, ua):
         logger.debug(f"loading STAC collection from {collection_location}")
         collection = pystac.Collection.from_file(collection_location)
         logger.debug(f"processing original title: {collection.title}")
-        dataset_name = re.sub(r"[^a-zA-Z0-9-_]+", "", collection.title.replace(" ", "_")).strip("_")
+        dataset_name = re.sub(r"[^a-zA-Z0-9-_]+", "",
+                              collection.title.replace(" ", "_")).strip("_")
         if not dataset_name:
-            logger.warning("No legal characters in dataset name. Named 'untitled' instead.")
+            logger.warning(
+                "No legal characters in dataset name. Named 'untitled' instead.")
             dataset_name = "untitled"
         if exclude:
             excluded = False
             for word in exclude:
                 if word.lower() in dataset_name.lower():
                     excluded = True
-                    logger.warning(f"Dataset {dataset_name} excluded for containing word {word}")
+                    logger.warning(
+                        f"Dataset {dataset_name} excluded for containing word {word}")
                     break
             if excluded:
                 return False
@@ -172,7 +184,8 @@ def deal_with_collection(collection_location, exclude, include, cb, ca, ub, ua):
                     included = True
                     break
             if not included:
-                logger.warning(f"Dataset {dataset_name} excluded for not containing word(s) from {str(include)}")
+                logger.warning(
+                    f"Dataset {dataset_name} excluded for not containing word(s) from {str(include)}")
                 return False
         try:
             summary = collection.summaries
@@ -181,13 +194,16 @@ def deal_with_collection(collection_location, exclude, include, cb, ca, ub, ua):
             created = datetime.fromisoformat(other.get("created"))
             updated = datetime.fromisoformat(other.get("updated"))
             if created > cb or created < ca:
-                logger.warning(f"{dataset_name} created at {created}, not between {ca} and {cb}")
+                logger.warning(
+                    f"{dataset_name} created at {created}, not between {ca} and {cb}")
                 return False
             if updated > ub or updated < ua:
-                logger.warning(f"{dataset_name} updated at {updated}, not between {ua} and {ub}")
+                logger.warning(
+                    f"{dataset_name} updated at {updated}, not between {ua} and {ub}")
                 return False
         except Exception as exc:
-            logger.warning(f"Can't find legal created/updated timestamp for {dataset_name}:")
+            logger.warning(
+                f"Can't find legal created/updated timestamp for {dataset_name}:")
             logger.warning(f"\t{str(exc)}")
     except Exception as exc:
         logger.error(f"{collection_location} illegal: {str(exc)}")
@@ -195,7 +211,7 @@ def deal_with_collection(collection_location, exclude, include, cb, ca, ub, ua):
     return dataset_name
 
 
-def original_filename(url:str):
+def original_filename(url: str):
     """
     Extract the original file name from Geonadir image url.
     for url = 'https://geonadir-prod.s3.amazonaws.com/privateuploads/images/ \
@@ -211,13 +227,14 @@ def original_filename(url:str):
     Returns:
         name: the name of the original image
     """
-    url_name = url.split("?")[0].split("/")[-1]  # DJI_20220519122445_0024_766891.JPG
+    url_name = url.split("?")[0].split(
+        "/")[-1]  # DJI_20220519122445_0024_766891.JPG
     # basename, ext = os.path.splitext(url_name)
     # return "_".join(basename.split("_")[:-1]) + ext  # DJI_20220519122445_0024.JPG
     return url_name
 
 
-def geonadir_filename_trans(filename:str):
+def geonadir_filename_trans(filename: str):
     """get transformed filename in GN.
 
     Step 1: Replace %xx escapes by their single-character equivalent using urllib.parse.unquote
@@ -231,7 +248,8 @@ def geonadir_filename_trans(filename:str):
         str: transformed filename
     """
     name, ext = os.path.splitext(filename)
-    trans_name = re.sub(r"[^a-zA-Z0-9_]+", "_", urllib.parse.unquote(name)).strip("_")
+    trans_name = re.sub(r"[^a-zA-Z0-9_]+", "_",
+                        urllib.parse.unquote(name)).strip("_")
     return trans_name + ext
 
 
@@ -247,7 +265,7 @@ def first_value(iterable):
     return next((item for item in iterable if item is not None), None)
 
 
-def clickable_link(text:str):
+def clickable_link(text: str):
     """Find urls starting with ftp/http/https/www with at least 3 sections,
     and make them clickable in markdown.
     e.g. https://a.b will be substituted by <https://a.b>
@@ -260,7 +278,7 @@ def clickable_link(text:str):
     """
     regexp = r'((?:(?:(?:https?|ftp):\/\/)|www)[\w/\-?=%.]+\.[\w/\-&?=%.]+)([^\w/\-&?=%.]|$)'
 
-    def repl(matchobj:re.Match):
+    def repl(matchobj: re.Match):
         rs = matchobj.group(1).rstrip(".")
         if rs:
             logger.debug(f"url found: {rs}")
